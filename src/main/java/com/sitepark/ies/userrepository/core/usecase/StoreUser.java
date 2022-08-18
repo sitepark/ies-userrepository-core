@@ -45,8 +45,8 @@ public final class StoreUser {
 
 		long id = this.repository.resolve(updateEntity.getIdentifier().get());
 
-		if (!this.accessControl.isEntityWritable(id)) {
-			throw new AccessDenied("Not allowed to update entity " + updateEntity.getIdentifier());
+		if (!this.accessControl.isUserWritable(id)) {
+			throw new AccessDenied("Not allowed to update user " + updateEntity.getIdentifier());
 		}
 
 		this.repository.store(updateEntity);

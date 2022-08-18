@@ -18,12 +18,12 @@ public final class PurgeUser {
 		this.accessControl = accessControl;
 	}
 
-	public void purgeEntity(long id) {
+	public void purgeUser(long id) {
 
-		if (!this.accessControl.isEntityRemovable(id)) {
-			throw new AccessDenied("Not allowed to remove entity " + id);
+		if (!this.accessControl.isUserRemovable(id)) {
+			throw new AccessDenied("Not allowed to remove user " + id);
 		}
 
-		this.repository.removeEntity(id);
+		this.repository.removeUser(id);
 	}
 }

@@ -18,13 +18,13 @@ class PurgeEntityTest {
 	void testAccessDenied() {
 
 		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isEntityRemovable(anyLong())).thenReturn(false);
+		when(accessControl.isUserRemovable(anyLong())).thenReturn(false);
 
 		var purgeEntity = new PurgeUser(
 				null,
 				accessControl);
 		assertThrows(AccessDenied.class, () -> {
-			purgeEntity.purgeEntity(10L);
+			purgeEntity.purgeUser(10L);
 		});
 	}
 
@@ -33,15 +33,15 @@ class PurgeEntityTest {
 	void testPurge() {
 
 		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isEntityRemovable(anyLong())).thenReturn(true);
+		when(accessControl.isUserRemovable(anyLong())).thenReturn(true);
 
 		UserRepository repository = mock(UserRepository.class);
 
 		PurgeUser purgeEntity = new PurgeUser(
 				repository,
 				accessControl);
-		purgeEntity.purgeEntity(10L);
+		purgeEntity.purgeUser(10L);
 
-		verify(repository).removeEntity(10L);
+		verify(repository).removeUser(10L);
 	}
 }
