@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 
 class PurgeEntityTest {
@@ -18,10 +19,12 @@ class PurgeEntityTest {
 	void testAccessDenied() {
 
 		AccessControl accessControl = mock(AccessControl.class);
+		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 		when(accessControl.isUserRemovable(anyLong())).thenReturn(false);
 
 		var purgeEntity = new PurgeUser(
 				null,
+				extensionsNotifier,
 				accessControl);
 		assertThrows(AccessDenied.class, () -> {
 			purgeEntity.purgeUser(10L);
@@ -34,14 +37,17 @@ class PurgeEntityTest {
 
 		AccessControl accessControl = mock(AccessControl.class);
 		when(accessControl.isUserRemovable(anyLong())).thenReturn(true);
+		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
 		UserRepository repository = mock(UserRepository.class);
 
 		PurgeUser purgeEntity = new PurgeUser(
 				repository,
+				extensionsNotifier,
 				accessControl);
 		purgeEntity.purgeUser(10L);
 
 		verify(repository).removeUser(10L);
+		verify(extensionsNotifier).notifyPurge(10L);
 	}
 }
