@@ -14,7 +14,8 @@ public final class PurgeUser {
 	private final AccessControl accessControl;
 
 	@Inject
-	protected PurgeUser(UserRepository repository,
+	protected PurgeUser(
+			UserRepository repository,
 			ExtensionsNotifier extensionsNotifier,
 			AccessControl accessControl) {
 
@@ -29,7 +30,7 @@ public final class PurgeUser {
 			throw new AccessDenied("Not allowed to remove user " + id);
 		}
 
-		this.repository.removeUser(id);
+		this.repository.remove(id);
 
 		this.extensionsNotifier.notifyPurge(id);
 	}

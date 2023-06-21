@@ -13,7 +13,7 @@ import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 
-class PurgeEntityTest {
+class PurgeUserTest {
 
 	@Test
 	void testAccessDenied() {
@@ -47,7 +47,7 @@ class PurgeEntityTest {
 				accessControl);
 		purgeEntity.purgeUser(10L);
 
-		verify(repository).removeUser(10L);
+		verify(repository).remove(10L);
 		verify(extensionsNotifier).notifyPurge(10L);
 	}
 }
