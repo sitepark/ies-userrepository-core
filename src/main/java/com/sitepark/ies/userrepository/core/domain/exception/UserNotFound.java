@@ -1,11 +1,12 @@
 package com.sitepark.ies.userrepository.core.domain.exception;
 
-public class GroupNotEmpty extends UserRepositoryException {
+public class UserNotFound extends UserRepositoryException {
+
 	private static final long serialVersionUID = 1L;
 
 	private final long id;
 
-	public GroupNotEmpty(long id) {
+	public UserNotFound(long id) {
 		super();
 		this.id = id;
 	}
@@ -16,7 +17,6 @@ public class GroupNotEmpty extends UserRepositoryException {
 
 	@Override
 	public String getMessage() {
-		return "Group with id " + this.id + " not empty";
+		return "User with id " + this.id + " not found";
 	}
-
 }
