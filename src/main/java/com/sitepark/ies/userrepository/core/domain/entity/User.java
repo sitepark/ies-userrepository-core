@@ -111,6 +111,7 @@ public final class User {
 		hash = (this.login != null) ? 31 * hash + this.login.hashCode() : hash;
 		hash = (this.firstname != null) ? 31 * hash + this.firstname.hashCode() : hash;
 		hash = (this.lastname != null) ? 31 * hash + this.lastname.hashCode() : hash;
+		hash = (this.ldapIdentity != null) ? 31 * hash + this.ldapIdentity.hashCode() : hash;
 		hash = (this.note != null) ? 31 * hash + this.note.hashCode() : hash;
 		hash = (this.roleList != null) ? 31 * hash + this.roleList.hashCode() : hash;
 
@@ -137,6 +138,8 @@ public final class User {
 		} else if (!Objects.equals(this.lastname, entity.lastname)) {
 			return false;
 		} else if (!Objects.equals(this.note, entity.note)) {
+			return false;
+		} else if (!Objects.equals(this.ldapIdentity, entity.ldapIdentity)) {
 			return false;
 		} else if (!Objects.equals(this.roleList, entity.roleList)) {
 			return false;
