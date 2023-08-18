@@ -119,6 +119,10 @@ public final class User {
 	}
 
 	@Override
+	@SuppressWarnings({
+		"PMD.CyclomaticComplexity",
+		"PMD.NPathComplexity"
+	})
 	public final boolean equals(Object o) {
 
 		if (!(o instanceof User)) {

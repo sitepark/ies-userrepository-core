@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 @JsonDeserialize(builder = LdapIdentity.Builder.class)
-public class LdapIdentity {
+public final class LdapIdentity {
 
 	private final int server;
 

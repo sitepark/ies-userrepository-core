@@ -18,7 +18,10 @@ import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+@SuppressWarnings({
+	"PMD.AvoidDuplicateLiterals",
+	"PMD.TooManyMethods"
+})
 class UserTest {
 
 	@Test

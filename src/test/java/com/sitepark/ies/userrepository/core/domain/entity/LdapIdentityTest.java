@@ -15,6 +15,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 class LdapIdentityTest {
 
+	private static final String USER_DN = "userdn";
+
 	@Test
 	@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 	void testEquals() {
@@ -26,7 +28,7 @@ class LdapIdentityTest {
 	void testSetServer() throws JsonProcessingException {
 		LdapIdentity ldapIdentity = LdapIdentity.builder()
 				.server(2)
-				.dn("userdn")
+				.dn(USER_DN)
 				.build();
 		assertEquals(2, ldapIdentity.getServer(), "unexpected server");
 	}
@@ -55,7 +57,7 @@ class LdapIdentityTest {
 	void testMissingServer() throws JsonProcessingException {
 		assertThrows(AssertionError.class, () -> {
 			LdapIdentity.builder()
-			.dn("userdn")
+			.dn(USER_DN)
 			.build();
 		});
 	}
@@ -73,9 +75,9 @@ class LdapIdentityTest {
 	void testSetDn() throws JsonProcessingException {
 		LdapIdentity ldapIdentity = LdapIdentity.builder()
 				.server(2)
-				.dn("userdn")
+				.dn(USER_DN)
 				.build();
-		assertEquals("userdn", ldapIdentity.getDn(), "unexpected server");
+		assertEquals(USER_DN, ldapIdentity.getDn(), "unexpected server");
 	}
 
 	@Test
@@ -87,7 +89,7 @@ class LdapIdentityTest {
 
 		LdapIdentity ldapIdentity = LdapIdentity.builder()
 				.server(2)
-				.dn("userdn")
+				.dn(USER_DN)
 				.build();
 
 		String json = mapper.writeValueAsString(ldapIdentity);
@@ -111,7 +113,7 @@ class LdapIdentityTest {
 
 		LdapIdentity expected = LdapIdentity.builder()
 				.server(2)
-				.dn("userdn")
+				.dn(USER_DN)
 				.build();
 
 		assertEquals(expected, ldapIdentity, "unexpected ldapIdentity");
@@ -123,13 +125,13 @@ class LdapIdentityTest {
 
 		LdapIdentity ldapIdentity = LdapIdentity.builder()
 				.server(2)
-				.dn("userdn")
+				.dn(USER_DN)
 				.build();
 
 		LdapIdentity changedLdapIdentity = ldapIdentity.toBuilder()
 				.build();
 
 		assertEquals(2, changedLdapIdentity.getServer(), "unexpected server");
-		assertEquals("userdn", changedLdapIdentity.getDn(), "dn");
+		assertEquals(USER_DN, changedLdapIdentity.getDn(), "dn");
 	}
 }
