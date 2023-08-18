@@ -28,6 +28,8 @@ public final class User {
 
 	private final String note;
 
+	private final LdapIdentity ldapIdentity;
+
 	private final List<Role> roleList;
 
 	protected User(Builder builder) {
@@ -37,6 +39,7 @@ public final class User {
 		this.firstname = builder.firstname;
 		this.lastname = builder.lastname;
 		this.note = builder.note;
+		this.ldapIdentity = builder.ldapIdentity;
 		this.roleList = Collections.unmodifiableList(builder.roleList);
 	}
 
@@ -83,6 +86,10 @@ public final class User {
 		return Optional.ofNullable(this.note);
 	}
 
+	public Optional<LdapIdentity> getLdapIdentity() {
+		return Optional.ofNullable(this.ldapIdentity);
+	}
+
 	@SuppressFBWarnings("EI_EXPOSE_REP")
 	public List<Role> getRoleList() {
 		return this.roleList;
@@ -104,6 +111,7 @@ public final class User {
 		hash = (this.login != null) ? 31 * hash + this.login.hashCode() : hash;
 		hash = (this.firstname != null) ? 31 * hash + this.firstname.hashCode() : hash;
 		hash = (this.lastname != null) ? 31 * hash + this.lastname.hashCode() : hash;
+		hash = (this.ldapIdentity != null) ? 31 * hash + this.ldapIdentity.hashCode() : hash;
 		hash = (this.note != null) ? 31 * hash + this.note.hashCode() : hash;
 		hash = (this.roleList != null) ? 31 * hash + this.roleList.hashCode() : hash;
 
@@ -111,6 +119,10 @@ public final class User {
 	}
 
 	@Override
+	@SuppressWarnings({
+		"PMD.CyclomaticComplexity",
+		"PMD.NPathComplexity"
+	})
 	public final boolean equals(Object o) {
 
 		if (!(o instanceof User)) {
@@ -130,6 +142,8 @@ public final class User {
 		} else if (!Objects.equals(this.lastname, entity.lastname)) {
 			return false;
 		} else if (!Objects.equals(this.note, entity.note)) {
+			return false;
+		} else if (!Objects.equals(this.ldapIdentity, entity.ldapIdentity)) {
 			return false;
 		} else if (!Objects.equals(this.roleList, entity.roleList)) {
 			return false;
@@ -169,6 +183,8 @@ public final class User {
 
 		private String note;
 
+		private LdapIdentity ldapIdentity;
+
 		private final List<Role> roleList = new ArrayList<>();
 
 		protected Builder() {
@@ -181,6 +197,7 @@ public final class User {
 			this.firstname = user.firstname;
 			this.lastname = user.lastname;
 			this.note = user.note;
+			this.ldapIdentity = user.ldapIdentity;
 			this.roleList.addAll(user.roleList);
 		}
 
@@ -217,6 +234,19 @@ public final class User {
 
 		public Builder note(String note) {
 			this.note = this.trimToNull(note);
+			return this;
+		}
+
+		public Builder ldapIdentity(LdapIdentity.Builder ldapIdentity) {
+			assert ldapIdentity != null : "ldapIdentity is null";
+			this.ldapIdentity = ldapIdentity.build();
+			return this;
+		}
+
+		@JsonSetter
+		public Builder ldapIdentity(LdapIdentity ldapIdentity) {
+			assert ldapIdentity != null : "ldapIdentity is null";
+			this.ldapIdentity = ldapIdentity;
 			return this;
 		}
 

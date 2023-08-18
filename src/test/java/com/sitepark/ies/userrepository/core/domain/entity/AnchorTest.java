@@ -43,7 +43,7 @@ class AnchorTest {
 
 	@Test
 	void testValidateOnlyDigits() {
-		InvalidAnchor thrown = assertThrows(InvalidAnchor.class,() -> {
+		InvalidAnchor thrown = assertThrows(InvalidAnchor.class, () -> {
 			Anchor.ofString("1234556789012345");
 		});
 		assertEquals("1234556789012345", thrown.getName(), "unexpected name");
@@ -51,7 +51,7 @@ class AnchorTest {
 
 	@Test
 	void testValidateInvalidChars() {
-		InvalidAnchor thrown = assertThrows(InvalidAnchor.class,() -> {
+		InvalidAnchor thrown = assertThrows(InvalidAnchor.class, () -> {
 			Anchor.ofString("a.b,c");
 		});
 		assertEquals("a.b,c", thrown.getName(), "unexpected name");
