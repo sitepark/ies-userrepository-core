@@ -28,6 +28,8 @@ public final class User {
 
 	private final String note;
 
+	private final LdapIdentity ldapIdentity;
+
 	private final List<Role> roleList;
 
 	protected User(Builder builder) {
@@ -37,6 +39,7 @@ public final class User {
 		this.firstname = builder.firstname;
 		this.lastname = builder.lastname;
 		this.note = builder.note;
+		this.ldapIdentity = builder.ldapIdentity;
 		this.roleList = Collections.unmodifiableList(builder.roleList);
 	}
 
@@ -81,6 +84,10 @@ public final class User {
 
 	public Optional<String> getNote() {
 		return Optional.ofNullable(this.note);
+	}
+
+	public Optional<LdapIdentity> getLdapIdentity() {
+		return Optional.ofNullable(this.ldapIdentity);
 	}
 
 	@SuppressFBWarnings("EI_EXPOSE_REP")
@@ -169,6 +176,8 @@ public final class User {
 
 		private String note;
 
+		private LdapIdentity ldapIdentity;
+
 		private final List<Role> roleList = new ArrayList<>();
 
 		protected Builder() {
@@ -181,6 +190,7 @@ public final class User {
 			this.firstname = user.firstname;
 			this.lastname = user.lastname;
 			this.note = user.note;
+			this.ldapIdentity = user.ldapIdentity;
 			this.roleList.addAll(user.roleList);
 		}
 
@@ -217,6 +227,19 @@ public final class User {
 
 		public Builder note(String note) {
 			this.note = this.trimToNull(note);
+			return this;
+		}
+
+		public Builder ldapIdentity(LdapIdentity.Builder ldapIdentity) {
+			assert ldapIdentity != null : "ldapIdentity is null";
+			this.ldapIdentity = ldapIdentity.build();
+			return this;
+		}
+
+		@JsonSetter
+		public Builder ldapIdentity(LdapIdentity ldapIdentity) {
+			assert ldapIdentity != null : "ldapIdentity is null";
+			this.ldapIdentity = ldapIdentity;
 			return this;
 		}
 

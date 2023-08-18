@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -40,6 +41,14 @@ class UserTest {
 				.firstname("Peter")
 				.lastname("Pan")
 				.login("peterpan")
+				.roleList(
+						UserLevelRoles.USER,
+						Ref.ofAnchor("test.anchor"),
+						Ref.ofId(123L))
+				.ldapIdentity(LdapIdentity.builder()
+						.server(2)
+						.dn("userdn"))
+				.note("a note")
 				.build();
 
 		String json = mapper.writeValueAsString(user);
@@ -48,7 +57,10 @@ class UserTest {
 				"\"anchor\":\"user.peterpan\"," +
 				"\"login\":\"peterpan\"," +
 				"\"firstname\":\"Peter\"," +
-				"\"lastname\":\"Pan\"}";
+				"\"lastname\":\"Pan\"," +
+				"\"note\":\"a note\"," +
+				"\"ldapIdentity\":{\"server\":2,\"dn\":\"userdn\"}," +
+				"\"roleList\":[\"USER\",\"REF(test.anchor)\",\"REF(123)\"]}";
 
 		assertEquals(expected, json, "unexpected json");
 	}
@@ -67,6 +79,8 @@ class UserTest {
 				"\"login\":\"peterpan\"," +
 				"\"firstname\":\"Peter\"," +
 				"\"lastname\":\"Pan\"," +
+				"\"note\":\"a note\"," +
+				"\"ldapIdentity\":{\"server\":2,\"dn\":\"userdn\"}," +
 				"\"roleList\":[\"USER\",\"REF(test.anchor)\",\"REF(123)\"]" +
 		"}";
 
@@ -82,6 +96,10 @@ class UserTest {
 						UserLevelRoles.USER,
 						Ref.ofAnchor("test.anchor"),
 						Ref.ofId(123L))
+				.ldapIdentity(LdapIdentity.builder()
+						.server(2)
+						.dn("userdn"))
+				.note("a note")
 				.build();
 
 		assertEquals(expected, user, "unexpected user");
@@ -162,5 +180,45 @@ class UserTest {
 				.lastname("  ")
 				.build();
 		assertTrue(user.getLastname().isEmpty(), "lastname should be empty");
+	}
+
+	@Test
+	void testSetLdapIdentity() throws JsonProcessingException {
+
+		LdapIdentity ldapIdentity = LdapIdentity.builder()
+				.server(2)
+				.dn("userdn")
+				.build();
+
+		User user = User.builder()
+				.login("test")
+				.ldapIdentity(ldapIdentity)
+				.build();
+
+		assertEquals(2, user.getLdapIdentity().get().getServer(), "unexpected ldapIdentity server");
+	}
+
+	@Test
+	void testSetLdapIdentityBuilder() throws JsonProcessingException {
+
+		User user = User.builder()
+				.login("test")
+				.ldapIdentity(LdapIdentity.builder()
+						.server(2)
+						.dn("userdn"))
+				.build();
+
+		assertEquals(2, user.getLdapIdentity().get().getServer(), "unexpected ldapIdentity server");
+	}
+
+
+	@Test
+	void testSetNullLdapIdentity() throws JsonProcessingException {
+
+		assertThrows(AssertionError.class, () -> {
+			User.builder()
+			.login("test")
+			.ldapIdentity((LdapIdentity)null);
+		});
 	}
 }

@@ -65,11 +65,11 @@ public final class UpdateUser {
 			LOGGER.info("update: {}", joinedUpdateUser);
 		}
 
-		this.repository.update(joinedUpdateUser);
-
 		this.roleAssigner.reassignRoleToUser(
 				joinedUpdateUser.getRoleList(),
 				Arrays.asList(id));
+
+		this.repository.update(joinedUpdateUser);
 
 		this.extensionsNotifier.notifyUpdated(joinedUpdateUser);
 
