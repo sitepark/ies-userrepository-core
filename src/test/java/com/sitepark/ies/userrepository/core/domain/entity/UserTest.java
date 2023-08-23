@@ -43,6 +43,8 @@ class UserTest {
 				.anchor("user.peterpan")
 				.firstname("Peter")
 				.lastname("Pan")
+				.email("peter.pan@nimmer.land")
+				.gender(GenderType.MALE)
 				.login("peterpan")
 				.roleList(
 						UserLevelRoles.USER,
@@ -61,7 +63,10 @@ class UserTest {
 				"\"login\":\"peterpan\"," +
 				"\"firstname\":\"Peter\"," +
 				"\"lastname\":\"Pan\"," +
+				"\"email\":\"peter.pan@nimmer.land\"," +
+				"\"gender\":\"MALE\"," +
 				"\"note\":\"a note\"," +
+				"\"validity\":{\"blocked\":false}," +
 				"\"ldapIdentity\":{\"server\":2,\"dn\":\"userdn\"}," +
 				"\"roleList\":[\"USER\",\"REF(test.anchor)\",\"REF(123)\"]}";
 
@@ -82,6 +87,8 @@ class UserTest {
 				"\"login\":\"peterpan\"," +
 				"\"firstname\":\"Peter\"," +
 				"\"lastname\":\"Pan\"," +
+				"\"email\":\"peter.pan@nimmer.land\"," +
+				"\"gender\":\"MALE\"," +
 				"\"note\":\"a note\"," +
 				"\"ldapIdentity\":{\"server\":2,\"dn\":\"userdn\"}," +
 				"\"roleList\":[\"USER\",\"REF(test.anchor)\",\"REF(123)\"]" +
@@ -94,6 +101,8 @@ class UserTest {
 				.anchor("user.peterpan")
 				.firstname("Peter")
 				.lastname("Pan")
+				.email("peter.pan@nimmer.land")
+				.gender(GenderType.MALE)
 				.login("peterpan")
 				.roleList(
 						UserLevelRoles.USER,
@@ -185,6 +194,61 @@ class UserTest {
 		assertTrue(user.getLastname().isEmpty(), "lastname should be empty");
 	}
 
+
+	@Test
+	void testSetEmail() throws JsonProcessingException {
+		User user = User.builder()
+				.login("test")
+				.email("peter.pan@nimmer.land")
+				.build();
+		assertEquals("peter.pan@nimmer.land", user.getEmail().get(), "unexpected lastname");
+	}
+
+	@Test
+	void testSetEmailWithNull() throws JsonProcessingException {
+		User user = User.builder()
+				.login("test")
+				.email(null)
+				.build();
+		assertTrue(user.getEmail().isEmpty(), "email should be empty");
+	}
+
+	@Test
+	void testSetEmailWithBlank() throws JsonProcessingException {
+		User user = User.builder()
+				.login("test")
+				.email("  ")
+				.build();
+		assertTrue(user.getEmail().isEmpty(), "email should be empty");
+	}
+
+	@Test
+	void testDefaultGender() throws JsonProcessingException {
+		User user = User.builder()
+				.login("test")
+				.build();
+		assertEquals(GenderType.UNKNOWN, user.getGender(), "unexpected gender");
+	}
+
+	@Test
+	void testSetGender() throws JsonProcessingException {
+		User user = User.builder()
+				.login("test")
+				.gender(GenderType.MALE)
+				.build();
+		assertEquals(GenderType.MALE, user.getGender(), "unexpected gender");
+	}
+
+	@Test
+	void testSetGenderWithNull() throws JsonProcessingException {
+		assertThrows(AssertionError.class, () -> {
+			User.builder()
+				.login("test")
+				.gender(null)
+				.build();
+		});
+	}
+
 	@Test
 	void testSetLdapIdentity() throws JsonProcessingException {
 
@@ -224,4 +288,42 @@ class UserTest {
 			.ldapIdentity((LdapIdentity)null);
 		});
 	}
+
+	@Test
+	void testSetValiditiy() throws JsonProcessingException {
+
+		User user = User.builder()
+				.login("test")
+				.validity(UserValidity.builder()
+						.blocked(true)
+						.build()
+				)
+				.build();
+
+		assertTrue(user.getValidity().isBlocked(), "user should be blocked");
+	}
+
+
+	@Test
+	void testSetValiditiyBuilder() throws JsonProcessingException {
+
+		User user = User.builder()
+				.login("test")
+				.validity(UserValidity.builder()
+						.blocked(true)
+				)
+				.build();
+
+		assertTrue(user.getValidity().isBlocked(), "user should be blocked");
+	}
+
+	@Test
+	void testSetNullValiditiy() throws JsonProcessingException {
+		assertThrows(AssertionError.class, () -> {
+			User.builder()
+					.login("test")
+					.validity((UserValidity)null);
+		});
+	}
+
 }

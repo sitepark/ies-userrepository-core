@@ -26,7 +26,13 @@ public final class User {
 
 	private final String lastname;
 
+	private final String email;
+
+	private final GenderType gender;
+
 	private final String note;
+
+	private final UserValidity validity;
 
 	private final LdapIdentity ldapIdentity;
 
@@ -38,7 +44,10 @@ public final class User {
 		this.login = builder.login;
 		this.firstname = builder.firstname;
 		this.lastname = builder.lastname;
+		this.email = builder.email;
+		this.gender = builder.gender;
 		this.note = builder.note;
+		this.validity = builder.validity;
 		this.ldapIdentity = builder.ldapIdentity;
 		this.roleList = Collections.unmodifiableList(builder.roleList);
 	}
@@ -82,8 +91,20 @@ public final class User {
 		return Optional.ofNullable(this.lastname);
 	}
 
+	public Optional<String> getEmail() {
+		return Optional.ofNullable(this.email);
+	}
+
+	public GenderType getGender() {
+		return this.gender;
+	}
+
 	public Optional<String> getNote() {
 		return Optional.ofNullable(this.note);
+	}
+
+	public UserValidity getValidity() {
+		return this.validity;
 	}
 
 	public Optional<LdapIdentity> getLdapIdentity() {
@@ -105,17 +126,18 @@ public final class User {
 
 	@Override
 	public final int hashCode() {
-
-		int hash = Long.hashCode(this.id);
-		hash = (this.anchor != null) ? 31 * hash + this.anchor.hashCode() : hash;
-		hash = (this.login != null) ? 31 * hash + this.login.hashCode() : hash;
-		hash = (this.firstname != null) ? 31 * hash + this.firstname.hashCode() : hash;
-		hash = (this.lastname != null) ? 31 * hash + this.lastname.hashCode() : hash;
-		hash = (this.ldapIdentity != null) ? 31 * hash + this.ldapIdentity.hashCode() : hash;
-		hash = (this.note != null) ? 31 * hash + this.note.hashCode() : hash;
-		hash = (this.roleList != null) ? 31 * hash + this.roleList.hashCode() : hash;
-
-		return hash;
+		return Objects.hash(
+				this.id,
+				this.anchor,
+				this.login,
+				this.firstname,
+				this.lastname,
+				this.email,
+				this.gender,
+				this.validity,
+				this.ldapIdentity,
+				this.note,
+				this.roleList);
 	}
 
 	@Override
@@ -141,7 +163,13 @@ public final class User {
 			return false;
 		} else if (!Objects.equals(this.lastname, entity.lastname)) {
 			return false;
+		} else if (!Objects.equals(this.email, entity.email)) {
+			return false;
+		} else if (!Objects.equals(this.gender, entity.gender)) {
+			return false;
 		} else if (!Objects.equals(this.note, entity.note)) {
+			return false;
+		} else if (!Objects.equals(this.validity, entity.validity)) {
 			return false;
 		} else if (!Objects.equals(this.ldapIdentity, entity.ldapIdentity)) {
 			return false;
@@ -181,7 +209,13 @@ public final class User {
 
 		private String lastname;
 
+		private String email;
+
+		private GenderType gender = GenderType.UNKNOWN;
+
 		private String note;
+
+		private UserValidity validity = UserValidity.ALWAYS_VALID;
 
 		private LdapIdentity ldapIdentity;
 
@@ -196,7 +230,10 @@ public final class User {
 			this.login = user.login;
 			this.firstname = user.firstname;
 			this.lastname = user.lastname;
+			this.email = user.email;
+			this.gender = user.gender;
 			this.note = user.note;
+			this.validity = user.validity;
 			this.ldapIdentity = user.ldapIdentity;
 			this.roleList.addAll(user.roleList);
 		}
@@ -232,8 +269,32 @@ public final class User {
 			return this;
 		}
 
+		public Builder email(String email) {
+			this.email = this.trimToNull(email);
+			return this;
+		}
+
+		public Builder gender(GenderType gender) {
+			assert gender != null : "gender is null";
+			this.gender = gender;
+			return this;
+		}
+
 		public Builder note(String note) {
 			this.note = this.trimToNull(note);
+			return this;
+		}
+
+		public Builder validity(UserValidity.Builder validity) {
+			assert validity != null : "validity is null";
+			this.validity = validity.build();
+			return this;
+		}
+
+		@JsonSetter
+		public Builder validity(UserValidity validity) {
+			assert validity != null : "validity is null";
+			this.validity = validity;
 			return this;
 		}
 
