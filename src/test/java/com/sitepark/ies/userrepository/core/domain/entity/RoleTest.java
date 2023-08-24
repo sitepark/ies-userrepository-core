@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +22,29 @@ class RoleTest {
 	}
 
 	@Test
-	void testCreate() {
+	void testOfName() {
 		Role role = Role.ofName(TEST_ROLE_NAME);
 		assertEquals(TEST_ROLE_NAME, role.getName(), "unexprected name");
+	}
+
+	@Test
+	void testOfNameWithNull() {
+		assertThrows(AssertionError.class, () -> {
+			Role.ofName(null);
+		});
+	}
+
+	@Test
+	void testOfNameWithBlank() {
+		assertThrows(AssertionError.class, () -> {
+			Role.ofName(" ");
+		});
+	}
+
+	@Test
+	void testToString() {
+		Role role = Role.ofName(TEST_ROLE_NAME);
+		assertEquals(TEST_ROLE_NAME, role.toString(), "unexprected string representation");
 	}
 
 	@Test

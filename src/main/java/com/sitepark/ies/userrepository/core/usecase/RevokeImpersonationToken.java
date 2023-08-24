@@ -1,0 +1,40 @@
+package com.sitepark.ies.userrepository.core.usecase;
+
+import javax.inject.Inject;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
+import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
+
+public class RevokeImpersonationToken {
+
+	private final AccessTokenRepository repository;
+
+	private final AccessControl accessControl;
+
+	private static Logger LOGGER = LogManager.getLogger();
+
+	@Inject
+	protected RevokeImpersonationToken(
+			AccessTokenRepository repository,
+			AccessControl accessControl) {
+		this.repository = repository;
+		this.accessControl = accessControl;
+	}
+
+	public void revokeImpersonationToken(long user, long id) {
+
+		if (!this.accessControl.isImpersonationTokensManageable()) {
+			throw new AccessDenied("Not allowed manage impersonation tokens");
+		}
+
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("revoke impersonation token: {}/{}", user, id);
+		}
+
+		this.repository.revoke(user, id);
+	}
+}

@@ -58,6 +58,18 @@ class AnchorTest {
 	}
 
 	@Test
+	void testToString() {
+		Anchor anchor = Anchor.ofString("a.b.c");
+		assertEquals("a.b.c", anchor.toString(), "unexpected string representation");
+	}
+
+	@Test
+	void testEmptyAnchorToString() {
+		Anchor anchor = Anchor.EMPTY;
+		assertEquals("EMPTY", anchor.toString(), "unexpected string representation");
+	}
+
+	@Test
 	void testSerialize() throws JsonProcessingException {
 
 		ObjectMapper mapper = new ObjectMapper();
