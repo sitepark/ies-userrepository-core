@@ -7,12 +7,15 @@ import org.apache.logging.log4j.Logger;
 
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 
 public final class PurgeUser {
 
 	private final UserRepository repository;
+
+	private final AccessTokenRepository accessTokenRepository;
 
 	private final ExtensionsNotifier extensionsNotifier;
 
@@ -24,11 +27,13 @@ public final class PurgeUser {
 	protected PurgeUser(
 			UserRepository repository,
 			ExtensionsNotifier extensionsNotifier,
-			AccessControl accessControl) {
+			AccessControl accessControl,
+			AccessTokenRepository accessTokenRepository) {
 
 		this.repository = repository;
 		this.extensionsNotifier = extensionsNotifier;
 		this.accessControl = accessControl;
+		this.accessTokenRepository = accessTokenRepository;
 	}
 
 	public void purgeUser(long id) {
@@ -42,6 +47,8 @@ public final class PurgeUser {
 		}
 
 		this.repository.remove(id);
+
+		this.accessTokenRepository.purgeByUser(id);
 
 		this.extensionsNotifier.notifyPurge(id);
 	}

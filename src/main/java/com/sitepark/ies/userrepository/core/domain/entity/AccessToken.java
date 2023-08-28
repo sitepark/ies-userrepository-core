@@ -30,7 +30,7 @@ public final class AccessToken {
 
 	private final OffsetDateTime lastUsed;
 
-	private final List<String> scopes;
+	private final List<String> scopeList;
 
 	private final boolean impersonation;
 
@@ -46,7 +46,7 @@ public final class AccessToken {
 		this.createdAt = builder.createdAt;
 		this.expiresAt = builder.expiresAt;
 		this.lastUsed = builder.lastUsed;
-		this.scopes = Collections.unmodifiableList(builder.scopes);
+		this.scopeList = Collections.unmodifiableList(builder.scopeList);
 		this.impersonation = builder.impersonation;
 		this.active = builder.active;
 		this.revoked = builder.revoked;
@@ -85,8 +85,8 @@ public final class AccessToken {
 	}
 
 	@SuppressFBWarnings("EI_EXPOSE_REP")
-	public List<String> getScopes() {
-		return this.scopes;
+	public List<String> getScopeList() {
+		return this.scopeList;
 	}
 
 	public boolean isImpersonation() {
@@ -119,7 +119,7 @@ public final class AccessToken {
 				this.createdAt,
 				this.expiresAt,
 				this.lastUsed,
-				this.scopes,
+				this.scopeList,
 				this.impersonation,
 				this.active,
 				this.revoked);
@@ -152,7 +152,7 @@ public final class AccessToken {
 			return false;
 		} else if (!Objects.equals(this.lastUsed, accessToken.lastUsed)) {
 			return false;
-		} else if (!Objects.equals(this.scopes, accessToken.scopes)) {
+		} else if (!Objects.equals(this.scopeList, accessToken.scopeList)) {
 			return false;
 		} else if (!Objects.equals(this.impersonation, accessToken.impersonation)) {
 			return false;
@@ -183,7 +183,7 @@ public final class AccessToken {
 
 		private OffsetDateTime lastUsed;
 
-		private final List<String> scopes = new ArrayList<>();
+		private final List<String> scopeList = new ArrayList<>();
 
 		private boolean impersonation;
 
@@ -202,7 +202,7 @@ public final class AccessToken {
 			this.createdAt = accessToken.createdAt;
 			this.expiresAt = accessToken.expiresAt;
 			this.lastUsed = accessToken.lastUsed;
-			this.scopes.addAll(accessToken.scopes);
+			this.scopeList.addAll(accessToken.scopeList);
 			this.impersonation = accessToken.impersonation;
 			this.active = accessToken.active;
 			this.revoked = accessToken.revoked;
@@ -253,19 +253,19 @@ public final class AccessToken {
 		}
 
 		@JsonSetter
-		public Builder scopes(List<String> scopes) {
-			assert scopes != null : "scopes is null";
-			this.scopes.clear();
-			for (String scope : scopes) {
+		public Builder scopeList(List<String> scopeList) {
+			assert scopeList != null : "scopeList is null";
+			this.scopeList.clear();
+			for (String scope : scopeList) {
 				this.scope(scope);
 			}
 			return this;
 		}
 
-		public Builder scopes(String... scopes) {
-			assert scopes != null : "scopes is null";
-			this.scopes.clear();
-			for (String scope : scopes) {
+		public Builder scopeList(String... scopeList) {
+			assert scopeList != null : "scopeList is null";
+			this.scopeList.clear();
+			for (String scope : scopeList) {
 				this.scope(scope);
 			}
 			return this;
@@ -274,7 +274,7 @@ public final class AccessToken {
 		public Builder scope(String scope) {
 			assert scope != null : "scope is null";
 			assert !scope.isBlank() : "scope is blank";
-			this.scopes.add(scope);
+			this.scopeList.add(scope);
 			return this;
 		}
 

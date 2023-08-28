@@ -197,90 +197,90 @@ class AccessTokenTest {
 
 	@Test
 	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
-	void testSetScopesViaList() throws JsonProcessingException {
+	void testSetScopeListViaList() throws JsonProcessingException {
 		AccessToken accessToken = this.createBuilderWithRequiredValues()
-				.scopes(Arrays.asList("a", "b"))
+				.scopeList(Arrays.asList("a", "b"))
 				.build();
 
-		assertEquals(Arrays.asList("a", "b"), accessToken.getScopes(), "unexpected scopes");
+		assertEquals(Arrays.asList("a", "b"), accessToken.getScopeList(), "unexpected scopeList");
 	}
 
 	@Test
-	void testSetNullScopesViaList() throws JsonProcessingException {
+	void testSetNullScopeListViaList() throws JsonProcessingException {
 		assertThrows(AssertionError.class, () -> {
-			AccessToken.builder().scopes((List<String>)null);
+			AccessToken.builder().scopeList((List<String>)null);
 		});
 	}
 
 	@Test
 	void testSetNullScopeViaList() throws JsonProcessingException {
 		assertThrows(AssertionError.class, () -> {
-			AccessToken.builder().scopes(Arrays.asList("a", null));
+			AccessToken.builder().scopeList(Arrays.asList("a", null));
 		});
 	}
 
 	@Test
-	void testSetBlankScopesViaList() throws JsonProcessingException {
+	void testSetBlankScopeListViaList() throws JsonProcessingException {
 		assertThrows(AssertionError.class, () -> {
-			AccessToken.builder().scopes(Arrays.asList("a", " "));
+			AccessToken.builder().scopeList(Arrays.asList("a", " "));
 		});
 	}
 
 	@Test
 	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
-	void testOverwriteScopesViaList() throws JsonProcessingException {
+	void testOverwriteScopeListViaList() throws JsonProcessingException {
 		AccessToken accessToken = this.createBuilderWithRequiredValues()
-				.scopes(Arrays.asList("a", "b"))
+				.scopeList(Arrays.asList("a", "b"))
 				.build();
 
 		AccessToken overwritten = accessToken.toBuilder()
-				.scopes(Arrays.asList("c", "d"))
+				.scopeList(Arrays.asList("c", "d"))
 				.build();
 
-		assertEquals(Arrays.asList("c", "d"), overwritten.getScopes(), "unexpected scopes");
+		assertEquals(Arrays.asList("c", "d"), overwritten.getScopeList(), "unexpected scopeList");
 	}
 
 	@Test
 	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
-	void testSetScopesViaVArgs() throws JsonProcessingException {
+	void testSetScopeListViaVArgs() throws JsonProcessingException {
 		AccessToken accessToken = this.createBuilderWithRequiredValues()
-				.scopes("a", "b")
+				.scopeList("a", "b")
 				.build();
 
-		assertEquals(Arrays.asList("a", "b"), accessToken.getScopes(), "unexpected scopes");
+		assertEquals(Arrays.asList("a", "b"), accessToken.getScopeList(), "unexpected scopeList");
 	}
 
 	@Test
 	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
-	void testOverwriteScopesViaVArgs() throws JsonProcessingException {
+	void testOverwriteScopeListViaVArgs() throws JsonProcessingException {
 		AccessToken accessToken = this.createBuilderWithRequiredValues()
-				.scopes("a", "b")
+				.scopeList("a", "b")
 				.build();
 		AccessToken overwritten = accessToken.toBuilder()
-				.scopes("c", "d")
+				.scopeList("c", "d")
 				.build();
 
-		assertEquals(Arrays.asList("c", "d"), overwritten.getScopes(), "unexpected scopes");
+		assertEquals(Arrays.asList("c", "d"), overwritten.getScopeList(), "unexpected scopeList");
 	}
 
 	@Test
-	void testSetNullScopesViaVArgs() throws JsonProcessingException {
+	void testSetNullScopeListViaVArgs() throws JsonProcessingException {
 		assertThrows(AssertionError.class, () -> {
-			AccessToken.builder().scopes((String[])null);
+			AccessToken.builder().scopeList((String[])null);
 		});
 	}
 
 	@Test
 	void testSetNullScopeViaVArgs() throws JsonProcessingException {
 		assertThrows(AssertionError.class, () -> {
-			AccessToken.builder().scopes("a", null);
+			AccessToken.builder().scopeList("a", null);
 		});
 	}
 
 	@Test
 	void testSetBlankScopeViaVArgs() throws JsonProcessingException {
 		assertThrows(AssertionError.class, () -> {
-			AccessToken.builder().scopes("a", " ");
+			AccessToken.builder().scopeList("a", " ");
 		});
 	}
 
@@ -288,14 +288,14 @@ class AccessTokenTest {
 	@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 	void testAddScope() throws JsonProcessingException {
 		AccessToken accessToken = this.createBuilderWithRequiredValues()
-				.scopes("a", "b")
+				.scopeList("a", "b")
 				.build();
 
 		AccessToken addition = accessToken.toBuilder()
 				.scope("c")
 				.build();
 
-		assertEquals(Arrays.asList("a", "b", "c"), addition.getScopes(), "unexpected scopes");
+		assertEquals(Arrays.asList("a", "b", "c"), addition.getScopeList(), "unexpected scopes");
 	}
 
 	@Test
