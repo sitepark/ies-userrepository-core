@@ -1,12 +1,13 @@
-package com.sitepark.ies.userrepository.core.domain.entity;
+package com.sitepark.ies.userrepository.core.domain.entity.identity;
 
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.sitepark.ies.userrepository.core.domain.entity.Identity;
 
 @JsonDeserialize(builder = LdapIdentity.Builder.class)
-public final class LdapIdentity {
+public final class LdapIdentity implements Identity {
 
 	private final int server;
 

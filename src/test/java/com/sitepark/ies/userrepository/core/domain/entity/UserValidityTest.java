@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -57,6 +58,23 @@ class UserValidityTest {
 	}
 
 	@Test
+	void testToString() throws JsonProcessingException {
+
+		OffsetDateTime validFrom = LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+		OffsetDateTime validTo = LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+
+		UserValidity userValidity = UserValidity.builder()
+				.blocked(false)
+				.validFrom(validFrom)
+				.validTo(validTo)
+				.build();
+
+		String expecated = "blocked: false, validFrom: 2023-08-21T00:00+02:00, validTo: 2023-08-21T00:00+02:00";
+
+		assertEquals(expecated, userValidity.toString(), "unexpected string representation");
+	}
+
+	@Test
 	void testAlwaysValid() throws JsonProcessingException {
 
 		UserValidity userValidity = UserValidity.ALWAYS_VALID;
@@ -74,6 +92,25 @@ class UserValidityTest {
 				.build();
 
 		assertTrue(userValidity.isNowValid(), "validity should be valid");
+	}
+
+	@Test
+	void testIsValidWithNullBase() throws JsonProcessingException {
+		assertThrows(AssertionError.class, () -> {
+			UserValidity.ALWAYS_VALID.isValid(null);
+		});
+	}
+
+	@Test
+	void testIsValidBlocked() throws JsonProcessingException {
+
+		UserValidity userValidity = UserValidity.builder()
+				.blocked(true)
+				.build();
+
+		OffsetDateTime base = LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+
+		assertFalse(userValidity.isValid(base), "validity should't be valid");
 	}
 
 	@Test
@@ -148,6 +185,13 @@ class UserValidityTest {
 	}
 
 	@Test
+	void testSetValidFromToNull() throws JsonProcessingException {
+		assertThrows(AssertionError.class, () -> {
+			UserValidity.builder().validFrom(null);
+		});
+	}
+
+	@Test
 	void testSetValidTo() throws JsonProcessingException {
 
 		OffsetDateTime validTo = LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -161,6 +205,12 @@ class UserValidityTest {
 		assertEquals(validTo, userValidity.getValidTo().get(), "unexpected validTo");
 	}
 
+	@Test
+	void testSetValidToToNull() throws JsonProcessingException {
+		assertThrows(AssertionError.class, () -> {
+			UserValidity.builder().validTo(null);
+		});
+	}
 
 	@Test
 	void testSerialize() throws JsonProcessingException {

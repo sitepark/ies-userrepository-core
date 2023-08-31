@@ -65,7 +65,7 @@ public final class CreateUser {
 		User userWithId = newUser.toBuilder().id(generatedId).build();
 
 		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("create: {}", userWithId);
+			LOGGER.info("create user: {}", userWithId);
 		}
 
 		this.repository.create(userWithId);

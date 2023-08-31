@@ -17,11 +17,7 @@ public class UserValidity {
 
 	private final OffsetDateTime validTo;
 
-	public static final UserValidity ALWAYS_VALID = new UserValidity();
-
-	public UserValidity() {
-		this(UserValidity.builder().blocked(false));
-	}
+	public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
 
 	protected UserValidity(Builder builder) {
 		this.blocked = builder.blocked;

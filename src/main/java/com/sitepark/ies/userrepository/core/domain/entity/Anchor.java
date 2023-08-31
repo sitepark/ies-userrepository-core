@@ -51,9 +51,6 @@ public final class Anchor implements Serializable {
 	 * @throws InvalidAnchor
 	 */
 	private static void validate(String name) {
-		if (name == null) {
-			return;
-		}
 
 		if (ONLY_NUMBERS_PATTERN.matcher(name).matches()) {
 			throw new InvalidAnchor(name, "Anchor must not only consist of numbers");

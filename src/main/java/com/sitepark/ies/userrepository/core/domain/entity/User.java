@@ -34,7 +34,7 @@ public final class User {
 
 	private final UserValidity validity;
 
-	private final LdapIdentity ldapIdentity;
+	private final List<Identity> identityList;
 
 	private final List<Role> roleList;
 
@@ -48,7 +48,7 @@ public final class User {
 		this.gender = builder.gender;
 		this.note = builder.note;
 		this.validity = builder.validity;
-		this.ldapIdentity = builder.ldapIdentity;
+		this.identityList = builder.identityList;
 		this.roleList = Collections.unmodifiableList(builder.roleList);
 	}
 
@@ -107,8 +107,18 @@ public final class User {
 		return this.validity;
 	}
 
-	public Optional<LdapIdentity> getLdapIdentity() {
-		return Optional.ofNullable(this.ldapIdentity);
+	@SuppressFBWarnings("EI_EXPOSE_REP")
+	public List<Identity> getIdentityList() {
+		return this.identityList;
+	}
+
+	public <T extends Identity> Optional<T> getIdentity(Class<T> type) {
+		for (Identity identity : this.identityList) {
+			if (type.isInstance(identity)) {
+				return Optional.of(type.cast(identity));
+			}
+		}
+		return Optional.empty();
 	}
 
 	@SuppressFBWarnings("EI_EXPOSE_REP")
@@ -135,7 +145,7 @@ public final class User {
 				this.email,
 				this.gender,
 				this.validity,
-				this.ldapIdentity,
+				this.identityList,
 				this.note,
 				this.roleList);
 	}
@@ -171,7 +181,7 @@ public final class User {
 			return false;
 		} else if (!Objects.equals(this.validity, entity.validity)) {
 			return false;
-		} else if (!Objects.equals(this.ldapIdentity, entity.ldapIdentity)) {
+		} else if (!Objects.equals(this.identityList, entity.identityList)) {
 			return false;
 		} else if (!Objects.equals(this.roleList, entity.roleList)) {
 			return false;
@@ -217,7 +227,7 @@ public final class User {
 
 		private UserValidity validity = UserValidity.ALWAYS_VALID;
 
-		private LdapIdentity ldapIdentity;
+		private final List<Identity> identityList = new ArrayList<>();
 
 		private final List<Role> roleList = new ArrayList<>();
 
@@ -234,7 +244,7 @@ public final class User {
 			this.gender = user.gender;
 			this.note = user.note;
 			this.validity = user.validity;
-			this.ldapIdentity = user.ldapIdentity;
+			this.identityList.addAll(user.identityList);
 			this.roleList.addAll(user.roleList);
 		}
 
@@ -298,39 +308,54 @@ public final class User {
 			return this;
 		}
 
-		public Builder ldapIdentity(LdapIdentity.Builder ldapIdentity) {
-			assert ldapIdentity != null : "ldapIdentity is null";
-			this.ldapIdentity = ldapIdentity.build();
+		@JsonSetter
+		public Builder identityList(List<Identity> identityList) {
+			assert identityList != null : "identityList is null";
+			this.identityList.clear();
+			for (Identity identity : identityList) {
+				this.identity(identity);
+			}
 			return this;
 		}
 
-		@JsonSetter
-		public Builder ldapIdentity(LdapIdentity ldapIdentity) {
-			assert ldapIdentity != null : "ldapIdentity is null";
-			this.ldapIdentity = ldapIdentity;
+		public Builder identityList(Identity... identityList) {
+			assert identityList != null : "identityList is null";
+			this.identityList.clear();
+			for (Identity identity : identityList) {
+				this.identity(identity);
+			}
+			return this;
+		}
+
+		public Builder identity(Identity identity) {
+			assert identity != null : "identity is null";
+			this.identityList.add(identity);
 			return this;
 		}
 
 		@JsonSetter
 		public Builder roleList(Role... roleList) {
 			assert roleList != null : "roleList is null";
+			this.roleList.clear();
 			for (Role role : roleList) {
-				this.addRole(role);
+				this.role(role);
 			}
 			return this;
 		}
 
 		public Builder roleList(List<Role> roleList) {
 			assert roleList != null : "roleList is null";
+			this.roleList.clear();
 			for (Role role : roleList) {
-				this.addRole(role);
+				this.role(role);
 			}
 			return this;
 		}
 
-		private void addRole(Role role) {
+		public Builder role(Role role) {
 			assert role != null : "role is null";
 			this.roleList.add(role);
+			return this;
 		}
 
 		public User build() {

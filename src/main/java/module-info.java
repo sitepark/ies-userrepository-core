@@ -1,5 +1,6 @@
 module com.sitepark.ies.userrepository.core {
 	exports com.sitepark.ies.userrepository.core.domain.entity;
+	exports com.sitepark.ies.userrepository.core.domain.entity.identity;
 	exports com.sitepark.ies.userrepository.core.domain.entity.role;
 	exports com.sitepark.ies.userrepository.core.domain.exception;
 	exports com.sitepark.ies.userrepository.core.port;
@@ -15,5 +16,6 @@ module com.sitepark.ies.userrepository.core {
 
 	opens com.sitepark.ies.userrepository.core.domain.entity;
 	opens com.sitepark.ies.userrepository.core.domain.entity.role;
+	opens com.sitepark.ies.userrepository.core.domain.entity.identity;
 
 }
