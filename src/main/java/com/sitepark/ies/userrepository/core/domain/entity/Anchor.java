@@ -11,7 +11,7 @@ public final class Anchor implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String VALID_CHARS_REGEX = "[a-zA-Z0-9.\\-]+";
+	public static final String VALID_CHARS_REGEX = "[a-zA-Z0-9_.\\-]+";
 
 	private static final Pattern VALIDATOR_PATTERN = Pattern.compile(VALID_CHARS_REGEX);
 
