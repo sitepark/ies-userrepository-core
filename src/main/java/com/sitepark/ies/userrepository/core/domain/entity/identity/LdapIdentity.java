@@ -6,6 +6,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.Identity;
 
+/**
+ * The <code>LdapIdentity</code> class represents an identity provider using
+ * LDAP for user authentication. It facilitates user authentication and access
+ * control using LDAP credentials.
+ */
 @JsonDeserialize(builder = LdapIdentity.Builder.class)
 public final class LdapIdentity implements Identity {
 
@@ -73,21 +78,30 @@ public final class LdapIdentity implements Identity {
 		}
 
 		public Builder server(int server) {
-			assert server > 0 : "server lower then 1: " + server;
+			if (server <= 0) {
+				throw new IllegalArgumentException("server should be greater then 0");
+			}
 			this.server = server;
 			return this;
 		}
 
 		public Builder dn(String dn) {
-			assert dn != null : "dn is null";
-			assert !dn.isBlank() : "dn is blank";
+			Objects.requireNonNull(dn, "dn is null");
+			if (dn.isBlank()) {
+				throw new IllegalArgumentException("dn should not be blank");
+			}
 			this.dn = dn;
 			return this;
 		}
 
 		public LdapIdentity build() {
-			assert this.server > 0 : "server not set";
-			assert this.dn != null : "dn not set";
+
+			if (this.server == 0) {
+				throw new IllegalStateException("server is not set");
+			}
+			if (this.dn == null) {
+				throw new IllegalStateException("dn is not set");
+			}
 			return new LdapIdentity(this);
 		}
 	}

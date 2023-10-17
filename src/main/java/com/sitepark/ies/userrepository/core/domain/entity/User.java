@@ -13,6 +13,9 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * Represents user
+ */
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
@@ -249,7 +252,9 @@ public final class User {
 		}
 
 		public Builder id(long id) {
-			assert id > 0 : "id must be greater than 0";
+			if (id <= 0) {
+				throw new IllegalArgumentException("id should be greater than 0");
+			}
 			this.id = id;
 			return this;
 		}
@@ -285,7 +290,7 @@ public final class User {
 		}
 
 		public Builder gender(GenderType gender) {
-			assert gender != null : "gender is null";
+			Objects.requireNonNull(gender, "gender is null");
 			this.gender = gender;
 			return this;
 		}
@@ -296,21 +301,21 @@ public final class User {
 		}
 
 		public Builder validity(UserValidity.Builder validity) {
-			assert validity != null : "validity is null";
+			Objects.requireNonNull(validity, "validity is null");
 			this.validity = validity.build();
 			return this;
 		}
 
 		@JsonSetter
 		public Builder validity(UserValidity validity) {
-			assert validity != null : "validity is null";
+			Objects.requireNonNull(validity, "validity is null");
 			this.validity = validity;
 			return this;
 		}
 
 		@JsonSetter
 		public Builder identityList(List<Identity> identityList) {
-			assert identityList != null : "identityList is null";
+			Objects.requireNonNull(identityList, "identityList is null");
 			this.identityList.clear();
 			for (Identity identity : identityList) {
 				this.identity(identity);
@@ -319,7 +324,7 @@ public final class User {
 		}
 
 		public Builder identityList(Identity... identityList) {
-			assert identityList != null : "identityList is null";
+			Objects.requireNonNull(identityList, "identityList is null");
 			this.identityList.clear();
 			for (Identity identity : identityList) {
 				this.identity(identity);
@@ -328,14 +333,14 @@ public final class User {
 		}
 
 		public Builder identity(Identity identity) {
-			assert identity != null : "identity is null";
+			Objects.requireNonNull(identity, "identity is null");
 			this.identityList.add(identity);
 			return this;
 		}
 
 		@JsonSetter
 		public Builder roleList(Role... roleList) {
-			assert roleList != null : "roleList is null";
+			Objects.requireNonNull(roleList, "roleList is null");
 			this.roleList.clear();
 			for (Role role : roleList) {
 				this.role(role);
@@ -344,7 +349,7 @@ public final class User {
 		}
 
 		public Builder roleList(List<Role> roleList) {
-			assert roleList != null : "roleList is null";
+			Objects.requireNonNull(roleList, "roleList is null");
 			this.roleList.clear();
 			for (Role role : roleList) {
 				this.role(role);
@@ -353,13 +358,15 @@ public final class User {
 		}
 
 		public Builder role(Role role) {
-			assert role != null : "role is null";
+			Objects.requireNonNull(role, "role is null");
 			this.roleList.add(role);
 			return this;
 		}
 
 		public User build() {
-			assert this.login != null : "login not set";
+			if (this.login == null) {
+				throw new IllegalStateException("login is not set");
+			}
 			return new User(this);
 		}
 

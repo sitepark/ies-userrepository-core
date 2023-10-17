@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 class RoleTest {
@@ -28,15 +29,16 @@ class RoleTest {
 	}
 
 	@Test
+	@SuppressFBWarnings("NP_NULL_PARAM_DEREF_NONVIRTUAL")
 	void testOfNameWithNull() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Role.ofName(null);
 		});
 	}
 
 	@Test
 	void testOfNameWithBlank() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			Role.ofName(" ");
 		});
 	}

@@ -6,15 +6,25 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.sitepark.ies.userrepository.core.domain.entity.role.RoleDeserializer;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+/**
+ * Defines user roles to manage permissions and access control
+ * based on the provided role name, allowing for custom role
+ * definitions in the application logic.
+ */
 @JsonDeserialize(using = RoleDeserializer.class)
 public class Role {
 
 	@JsonValue
 	private final String name;
 
+	@SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
 	protected Role(String name) {
-		assert name != null : "name is null";
-		assert !name.isBlank() : "name is blank";
+		Objects.requireNonNull(name, "name is null");
+		if (name.isBlank()) {
+			throw new IllegalArgumentException("name is blank");
+		}
 		this.name = name;
 	}
 

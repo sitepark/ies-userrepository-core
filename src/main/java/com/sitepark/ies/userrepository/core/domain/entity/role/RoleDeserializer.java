@@ -8,6 +8,14 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 
+/**
+ * The <code>RoleDeserializer</code> is a custom Jackson deserializer responsible for
+ * handling special deserialization cases, particularly for {@link Ref} objects.
+ * It ensures proper deserialization of JSON data, including the handling of  {@link Ref}
+ * references within the context of roles.
+ *
+ * @see Ref
+ */
 public class RoleDeserializer extends StdDeserializer<Role> {
 
 	private static final long serialVersionUID = 1L;

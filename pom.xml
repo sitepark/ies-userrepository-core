@@ -16,7 +16,7 @@
 
 	<properties>
 		<junit.version>5.10.0</junit.version>
-		<spotbugs.version>4.7.3</spotbugs.version>
+		<spotbugs.version>4.8.0</spotbugs.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>11</maven.compiler.release>
 	</properties>
@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>com.github.spotbugs</groupId>
 			<artifactId>spotbugs-annotations</artifactId>
-			<version>4.8.0</version>
+			<version>${spotbugs.version}</version>
 			<optional>true</optional>
 		</dependency>
 
@@ -219,7 +219,7 @@
 				<version>3.3.0</version>
 				<configuration>
 					<configLocation>checkstyle.xml</configLocation>
-					<encoding>UTF-8</encoding>
+					<inputEncoding>UTF-8</inputEncoding>
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<linkXRef>false</linkXRef>

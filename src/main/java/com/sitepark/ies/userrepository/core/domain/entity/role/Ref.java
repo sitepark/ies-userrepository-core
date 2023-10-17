@@ -1,10 +1,16 @@
 package com.sitepark.ies.userrepository.core.domain.entity.role;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 
+/**
+ * Represents a role that references a group,
+ * allowing for the assignment of various
+ * permissions within the context of the group.
+ */
 public final class Ref extends Role {
 
 	private final long id;
@@ -19,7 +25,7 @@ public final class Ref extends Role {
 	 */
 	@SuppressWarnings("PMD.NullAssignment")
 	protected Ref() {
-		super(null);
+		super("NONE");
 		this.id = 0L;
 		this.anchor = null;
 	}
@@ -28,14 +34,16 @@ public final class Ref extends Role {
 	@SuppressWarnings("PMD.NullAssignment")
 	private Ref(long id) {
 		super("REF(" + id + ")");
-		assert id > 0 : "id must be greater than 0";
+		if (id <= 0) {
+			throw new IllegalArgumentException("id must be greater than 0");
+		}
 		this.id = id;
 		this.anchor = null;
 	}
 
 	private Ref(Anchor anchor) {
 		super("REF(" + anchor + ")");
-		assert anchor != null : "anchor is null";
+		Objects.requireNonNull(anchor, "anchor is null");
 		this.id = 0;
 		this.anchor = anchor;
 	}
@@ -49,7 +57,7 @@ public final class Ref extends Role {
 	}
 
 	public static Ref ofAnchor(String anchor) {
-		assert anchor != null : "anchor is null";
+		Objects.requireNonNull(anchor, "anchor is null");
 		return new Ref(Anchor.ofString(anchor));
 	}
 

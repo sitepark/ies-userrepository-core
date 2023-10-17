@@ -96,7 +96,7 @@ class UserValidityTest {
 
 	@Test
 	void testIsValidWithNullBase() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			UserValidity.ALWAYS_VALID.isValid(null);
 		});
 	}
@@ -186,7 +186,7 @@ class UserValidityTest {
 
 	@Test
 	void testSetValidFromToNull() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			UserValidity.builder().validFrom(null);
 		});
 	}
@@ -207,7 +207,7 @@ class UserValidityTest {
 
 	@Test
 	void testSetValidToToNull() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			UserValidity.builder().validTo(null);
 		});
 	}

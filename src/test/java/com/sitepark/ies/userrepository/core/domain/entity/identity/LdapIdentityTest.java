@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.sitepark.ies.userrepository.core.domain.entity.identity.LdapIdentity;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
@@ -37,37 +36,28 @@ class LdapIdentityTest {
 
 	@Test
 	void testSetInvalidServer() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
-			LdapIdentity.builder()
-			.server(0)
-			.dn("userdn")
-			.build();
+		assertThrows(IllegalArgumentException.class, () -> {
+			LdapIdentity.builder().server(0);
 		});
 	}
 
 	@Test
 	void testSetNullDn() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
-			LdapIdentity.builder()
-			.server(1)
-			.dn(null)
-			.build();
+		assertThrows(NullPointerException.class, () -> {
+			LdapIdentity.builder().dn(null);
 		});
 	}
 
 	@Test
 	void testSetBlankdDn() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
-			LdapIdentity.builder()
-			.server(1)
-			.dn(" ")
-			.build();
+		assertThrows(IllegalArgumentException.class, () -> {
+			LdapIdentity.builder().dn(" ");
 		});
 	}
 
 	@Test
 	void testMissingServer() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			LdapIdentity.builder()
 			.dn(USER_DN)
 			.build();
@@ -76,7 +66,7 @@ class LdapIdentityTest {
 
 	@Test
 	void testMissingDn() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			LdapIdentity.builder()
 			.server(1)
 			.build();

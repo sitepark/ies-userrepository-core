@@ -1,5 +1,10 @@
 package com.sitepark.ies.userrepository.core.domain.exception;
 
+/**
+ * The <code>LoginAlreadyExists</code> exception is thrown when attempting to create
+ * a user with a login or username that already exists in the system, violating the
+ * uniqueness constraint for user logins.
+ */
 public class LoginAlreadyExists extends UserRepositoryException {
 
 	private static final long serialVersionUID = 1L;

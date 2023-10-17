@@ -13,6 +13,10 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * An access token enables authentication as a user
+ * without specifying a username and password.
+ */
 @JsonDeserialize(builder = AccessToken.Builder.class)
 public final class AccessToken {
 
@@ -209,52 +213,56 @@ public final class AccessToken {
 		}
 
 		public Builder id(long id) {
-			assert id > 0 : "id must be greater than 0";
+			if (id <= 0) {
+				throw new IllegalArgumentException("id should be greater than 0");
+			}
 			this.id = id;
 			return this;
 		}
 
 		public Builder user(long user) {
-			assert user > 0 : "user must be greater than 0";
+			if (user <= 0) {
+				throw new IllegalArgumentException("user should be greater than 0");
+			}
 			this.user = user;
 			return this;
 		}
 
 		public Builder name(String name) {
-			assert name != null : "name is null";
-			assert !name.isBlank() : "name is blank";
+			Objects.requireNonNull(name, "name is null");
+			this.requireNonBlank(name, "name is blank");
 			this.name = name;
 			return this;
 		}
 
 		public Builder token(String token) {
-			assert token != null : "token is null";
-			assert !token.isBlank() : "token is blank";
+			Objects.requireNonNull(token, "token is null");
+			this.requireNonBlank(token, "token is blank");
 			this.token = token;
 			return this;
 		}
 
 		public Builder createdAt(OffsetDateTime createdAt) {
-			assert createdAt != null : "createdAt is null";
+			Objects.requireNonNull(createdAt, "createdAt is null");
 			this.createdAt = createdAt;
 			return this;
 		}
 
 		public Builder expiresAt(OffsetDateTime expiresAt) {
-			assert expiresAt != null : "expiresAt is null";
+			Objects.requireNonNull(expiresAt, "expiresAt is null");
 			this.expiresAt = expiresAt;
 			return this;
 		}
 
 		public Builder lastUsed(OffsetDateTime lastUsed) {
-			assert lastUsed != null : "lastUsed is null";
+			Objects.requireNonNull(lastUsed, "lastUsed is null");
 			this.lastUsed = lastUsed;
 			return this;
 		}
 
 		@JsonSetter
 		public Builder scopeList(List<String> scopeList) {
-			assert scopeList != null : "scopeList is null";
+			Objects.requireNonNull(scopeList, "scopeList is null");
 			this.scopeList.clear();
 			for (String scope : scopeList) {
 				this.scope(scope);
@@ -263,7 +271,7 @@ public final class AccessToken {
 		}
 
 		public Builder scopeList(String... scopeList) {
-			assert scopeList != null : "scopeList is null";
+			Objects.requireNonNull(scopeList, "scopeList is null");
 			this.scopeList.clear();
 			for (String scope : scopeList) {
 				this.scope(scope);
@@ -272,8 +280,8 @@ public final class AccessToken {
 		}
 
 		public Builder scope(String scope) {
-			assert scope != null : "scope is null";
-			assert !scope.isBlank() : "scope is blank";
+			Objects.requireNonNull(scope, "scope is null");
+			this.requireNonBlank(scope, "scope is blank");
 			this.scopeList.add(scope);
 			return this;
 		}
@@ -295,11 +303,20 @@ public final class AccessToken {
 
 		public AccessToken build() {
 
-			assert user > 0 : "user not set";
-			assert name != null : "name not set";
+			if (this.user == 0) {
+				throw new IllegalStateException("user is not set");
+			}
+			if (this.name == null) {
+				throw new IllegalStateException("name is not set");
+			}
 
 			return new AccessToken(this);
 		}
 
+		private void requireNonBlank(String s, String message) {
+			if (s.isBlank()) {
+				throw new IllegalArgumentException(message);
+			}
+		}
 	}
 }

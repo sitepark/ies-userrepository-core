@@ -1,3 +1,7 @@
+/**
+ * This module contains the essential business logic
+ * and data structures, of the user repository.
+ */
 module com.sitepark.ies.userrepository.core {
 	exports com.sitepark.ies.userrepository.core.domain.entity;
 	exports com.sitepark.ies.userrepository.core.domain.entity.identity;

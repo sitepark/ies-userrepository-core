@@ -42,7 +42,7 @@ class UserTest {
 
 	@Test
 	void testBuildWithoutLogin() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			User.builder().build();
 		});
 	}
@@ -72,7 +72,7 @@ class UserTest {
 
 	@Test
 	void testSetInvalidId() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			User.builder().id(0);
 		});
 	}
@@ -236,14 +236,14 @@ class UserTest {
 
 	@Test
 	void testSetNullRoleListAsList() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList((List<Role>)null);
 		});
 	}
 
 	@Test
 	void testSetNullRoleInList() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList(Arrays.asList(Ref.ofId(345L), null));
 		});
 	}
@@ -269,14 +269,14 @@ class UserTest {
 
 	@Test
 	void testSetNullRoleListAsVArgs() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList((Role[])null);
 		});
 	}
 
 	@Test
 	void testSetNullRoleInVArgs() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList(Ref.ofId(345L), null);
 		});
 	}
@@ -305,7 +305,7 @@ class UserTest {
 
 	@Test
 	void testSetNullRole() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().role(null);
 		});
 	}
@@ -335,14 +335,14 @@ class UserTest {
 
 	@Test
 	void testSetNullIdentityListAsList() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList((List<Identity>)null);
 		});
 	}
 
 	@Test
 	void testSetNullIdentityInList() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList(Arrays.asList(TEST_IDENTITY, null));
 		});
 	}
@@ -372,14 +372,14 @@ class UserTest {
 
 	@Test
 	void testSetNullIdentityListAsVArgs() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList((Identity[])null);
 		});
 	}
 
 	@Test
 	void testSetNullIdentityInVArgs() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList(TEST_IDENTITY, null);
 		});
 	}
@@ -414,7 +414,7 @@ class UserTest {
 
 	@Test
 	void testSetNullIdentity() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().identity(null);
 		});
 	}
@@ -453,7 +453,7 @@ class UserTest {
 
 	@Test
 	void testSetGenderWithNull() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().gender(null);
 		});
 	}
@@ -485,14 +485,14 @@ class UserTest {
 
 	@Test
 	void testSetNullValiditiy() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().validity((UserValidity)null);
 		});
 	}
 
 	@Test
 	void testSetNullValiditiyBuilder() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			User.builder().validity((UserValidity.Builder)null);
 		});
 	}

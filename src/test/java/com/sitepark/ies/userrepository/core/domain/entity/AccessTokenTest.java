@@ -48,7 +48,7 @@ class AccessTokenTest {
 
 	@Test
 	void testSetInvalidUser() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().user(0);
 		});
 	}
@@ -64,21 +64,21 @@ class AccessTokenTest {
 
 	@Test
 	void testSetNullName() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().name(null);
 		});
 	}
 
 	@Test
 	void testSetBlankName() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().name(" ");
 		});
 	}
 
 	@Test
 	void testBuildUserNotSet() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			AccessToken.builder()
 				.name(TOKEN_NAME)
 				.build();
@@ -87,7 +87,7 @@ class AccessTokenTest {
 
 	@Test
 	void testBuildNameNotSet() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalStateException.class, () -> {
 			AccessToken.builder()
 				.user(123)
 				.build();
@@ -111,7 +111,7 @@ class AccessTokenTest {
 
 	@Test
 	void testSetInvalidId() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().id(0);
 		});
 	}
@@ -126,14 +126,14 @@ class AccessTokenTest {
 
 	@Test
 	void testSetNullToken() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().token(null);
 		});
 	}
 
 	@Test
 	void testSetBlankToken() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().token(" ");
 		});
 	}
@@ -152,7 +152,7 @@ class AccessTokenTest {
 
 	@Test
 	void testSetNullCreatedAt() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().createdAt(null);
 		});
 	}
@@ -171,7 +171,7 @@ class AccessTokenTest {
 
 	@Test
 	void testSetNullExpiresAt() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().expiresAt(null);
 		});
 	}
@@ -190,7 +190,7 @@ class AccessTokenTest {
 
 	@Test
 	void testSetNullLastUsed() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().lastUsed(null);
 		});
 	}
@@ -207,21 +207,21 @@ class AccessTokenTest {
 
 	@Test
 	void testSetNullScopeListViaList() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().scopeList((List<String>)null);
 		});
 	}
 
 	@Test
 	void testSetNullScopeViaList() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().scopeList(Arrays.asList("a", null));
 		});
 	}
 
 	@Test
 	void testSetBlankScopeListViaList() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().scopeList(Arrays.asList("a", " "));
 		});
 	}
@@ -265,21 +265,21 @@ class AccessTokenTest {
 
 	@Test
 	void testSetNullScopeListViaVArgs() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().scopeList((String[])null);
 		});
 	}
 
 	@Test
 	void testSetNullScopeViaVArgs() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			AccessToken.builder().scopeList("a", null);
 		});
 	}
 
 	@Test
 	void testSetBlankScopeViaVArgs() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().scopeList("a", " ");
 		});
 	}
@@ -300,7 +300,7 @@ class AccessTokenTest {
 
 	@Test
 	void testAddNullScope() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			this.createBuilderWithRequiredValues()
 					.scope(null);
 		});
@@ -308,7 +308,7 @@ class AccessTokenTest {
 
 	@Test
 	void testAddBlankScope() throws JsonProcessingException {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().scope(" ");
 		});
 	}

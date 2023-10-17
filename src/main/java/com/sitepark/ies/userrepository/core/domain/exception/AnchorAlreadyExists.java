@@ -2,6 +2,10 @@ package com.sitepark.ies.userrepository.core.domain.exception;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
 
+/**
+ * The <code>AnchorAlreadyExists</code> exception is thrown when attempting to create
+ * a new anchor that already exists, violating the uniqueness constraint for anchors.
+ */
 public class AnchorAlreadyExists extends UserRepositoryException {
 
 	private static final long serialVersionUID = 1L;

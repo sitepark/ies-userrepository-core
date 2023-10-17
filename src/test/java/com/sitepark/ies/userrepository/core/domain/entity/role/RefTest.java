@@ -45,21 +45,21 @@ class RefTest {
 	@Test
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testNullAnchorRef() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Ref.ofAnchor((Anchor)null);
 		});
 	}
 
 	@Test
 	void testNullAnchorStringRef() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(NullPointerException.class, () -> {
 			Ref.ofAnchor((String)null);
 		});
 	}
 
 	@Test
 	void testNullIdRef() {
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			Ref.ofId(0);
 		});
 	}
@@ -74,10 +74,8 @@ class RefTest {
 	}
 
 	@Test
-	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testWorkarroundConstructor() {
-		assertThrows(AssertionError.class, () -> {
-			new Ref();
-		});
+		Ref ref = new Ref();
+		assertEquals("NONE", ref.getName(), "unexpected role name");
 	}
 }

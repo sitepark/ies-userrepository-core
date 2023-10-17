@@ -8,6 +8,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+/**
+ * Encapsulates user properties indicating whether a user
+ * is blocked or has a limited validity period.
+ */
 @JsonDeserialize(builder = UserValidity.Builder.class)
 public class UserValidity {
 
@@ -41,7 +45,7 @@ public class UserValidity {
 	@SuppressWarnings("PMD.SimplifyBooleanReturns")
 	public boolean isValid(OffsetDateTime base) {
 
-		assert base != null : "base is null";
+		Objects.requireNonNull(base, "base is null");
 
 		if (this.blocked) {
 			return false;
@@ -140,13 +144,13 @@ public class UserValidity {
 		}
 
 		public Builder validFrom(OffsetDateTime validFrom) {
-			assert validFrom != null : "validFrom is null";
+			Objects.requireNonNull(validFrom, "validFrom is null");
 			this.validFrom = validFrom;
 			return this;
 		}
 
 		public Builder validTo(OffsetDateTime validTo) {
-			assert validTo != null : "validTo is null";
+			Objects.requireNonNull(validTo, "validTo is null");
 			this.validTo = validTo;
 			return this;
 		}

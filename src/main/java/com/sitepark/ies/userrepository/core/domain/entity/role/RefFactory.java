@@ -5,6 +5,14 @@ import java.util.regex.Pattern;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
 
+/**
+ * The <code>RefFactory</code> class is responsible for creating {@link Ref} objects,
+ * which can reference a group using either an {@link Anchor} or an ID as a reference.
+ * This factory intelligently determines whether the given string represents an Anchor
+ * or an ID and creates the corresponding {@link Ref} object accordingly.
+ *
+ * @see Ref
+ */
 public class RefFactory implements RoleFactory {
 
 	private static final long serialVersionUID = 1L;
