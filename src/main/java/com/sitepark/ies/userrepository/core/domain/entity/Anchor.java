@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchorException;
 
 /**
- * <p>
- * An "anchor" in the IES system is an additional optional field that
+ * <p>An "anchor" in the IES system is an additional optional field that
  * serves as an alternative identifier.
  * This identifier, like an ID, is unique. An anchor may only use
  * the following characters:
+ * </p>
  * <ul>
  * <li><code>A-Z</code></li>
  * <li><code>a-z</code></li>
@@ -21,19 +21,18 @@ import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchorExcept
  * <li><code>-</code> (minus)</li>
  * <li><code>.</code> (dot)</li>
  * </ul>
- * </p>
+ *
  * <p>
  * An anchor can be assigned for each user or content entity. Anchors can be
  * changed or transferred to other entities. However, they must always be unique.
  * </p>
- * <p>
+ *
  * For anchor there are several use cases:
  * <ul>
  * <li>Foreign key mapping for data imports from external systems</li>
  * <li>Id mappings for data imports from other IES installations</li>
  * <li>As coded reference application logic or search queries</li>
  * </ul>
- * </p>
  */
 public final class Anchor implements Serializable {
 

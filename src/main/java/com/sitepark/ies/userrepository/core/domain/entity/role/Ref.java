@@ -20,8 +20,8 @@ public final class Ref extends Role {
 	/**
 	 * For object mapping with myBatis an objectfactory is used.
 	 * However, this only takes effect if a default constructor exists.
-	 * @See https://github.com/mybatis/mybatis-3/blob/mybatis-3.5.13/
-	 *	src/main/java/org/apache/ibatis/executor/resultset/DefaultResultSetHandler.java#L682
+	 * @see <a href="https://github.com/mybatis/mybatis-3/blob/mybatis-3.5.13/src/main/java/org/apache/ibatis/executor/resultset/DefaultResultSetHandler.java#L682">DefaultResultSetHandler.java</a>
+	 *
 	 */
 	@SuppressWarnings("PMD.NullAssignment")
 	protected Ref() {
