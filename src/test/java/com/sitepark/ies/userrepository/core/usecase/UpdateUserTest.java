@@ -17,10 +17,10 @@ import org.junit.jupiter.api.Test;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFound;
-import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExists;
-import com.sitepark.ies.userrepository.core.domain.exception.UserNotFound;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
+import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
+import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -46,7 +46,7 @@ class UpdateUserTest {
 				null,
 				accessControl,
 				extensionsNotifier);
-		assertThrows(AccessDenied.class, () -> {
+		assertThrows(AccessDeniedException.class, () -> {
 			updateUserUseCase.updateUser(user);
 		});
 
@@ -92,7 +92,7 @@ class UpdateUserTest {
 				.login("test")
 				.build();
 
-		UserNotFound thrown = assertThrows(UserNotFound.class, () -> {
+		UserNotFoundException thrown = assertThrows(UserNotFoundException.class, () -> {
 			updateUserUseCase.updateUser(user);
 		});
 
@@ -131,7 +131,7 @@ class UpdateUserTest {
 				.login("test2")
 				.build();
 
-		LoginAlreadyExists thrown = assertThrows(LoginAlreadyExists.class, () -> {
+		LoginAlreadyExistsException thrown = assertThrows(LoginAlreadyExistsException.class, () -> {
 			updateUserUseCase.updateUser(user);
 		});
 
@@ -388,7 +388,7 @@ class UpdateUserTest {
 				.anchor("user.test2")
 				.build();
 
-		AnchorNotFound thrown = assertThrows(AnchorNotFound.class, () -> {
+		AnchorNotFoundException thrown = assertThrows(AnchorNotFoundException.class, () -> {
 			updateUserUseCase.updateUser(user);
 		});
 

@@ -6,8 +6,8 @@ import javax.inject.Inject;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
-import com.sitepark.ies.userrepository.core.domain.exception.UserNotFound;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -33,10 +33,10 @@ public final class GetUser {
 	public User getUser(long id) {
 
 		if (!this.accessControl.isUserReadable(id)) {
-			throw new AccessDenied("Not allowed to reat user " + id);
+			throw new AccessDeniedException("Not allowed to reat user " + id);
 		}
 
-		User user = this.repository.get(id).orElseThrow(() -> new UserNotFound(id));
+		User user = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));
 
 		List<Role> roleList = this.roleAssigner.getRolesAssignByUser(id);
 

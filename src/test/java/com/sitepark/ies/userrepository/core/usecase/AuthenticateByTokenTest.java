@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenExpired;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenNotActive;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenRevoked;
-import com.sitepark.ies.userrepository.core.domain.exception.InvalidAccessToken;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenExpiredException;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenNotActiveException;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenRevokedException;
+import com.sitepark.ies.userrepository.core.domain.exception.InvalidAccessTokenException;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 
@@ -38,7 +38,7 @@ class AuthenticateByTokenTest {
 				accessTokenRepository,
 				userRepository);
 
-		assertThrows(InvalidAccessToken.class, () -> {
+		assertThrows(InvalidAccessTokenException.class, () -> {
 			authenticateByToken.authenticateByToken(TOKEN_STRING);
 		});
 	}
@@ -61,7 +61,7 @@ class AuthenticateByTokenTest {
 				accessTokenRepository,
 				userRepository);
 
-		assertThrows(AccessTokenNotActive.class, () -> {
+		assertThrows(AccessTokenNotActiveException.class, () -> {
 			authenticateByToken.authenticateByToken(TOKEN_STRING);
 		});
 	}
@@ -84,7 +84,7 @@ class AuthenticateByTokenTest {
 				accessTokenRepository,
 				userRepository);
 
-		assertThrows(AccessTokenRevoked.class, () -> {
+		assertThrows(AccessTokenRevokedException.class, () -> {
 			authenticateByToken.authenticateByToken("abc");
 		});
 	}
@@ -109,7 +109,7 @@ class AuthenticateByTokenTest {
 				accessTokenRepository,
 				userRepository);
 
-		assertThrows(AccessTokenExpired.class, () -> {
+		assertThrows(AccessTokenExpiredException.class, () -> {
 			authenticateByToken.authenticateByToken(TOKEN_STRING);
 		});
 	}
@@ -134,7 +134,7 @@ class AuthenticateByTokenTest {
 				accessTokenRepository,
 				userRepository);
 
-		assertThrows(InvalidAccessToken.class, () -> {
+		assertThrows(InvalidAccessTokenException.class, () -> {
 			authenticateByToken.authenticateByToken(TOKEN_STRING);
 		});
 	}

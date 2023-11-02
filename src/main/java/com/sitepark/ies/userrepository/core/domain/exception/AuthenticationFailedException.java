@@ -1,18 +1,18 @@
 package com.sitepark.ies.userrepository.core.domain.exception;
 
 /**
- * The <code>AuthenticationFailed</code> exception is thrown when an authentication
+ * The <code>AuthenticationFailedException</code> exception is thrown when an authentication
  * process fails, indicating that the provided credentials are invalid or authentication
  * was unsuccessful for some reason.
  */
-public abstract class AuthenticationFailed extends UserRepositoryException {
+public abstract class AuthenticationFailedException extends UserRepositoryException {
 	private static final long serialVersionUID = 1L;
 
-	public AuthenticationFailed() {
+	public AuthenticationFailedException() {
 		super();
 	}
 
-	public AuthenticationFailed(String msg) {
+	public AuthenticationFailedException(String msg) {
 		super(msg);
 	}
 

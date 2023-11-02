@@ -11,10 +11,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFound;
-import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExists;
-import com.sitepark.ies.userrepository.core.domain.exception.UserNotFound;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
+import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
+import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -81,7 +81,7 @@ public final class UpdateUser {
 			return user;
 		} else if (user.getAnchor().isPresent()) {
 			long id = this.repository.resolveAnchor(user.getAnchor().get())
-					.orElseThrow(() -> new AnchorNotFound(user.getAnchor().get()));
+					.orElseThrow(() -> new AnchorNotFoundException(user.getAnchor().get()));
 			return user.toBuilder().id(id).build();
 		} else {
 			throw new IllegalArgumentException("For users to be updated neither an id nor an anchor is set");
@@ -90,13 +90,13 @@ public final class UpdateUser {
 
 	private void validateWritable(long id) {
 		if (!this.accessControl.isUserWritable(id)) {
-			throw new AccessDenied("Not allowed to update user " + id);
+			throw new AccessDeniedException("Not allowed to update user " + id);
 		}
 	}
 
 	private User loadStoredUser(long id) {
 		User storedUser = this.repository.get(id)
-				.orElseThrow(() -> new UserNotFound(id));
+				.orElseThrow(() -> new UserNotFoundException(id));
 
 		List<Role> roleList = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
 		return storedUser.toBuilder()
@@ -107,7 +107,7 @@ public final class UpdateUser {
 	private void validateLogin(User user) {
 		Optional<Long> resolveLogin = this.repository.resolveLogin(user.getLogin());
 		if (resolveLogin.isPresent() && !resolveLogin.equals(user.getId())) {
-			throw new LoginAlreadyExists(user.getLogin(), resolveLogin.get());
+			throw new LoginAlreadyExistsException(user.getLogin(), resolveLogin.get());
 		}
 	}
 
