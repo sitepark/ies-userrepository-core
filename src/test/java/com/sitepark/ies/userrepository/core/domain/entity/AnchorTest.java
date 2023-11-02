@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchor;
+import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchorException;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
@@ -43,7 +43,7 @@ class AnchorTest {
 
 	@Test
 	void testValidateOnlyDigits() {
-		InvalidAnchor thrown = assertThrows(InvalidAnchor.class, () -> {
+		InvalidAnchorException thrown = assertThrows(InvalidAnchorException.class, () -> {
 			Anchor.ofString("1234556789012345");
 		});
 		assertEquals("1234556789012345", thrown.getName(), "unexpected name");
@@ -51,7 +51,7 @@ class AnchorTest {
 
 	@Test
 	void testValidateInvalidChars() {
-		InvalidAnchor thrown = assertThrows(InvalidAnchor.class, () -> {
+		InvalidAnchorException thrown = assertThrows(InvalidAnchorException.class, () -> {
 			Anchor.ofString("a.b,c");
 		});
 		assertEquals("a.b,c", thrown.getName(), "unexpected name");

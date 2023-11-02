@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
@@ -29,7 +29,7 @@ class PurgeUserTest {
 				extensionsNotifier,
 				accessControl,
 				accessTokenRepository);
-		assertThrows(AccessDenied.class, () -> {
+		assertThrows(AccessDeniedException.class, () -> {
 			purgeEntity.purgeUser(10L);
 		});
 	}

@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
@@ -39,7 +39,7 @@ public final class PurgeUser {
 	public void purgeUser(long id) {
 
 		if (!this.accessControl.isUserRemovable(id)) {
-			throw new AccessDenied("Not allowed to remove user " + id);
+			throw new AccessDeniedException("Not allowed to remove user " + id);
 		}
 
 		if (LOGGER.isInfoEnabled()) {

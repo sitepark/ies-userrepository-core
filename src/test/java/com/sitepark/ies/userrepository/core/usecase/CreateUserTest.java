@@ -18,9 +18,9 @@ import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
 import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExists;
-import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExists;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExistsException;
+import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.IdGenerator;
@@ -48,7 +48,7 @@ class CreateUserTest {
 				accessControl,
 				null,
 				extensionsNotifier);
-		assertThrows(AccessDenied.class, () -> {
+		assertThrows(AccessDeniedException.class, () -> {
 			createUserUseCase.createUser(user);
 		});
 
@@ -97,7 +97,7 @@ class CreateUserTest {
 				null,
 				extensionsNotifier);
 
-		AnchorAlreadyExists thrown = assertThrows(AnchorAlreadyExists.class, () -> {
+		AnchorAlreadyExistsException thrown = assertThrows(AnchorAlreadyExistsException.class, () -> {
 			createUserUseCase.createUser(user);
 		});
 
@@ -209,7 +209,7 @@ class CreateUserTest {
 				idGenerator,
 				extensionsNotifier);
 
-		assertThrows(LoginAlreadyExists.class, () -> {
+		assertThrows(LoginAlreadyExistsException.class, () -> {
 			createUserUseCase.createUser(user);
 		});
 	}

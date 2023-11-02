@@ -7,10 +7,10 @@ import javax.inject.Inject;
 
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenExpired;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenNotActive;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenRevoked;
-import com.sitepark.ies.userrepository.core.domain.exception.InvalidAccessToken;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenExpiredException;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenNotActiveException;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenRevokedException;
+import com.sitepark.ies.userrepository.core.domain.exception.InvalidAccessTokenException;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 
@@ -32,21 +32,21 @@ public class AuthenticateByToken {
 
 		Optional<AccessToken> accessTokenOptinal = this.accessTokenRepository.getByToken(token);
 		if (accessTokenOptinal.isEmpty()) {
-			throw new InvalidAccessToken("Token not found");
+			throw new InvalidAccessTokenException("Token not found");
 		}
 
 		AccessToken accessToken = accessTokenOptinal.get();
 		if (!accessToken.isActive()) {
-			throw new AccessTokenNotActive();
+			throw new AccessTokenNotActiveException();
 		}
 		if (accessToken.isRevoked()) {
-			throw new AccessTokenRevoked();
+			throw new AccessTokenRevokedException();
 		}
 		this.checkExpirationDate(accessToken.getExpiresAt());
 
 		Optional<User> user = this.userRepository.get(accessToken.getUser());
 		if (user.isEmpty()) {
-			throw new InvalidAccessToken("User " + accessToken.getUser() + " not found");
+			throw new InvalidAccessTokenException("User " + accessToken.getUser() + " not found");
 		}
 
 		return user.get();
@@ -60,7 +60,7 @@ public class AuthenticateByToken {
 
 		OffsetDateTime now = OffsetDateTime.now();
 		if (expiredAt.get().isBefore(now)) {
-			throw new AccessTokenExpired(expiredAt.get());
+			throw new AccessTokenExpiredException(expiredAt.get());
 		}
 	}
 }

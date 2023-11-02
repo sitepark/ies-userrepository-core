@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.Test;
 
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 
@@ -28,7 +28,7 @@ class CreateImpersonationTokenTest {
 				accessTokenRepository,
 				accessControl);
 
-		assertThrows(AccessDenied.class, () -> {
+		assertThrows(AccessDeniedException.class, () -> {
 			createImpersonationToken.createPersonalAccessToken(accessToken);
 		});
 

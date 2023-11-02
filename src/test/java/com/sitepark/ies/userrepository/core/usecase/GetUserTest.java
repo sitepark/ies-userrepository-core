@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
 import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
-import com.sitepark.ies.userrepository.core.domain.exception.UserNotFound;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -35,7 +35,7 @@ class GetUserTest {
 				roleAssigner,
 				accessControl);
 
-		assertThrows(AccessDenied.class, () -> {
+		assertThrows(AccessDeniedException.class, () -> {
 			getUserUseCase.getUser(123L);
 		});
 	}
@@ -86,7 +86,7 @@ class GetUserTest {
 				roleAssigner,
 				accessControl);
 
-		assertThrows(UserNotFound.class, () -> {
+		assertThrows(UserNotFoundException.class, () -> {
 			getUserUseCase.getUser(123L);
 		});
 	}

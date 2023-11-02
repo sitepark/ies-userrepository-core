@@ -9,9 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDenied;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExists;
-import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExists;
+import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExistsException;
+import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.IdGenerator;
@@ -57,7 +57,7 @@ public final class CreateUser {
 		this.validateLogin(newUser);
 
 		if (!this.accessControl.isUserCreateable()) {
-			throw new AccessDenied("Not allowed to create user " + newUser);
+			throw new AccessDeniedException("Not allowed to create user " + newUser);
 		}
 
 		long generatedId = this.idGenerator.generate();
@@ -83,7 +83,7 @@ public final class CreateUser {
 		if (newUser.getAnchor().isPresent()) {
 			Optional<Long> anchorOwner = this.repository.resolveAnchor(newUser.getAnchor().get());
 			if (anchorOwner.isPresent()) {
-				throw new AnchorAlreadyExists(newUser.getAnchor().get(), anchorOwner.get());
+				throw new AnchorAlreadyExistsException(newUser.getAnchor().get(), anchorOwner.get());
 			}
 		}
 	}
@@ -91,7 +91,7 @@ public final class CreateUser {
 	private void validateLogin(User newUser) {
 		Optional<Long> resolveLogin = this.repository.resolveLogin(newUser.getLogin());
 		if (resolveLogin.isPresent()) {
-			throw new LoginAlreadyExists(newUser.getLogin(), resolveLogin.get());
+			throw new LoginAlreadyExistsException(newUser.getLogin(), resolveLogin.get());
 		}
 	}
 }
