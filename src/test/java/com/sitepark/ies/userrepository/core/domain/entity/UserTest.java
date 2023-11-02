@@ -41,14 +41,14 @@ class UserTest {
 	}
 
 	@Test
-	void testBuildWithoutLogin() throws JsonProcessingException {
+	void testBuildWithoutLogin() {
 		assertThrows(IllegalStateException.class, () -> {
 			User.builder().build();
 		});
 	}
 
 	@Test
-	void testSetLogin() throws JsonProcessingException {
+	void testSetLogin() {
 		User user = User.builder()
 				.login("peterpan")
 				.build();
@@ -56,7 +56,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetId() throws JsonProcessingException {
+	void testSetId() {
 		User user = this.createBuilderWithRequiredValues()
 				.id(123)
 				.build();
@@ -64,21 +64,21 @@ class UserTest {
 	}
 
 	@Test
-	void testGetEmptyId() throws JsonProcessingException {
+	void testGetEmptyId() {
 		User user = this.createBuilderWithRequiredValues()
 				.build();
 		assertTrue(user.getId().isEmpty(), "id should be empty");
 	}
 
 	@Test
-	void testSetInvalidId() throws JsonProcessingException {
+	void testSetInvalidId() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			User.builder().id(0);
-		});
+		}, "id 0 should't be allowed");
 	}
 
 	@Test
-	void testSetAnchor() throws JsonProcessingException {
+	void testSetAnchor() {
 		Anchor anchor = Anchor.ofString("user.pan.peter");
 		User user = this.createBuilderWithRequiredValues()
 				.anchor(anchor)
@@ -87,7 +87,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetAnchorString() throws JsonProcessingException {
+	void testSetAnchorString() {
 		User user = this.createBuilderWithRequiredValues()
 				.anchor("user.pan.peter")
 				.build();
@@ -96,7 +96,7 @@ class UserTest {
 
 	@Test
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
-	void testToBuilder() throws JsonProcessingException {
+	void testToBuilder() {
 		User user = User.builder()
 				.id(100560100000014842L)
 				.anchor("user.peterpan")
@@ -118,7 +118,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetFirstname() throws JsonProcessingException {
+	void testSetFirstname() {
 		User user = this.createBuilderWithRequiredValues()
 				.firstname("Peter")
 				.build();
@@ -126,7 +126,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetFirstnameWithNull() throws JsonProcessingException {
+	void testSetFirstnameWithNull() {
 		User user = this.createBuilderWithRequiredValues()
 				.firstname(null)
 				.build();
@@ -134,7 +134,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetFirstnameWithBlank() throws JsonProcessingException {
+	void testSetFirstnameWithBlank() {
 		User user = this.createBuilderWithRequiredValues()
 				.firstname("  ")
 				.build();
@@ -142,7 +142,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetLastname() throws JsonProcessingException {
+	void testSetLastname() {
 		User user = this.createBuilderWithRequiredValues()
 				.lastname("Pan")
 				.build();
@@ -150,7 +150,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetLastnameWithNull() throws JsonProcessingException {
+	void testSetLastnameWithNull() {
 		User user = this.createBuilderWithRequiredValues()
 				.lastname(null)
 				.build();
@@ -158,7 +158,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetLastnameWithBlank() throws JsonProcessingException {
+	void testSetLastnameWithBlank() {
 		User user = this.createBuilderWithRequiredValues()
 				.lastname("  ")
 				.build();
@@ -166,7 +166,7 @@ class UserTest {
 	}
 
 	@Test
-	void testGetNameOnlyLastname() throws JsonProcessingException {
+	void testGetNameOnlyLastname() {
 		User user = this.createBuilderWithRequiredValues()
 				.lastname("Pan")
 				.build();
@@ -174,7 +174,7 @@ class UserTest {
 	}
 
 	@Test
-	void testGetNameOnlyFirstname() throws JsonProcessingException {
+	void testGetNameOnlyFirstname() {
 		User user = this.createBuilderWithRequiredValues()
 				.firstname("Peter")
 				.build();
@@ -182,7 +182,7 @@ class UserTest {
 	}
 
 	@Test
-	void testGetNameFirstnameAndLastName() throws JsonProcessingException {
+	void testGetNameFirstnameAndLastName() {
 		User user = this.createBuilderWithRequiredValues()
 				.lastname("Pan")
 				.firstname("Peter")
@@ -191,7 +191,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetEmail() throws JsonProcessingException {
+	void testSetEmail() {
 		User user = this.createBuilderWithRequiredValues()
 				.email("peter.pan@nimmer.land")
 				.build();
@@ -199,7 +199,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetEmailWithNull() throws JsonProcessingException {
+	void testSetEmailWithNull() {
 		User user = this.createBuilderWithRequiredValues()
 				.email(null)
 				.build();
@@ -207,7 +207,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetEmailWithBlank() throws JsonProcessingException {
+	void testSetEmailWithBlank() {
 		User user = User.builder()
 				.login("test")
 				.email("  ")
@@ -216,7 +216,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetRoleListAsList() throws JsonProcessingException {
+	void testSetRoleListAsList() {
 		User user = this.createBuilderWithRequiredValues()
 				.roleList(Arrays.asList(Ref.ofId(123L)))
 				.build();
@@ -224,7 +224,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetOverwriteRoleListAsList() throws JsonProcessingException {
+	void testSetOverwriteRoleListAsList() {
 		User user = this.createBuilderWithRequiredValues()
 				.roleList(Arrays.asList(Ref.ofId(123L)))
 				.build();
@@ -235,21 +235,21 @@ class UserTest {
 	}
 
 	@Test
-	void testSetNullRoleListAsList() throws JsonProcessingException {
+	void testSetNullRoleListAsList() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList((List<Role>)null);
 		});
 	}
 
 	@Test
-	void testSetNullRoleInList() throws JsonProcessingException {
+	void testSetNullRoleInList() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList(Arrays.asList(Ref.ofId(345L), null));
 		});
 	}
 
 	@Test
-	void testSetRoleListAsVArgs() throws JsonProcessingException {
+	void testSetRoleListAsVArgs() {
 		User user = this.createBuilderWithRequiredValues()
 				.roleList(Ref.ofId(123L))
 				.build();
@@ -257,7 +257,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetOverwriteRoleListAsVArgs() throws JsonProcessingException {
+	void testSetOverwriteRoleListAsVArgs() {
 		User user = this.createBuilderWithRequiredValues()
 				.roleList(Ref.ofId(123L))
 				.build();
@@ -268,21 +268,21 @@ class UserTest {
 	}
 
 	@Test
-	void testSetNullRoleListAsVArgs() throws JsonProcessingException {
+	void testSetNullRoleListAsVArgs() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList((Role[])null);
 		});
 	}
 
 	@Test
-	void testSetNullRoleInVArgs() throws JsonProcessingException {
+	void testSetNullRoleInVArgs() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().roleList(Ref.ofId(345L), null);
 		});
 	}
 
 	@Test
-	void testSetRole() throws JsonProcessingException {
+	void testSetRole() {
 		User user = this.createBuilderWithRequiredValues()
 				.role(Ref.ofId(123L))
 				.build();
@@ -290,7 +290,7 @@ class UserTest {
 	}
 
 	@Test
-	void testAddRole() throws JsonProcessingException {
+	void testAddRole() {
 		User user = this.createBuilderWithRequiredValues()
 				.role(Ref.ofId(123L))
 				.build();
@@ -304,14 +304,14 @@ class UserTest {
 	}
 
 	@Test
-	void testSetNullRole() throws JsonProcessingException {
+	void testSetNullRole() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().role(null);
 		});
 	}
 
 	@Test
-	void testSetIdentityListAsList() throws JsonProcessingException {
+	void testSetIdentityListAsList() {
 		User user = this.createBuilderWithRequiredValues()
 				.identityList(Arrays.asList(TEST_IDENTITY))
 				.build();
@@ -319,7 +319,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetOverwriteIdentityListAsList() throws JsonProcessingException {
+	void testSetOverwriteIdentityListAsList() {
 		User user = this.createBuilderWithRequiredValues()
 				.identityList(Arrays.asList(TEST_IDENTITY))
 				.build();
@@ -334,21 +334,21 @@ class UserTest {
 	}
 
 	@Test
-	void testSetNullIdentityListAsList() throws JsonProcessingException {
+	void testSetNullIdentityListAsList() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList((List<Identity>)null);
 		});
 	}
 
 	@Test
-	void testSetNullIdentityInList() throws JsonProcessingException {
+	void testSetNullIdentityInList() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList(Arrays.asList(TEST_IDENTITY, null));
 		});
 	}
 
 	@Test
-	void testSetIdentityListAsVArgs() throws JsonProcessingException {
+	void testSetIdentityListAsVArgs() {
 		User user = this.createBuilderWithRequiredValues()
 				.identityList(TEST_IDENTITY)
 				.build();
@@ -356,7 +356,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetOverwriteIdentityListAsVArgs() throws JsonProcessingException {
+	void testSetOverwriteIdentityListAsVArgs() {
 		User user = this.createBuilderWithRequiredValues()
 				.identityList(TEST_IDENTITY)
 				.build();
@@ -371,21 +371,21 @@ class UserTest {
 	}
 
 	@Test
-	void testSetNullIdentityListAsVArgs() throws JsonProcessingException {
+	void testSetNullIdentityListAsVArgs() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList((Identity[])null);
 		});
 	}
 
 	@Test
-	void testSetNullIdentityInVArgs() throws JsonProcessingException {
+	void testSetNullIdentityInVArgs() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().identityList(TEST_IDENTITY, null);
 		});
 	}
 
 	@Test
-	void testSetIndentity() throws JsonProcessingException {
+	void testSetIndentity() {
 		User user = this.createBuilderWithRequiredValues()
 				.identity(TEST_IDENTITY)
 				.build();
@@ -393,7 +393,7 @@ class UserTest {
 	}
 
 	@Test
-	void testAddIdentity() throws JsonProcessingException {
+	void testAddIdentity() {
 		User user = this.createBuilderWithRequiredValues()
 				.identity(TEST_IDENTITY)
 				.build();
@@ -413,14 +413,14 @@ class UserTest {
 	}
 
 	@Test
-	void testSetNullIdentity() throws JsonProcessingException {
+	void testSetNullIdentity() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().identity(null);
 		});
 	}
 
 	@Test
-	void testGetIdentity() throws JsonProcessingException {
+	void testGetIdentity() {
 		User user = this.createBuilderWithRequiredValues()
 				.identity(TEST_IDENTITY)
 				.build();
@@ -429,7 +429,7 @@ class UserTest {
 	}
 
 	@Test
-	void testGetUnknownIdentity() throws JsonProcessingException {
+	void testGetUnknownIdentity() {
 		User user = this.createBuilderWithRequiredValues()
 				.build();
 		Optional<LdapIdentity> identity = user.getIdentity(LdapIdentity.class);
@@ -437,14 +437,14 @@ class UserTest {
 	}
 
 	@Test
-	void testDefaultGender() throws JsonProcessingException {
+	void testDefaultGender() {
 		User user = this.createBuilderWithRequiredValues()
 				.build();
 		assertEquals(GenderType.UNKNOWN, user.getGender(), "unexpected gender");
 	}
 
 	@Test
-	void testSetGender() throws JsonProcessingException {
+	void testSetGender() {
 		User user = this.createBuilderWithRequiredValues()
 				.gender(GenderType.MALE)
 				.build();
@@ -452,14 +452,14 @@ class UserTest {
 	}
 
 	@Test
-	void testSetGenderWithNull() throws JsonProcessingException {
+	void testSetGenderWithNull() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().gender(null);
 		});
 	}
 
 	@Test
-	void testSetValiditiy() throws JsonProcessingException {
+	void testSetValiditiy() {
 
 		User user = this.createBuilderWithRequiredValues()
 				.validity(UserValidity.builder()
@@ -472,7 +472,7 @@ class UserTest {
 	}
 
 	@Test
-	void testSetValiditiyBuilder() throws JsonProcessingException {
+	void testSetValiditiyBuilder() {
 
 		User user = this.createBuilderWithRequiredValues()
 				.validity(UserValidity.builder()
@@ -484,21 +484,21 @@ class UserTest {
 	}
 
 	@Test
-	void testSetNullValiditiy() throws JsonProcessingException {
+	void testSetNullValiditiy() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().validity((UserValidity)null);
 		});
 	}
 
 	@Test
-	void testSetNullValiditiyBuilder() throws JsonProcessingException {
+	void testSetNullValiditiyBuilder() {
 		assertThrows(NullPointerException.class, () -> {
 			User.builder().validity((UserValidity.Builder)null);
 		});
 	}
 
 	@Test
-	void testToString() throws JsonProcessingException {
+	void testToString() {
 		User user = User.builder()
 				.id(100560100000014842L)
 				.anchor("user.peterpan")

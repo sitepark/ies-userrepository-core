@@ -154,10 +154,6 @@ public final class User {
 	}
 
 	@Override
-	@SuppressWarnings({
-		"PMD.CyclomaticComplexity",
-		"PMD.NPathComplexity"
-	})
 	public final boolean equals(Object o) {
 
 		if (!(o instanceof User)) {
@@ -166,31 +162,18 @@ public final class User {
 
 		User entity = (User)o;
 
-		if (!Objects.equals(this.id, entity.id)) {
-			return false;
-		} else if (!Objects.equals(this.anchor, entity.anchor)) {
-			return false;
-		} else if (!Objects.equals(this.login, entity.login)) {
-			return false;
-		} else if (!Objects.equals(this.firstname, entity.firstname)) {
-			return false;
-		} else if (!Objects.equals(this.lastname, entity.lastname)) {
-			return false;
-		} else if (!Objects.equals(this.email, entity.email)) {
-			return false;
-		} else if (!Objects.equals(this.gender, entity.gender)) {
-			return false;
-		} else if (!Objects.equals(this.note, entity.note)) {
-			return false;
-		} else if (!Objects.equals(this.validity, entity.validity)) {
-			return false;
-		} else if (!Objects.equals(this.identityList, entity.identityList)) {
-			return false;
-		} else if (!Objects.equals(this.roleList, entity.roleList)) {
-			return false;
-		}
-
-		return true;
+		return
+				Objects.equals(this.id, entity.id) &&
+				Objects.equals(this.anchor, entity.anchor) &&
+				Objects.equals(this.login, entity.login) &&
+				Objects.equals(this.firstname, entity.firstname) &&
+				Objects.equals(this.lastname, entity.lastname) &&
+				Objects.equals(this.email, entity.email) &&
+				Objects.equals(this.gender, entity.gender) &&
+				Objects.equals(this.note, entity.note) &&
+				Objects.equals(this.validity, entity.validity) &&
+				Objects.equals(this.identityList, entity.identityList) &&
+				Objects.equals(this.roleList, entity.roleList);
 	}
 
 	@Override
