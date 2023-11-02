@@ -3,6 +3,7 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.List;
@@ -421,7 +422,9 @@ class UserTest {
 
 	@Test
 	void testGetIdentity() {
+		Identity otherIdentity = mock(Identity.class);
 		User user = this.createBuilderWithRequiredValues()
+				.identity(otherIdentity)
 				.identity(TEST_IDENTITY)
 				.build();
 		Optional<LdapIdentity> identity = user.getIdentity(LdapIdentity.class);

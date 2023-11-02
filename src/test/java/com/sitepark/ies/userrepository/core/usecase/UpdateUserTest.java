@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -388,10 +389,11 @@ class UpdateUserTest {
 				.anchor("user.test2")
 				.build();
 
-		AnchorNotFoundException thrown = assertThrows(AnchorNotFoundException.class, () -> {
+		AnchorNotFoundException e = assertThrows(AnchorNotFoundException.class, () -> {
 			updateUserUseCase.updateUser(user);
 		});
 
-		assertEquals(Anchor.ofString("user.test2"), thrown.getAnchor(), "unexpected anchor");
+		assertEquals(Anchor.ofString("user.test2"), e.getAnchor(), "unexpected anchor");
+		assertNotNull(e.getMessage(), "message is null");
 	}
 }

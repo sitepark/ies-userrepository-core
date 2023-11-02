@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -97,12 +98,13 @@ class CreateUserTest {
 				null,
 				extensionsNotifier);
 
-		AnchorAlreadyExistsException thrown = assertThrows(AnchorAlreadyExistsException.class, () -> {
+		AnchorAlreadyExistsException e = assertThrows(AnchorAlreadyExistsException.class, () -> {
 			createUserUseCase.createUser(user);
 		});
 
-		assertEquals(Anchor.ofString("test.user"), thrown.getAnchor(), "unexpected anchor");
-		assertEquals(123L, thrown.getOwner(), "unexpected owner");
+		assertEquals(Anchor.ofString("test.user"), e.getAnchor(), "unexpected anchor");
+		assertEquals(123L, e.getOwner(), "unexpected owner");
+		assertNotNull(e.getMessage(), "message is null");
 	}
 
 	@Test
@@ -194,7 +196,7 @@ class CreateUserTest {
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
-		when(repository.resolveLogin(anyString())).thenReturn(Optional.of(123L));
+		when(repository.resolveLogin(anyString())).thenReturn(Optional.of(345L));
 		RoleAssigner roleAssigner = mock();
 
 		User user = User.builder()
@@ -209,8 +211,11 @@ class CreateUserTest {
 				idGenerator,
 				extensionsNotifier);
 
-		assertThrows(LoginAlreadyExistsException.class, () -> {
+		LoginAlreadyExistsException e = assertThrows(LoginAlreadyExistsException.class, () -> {
 			createUserUseCase.createUser(user);
 		});
+		assertEquals("test", e.getLogin(), "unexpected login");
+		assertEquals(345L, e.getOwner(), "unexpected owner");
+		assertNotNull(e.getMessage(), "message is null");
 	}
 }

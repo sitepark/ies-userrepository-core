@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -43,18 +44,20 @@ class AnchorTest {
 
 	@Test
 	void testValidateOnlyDigits() {
-		InvalidAnchorException thrown = assertThrows(InvalidAnchorException.class, () -> {
+		InvalidAnchorException e = assertThrows(InvalidAnchorException.class, () -> {
 			Anchor.ofString("1234556789012345");
 		});
-		assertEquals("1234556789012345", thrown.getName(), "unexpected name");
+		assertEquals("1234556789012345", e.getName(), "unexpected name");
+		assertNotNull(e.getMessage(), "message is null");
 	}
 
 	@Test
 	void testValidateInvalidChars() {
-		InvalidAnchorException thrown = assertThrows(InvalidAnchorException.class, () -> {
+		InvalidAnchorException e = assertThrows(InvalidAnchorException.class, () -> {
 			Anchor.ofString("a.b,c");
 		});
-		assertEquals("a.b,c", thrown.getName(), "unexpected name");
+		assertEquals("a.b,c", e.getName(), "unexpected name");
+		assertNotNull(e.getMessage(), "message is null");
 	}
 
 	@Test

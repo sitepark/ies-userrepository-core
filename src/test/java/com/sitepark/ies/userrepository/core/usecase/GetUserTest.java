@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -86,8 +87,10 @@ class GetUserTest {
 				roleAssigner,
 				accessControl);
 
-		assertThrows(UserNotFoundException.class, () -> {
+		UserNotFoundException e = assertThrows(UserNotFoundException.class, () -> {
 			getUserUseCase.getUser(123L);
 		});
+		assertEquals(123L, e.getId(), "unexpected user");
+		assertNotNull(e.getMessage(), "message is null");
 	}
 }

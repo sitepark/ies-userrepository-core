@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -109,9 +110,11 @@ class AuthenticateByTokenTest {
 				accessTokenRepository,
 				userRepository);
 
-		assertThrows(AccessTokenExpiredException.class, () -> {
+		AccessTokenExpiredException e = assertThrows(AccessTokenExpiredException.class, () -> {
 			authenticateByToken.authenticateByToken(TOKEN_STRING);
 		});
+		assertNotNull(e.getExpiredAt(), "expiredAt expected");
+		assertNotNull(e.getMessage(), "message expected");
 	}
 
 	@Test
