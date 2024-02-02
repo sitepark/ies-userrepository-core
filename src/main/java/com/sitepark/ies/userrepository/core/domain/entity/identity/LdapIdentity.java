@@ -47,6 +47,11 @@ public final class LdapIdentity implements Identity {
 	}
 
 	@Override
+	public String toString() {
+		return "LdapIdentity [server=" + server + ", dn=" + dn + "]";
+	}
+
+	@Override
 	public final boolean equals(Object o) {
 
 		if (!(o instanceof LdapIdentity)) {

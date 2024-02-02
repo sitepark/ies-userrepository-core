@@ -178,17 +178,9 @@ public final class User {
 
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append(this.getName())
-				.append(" (")
-				.append("login: ").append(this.login)
-				.append(", ")
-				.append("id: ").append(this.id)
-				.append(", ")
-				.append("anchor: ").append(this.anchor)
-				.append(", ")
-				.append("roleList: ").append(this.roleList)
-				.append(')').toString();
+		return "User [id=" + id + ", anchor=" + anchor + ", login=" + login + ", firstname=" + firstname + ", lastname="
+				+ lastname + ", email=" + email + ", gender=" + gender + ", note=" + note + ", validity=" + validity
+				+ ", identityList=" + identityList + ", roleList=" + roleList + "]";
 	}
 
 	@SuppressWarnings("PMD.TooManyMethods")

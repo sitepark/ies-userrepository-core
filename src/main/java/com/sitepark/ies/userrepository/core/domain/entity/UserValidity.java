@@ -111,13 +111,7 @@ public class UserValidity {
 
 	@Override
 	public String toString() {
-		return new StringBuilder()
-				.append("blocked: ").append(this.blocked)
-				.append(", ")
-				.append("validFrom: ").append(this.validFrom)
-				.append(", ")
-				.append("validTo: ").append(this.validTo)
-				.toString();
+		return "UserValidity [blocked=" + blocked + ", validFrom=" + validFrom + ", validTo=" + validTo + "]";
 	}
 
 	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
