@@ -69,7 +69,8 @@ class UserValidityTest {
 				.validTo(validTo)
 				.build();
 
-		String expecated = "blocked: false, validFrom: 2023-08-21T00:00+02:00, validTo: 2023-08-21T00:00+02:00";
+		String expecated = "UserValidity [blocked=false, validFrom=2023-08-21T00:00+02:00, " +
+				"validTo=2023-08-21T00:00+02:00]";
 
 		assertEquals(expecated, userValidity.toString(), "unexpected string representation");
 	}

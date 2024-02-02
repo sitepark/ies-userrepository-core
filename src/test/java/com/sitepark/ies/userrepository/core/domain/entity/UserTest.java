@@ -517,12 +517,11 @@ class UserTest {
 				.identity(TEST_IDENTITY)
 				.note("a note")
 				.build();
-		String expected = "Pan, Peter " +
-				"(login: peterpan, id: " +
-				"100560100000014842, " +
-				"anchor: user.peterpan, " +
-				"roleList: [USER, REF(test.anchor), " +
-				"REF(123)])";
+		String expected = "User [id=100560100000014842, anchor=user.peterpan, login=peterpan, " +
+				"firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE, " +
+				"note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null], " +
+				"identityList=[LdapIdentity [server=2, dn=userdn]], " +
+				"roleList=[USER, REF(test.anchor), REF(123)]]";
 		assertEquals(expected, user.toString(), "unexpected string representation");
 	}
 
