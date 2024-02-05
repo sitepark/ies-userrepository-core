@@ -5,7 +5,9 @@ import javax.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
@@ -14,6 +16,8 @@ import com.sitepark.ies.userrepository.core.port.UserRepository;
 public final class PurgeUser {
 
 	private final UserRepository repository;
+
+	private final IdentifierResolver identifierResolver;
 
 	private final AccessTokenRepository accessTokenRepository;
 
@@ -26,17 +30,21 @@ public final class PurgeUser {
 	@Inject
 	protected PurgeUser(
 			UserRepository repository,
+			IdentifierResolver identifierResolver,
 			ExtensionsNotifier extensionsNotifier,
 			AccessControl accessControl,
 			AccessTokenRepository accessTokenRepository) {
 
 		this.repository = repository;
 		this.extensionsNotifier = extensionsNotifier;
+		this.identifierResolver = identifierResolver;
 		this.accessControl = accessControl;
 		this.accessTokenRepository = accessTokenRepository;
 	}
 
-	public void purgeUser(long id) {
+	public void purgeUser(Identifier identifier) {
+
+		long id = this.identifierResolver.resolveIdentifier(identifier);
 
 		if (!this.accessControl.isUserRemovable(id)) {
 			throw new AccessDeniedException("Not allowed to remove user " + id);
