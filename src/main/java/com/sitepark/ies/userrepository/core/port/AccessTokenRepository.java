@@ -8,13 +8,13 @@ public interface AccessTokenRepository {
 
 	AccessToken create(AccessToken accessToken);
 
-	void revoke(long user, long id);
+	void revoke(String user, String id);
 
-	void purge(long user, long id);
+	void purge(String user, String id);
 
-	void purgeByUser(long user);
+	void purgeByUser(String user);
 
-	void touch(long user, long id);
+	void touch(String user, String id);
 
 	Optional<AccessToken> getByToken(String token);
 }

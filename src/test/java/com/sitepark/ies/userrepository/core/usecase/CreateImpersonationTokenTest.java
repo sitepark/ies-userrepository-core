@@ -2,7 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,7 +29,7 @@ class CreateImpersonationTokenTest {
 		when(accessControl.isImpersonationTokensManageable()).thenReturn(false);
 		UserRepository userRepository = mock(UserRepository.class);
 
-		AccessToken accessToken = AccessToken.builder().user(123).name("Test Token").build();
+		AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
 
 		var createImpersonationToken = new CreateImpersonationToken(
 				accessTokenRepository,
@@ -50,9 +50,9 @@ class CreateImpersonationTokenTest {
 		AccessControl accessControl = mock(AccessControl.class);
 		when(accessControl.isImpersonationTokensManageable()).thenReturn(true);
 		UserRepository userRepository = mock(UserRepository.class);
-		when(userRepository.get(anyLong())).thenReturn(Optional.empty());
+		when(userRepository.get(anyString())).thenReturn(Optional.empty());
 
-		AccessToken accessToken = AccessToken.builder().user(123).name("Test Token").build();
+		AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
 
 		var createImpersonationToken = new CreateImpersonationToken(
 				accessTokenRepository,
@@ -72,9 +72,9 @@ class CreateImpersonationTokenTest {
 		when(accessControl.isImpersonationTokensManageable()).thenReturn(true);
 		UserRepository userRepository = mock(UserRepository.class);
 		User user = mock(User.class);
-		when(userRepository.get(anyLong())).thenReturn(Optional.of(user));
+		when(userRepository.get(anyString())).thenReturn(Optional.of(user));
 
-		AccessToken accessToken = AccessToken.builder().user(123).name("Test Token").build();
+		AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
 
 		var createImpersonationToken = new CreateImpersonationToken(
 				accessTokenRepository,

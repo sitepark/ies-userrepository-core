@@ -1,10 +1,8 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -22,6 +20,7 @@ import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedExcepti
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
+import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -33,17 +32,20 @@ class UpdateUserTest {
 	@Test
 	void testAccessDeniedUpdate() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isUserWritable(anyLong())).thenReturn(false);
+		when(accessControl.isUserWritable(anyString())).thenReturn(false);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
 		User user = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.build();
 
 		var updateUserUseCase = new UpdateUser(
 				null,
+				identifierResolver,
 				null,
 				accessControl,
 				extensionsNotifier);
@@ -51,7 +53,7 @@ class UpdateUserTest {
 			updateUserUseCase.updateUser(user);
 		});
 
-		verify(accessControl).isUserWritable(123L);
+		verify(accessControl).isUserWritable("123");
 	}
 
 	@Test
@@ -65,6 +67,7 @@ class UpdateUserTest {
 				null,
 				null,
 				null,
+				null,
 				null);
 		assertThrows(IllegalArgumentException.class, () -> {
 			updateUserUseCase.updateUser(user);
@@ -75,20 +78,23 @@ class UpdateUserTest {
 	@Test
 	void testUpdateUserNotFound() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
 		UserRepository repository = mock(UserRepository.class);
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				null,
 				accessControl,
 				extensionsNotifier);
 
 		User user = User.builder()
-				.id(123L)
+				.id("123")
 				.anchor("user.test")
 				.login("test")
 				.build();
@@ -97,37 +103,40 @@ class UpdateUserTest {
 			updateUserUseCase.updateUser(user);
 		});
 
-		assertEquals(123L, thrown.getId(), "unexpected id");
+		assertEquals("123", thrown.getId(), "unexpected id");
 	}
 
 	@Test
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testChangeLoginToAlreadyExistsLogin() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 		RoleAssigner roleAssigner = mock();
 
 		UserRepository repository = mock(UserRepository.class);
-		when(repository.resolveLogin("test")).thenReturn(Optional.of(123L));
-		when(repository.resolveLogin("test2")).thenReturn(Optional.of(55L));
+		when(repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+		when(repository.resolveLogin("test2")).thenReturn(Optional.of("55"));
 
 		User storedUser = User.builder()
-				.id(123)
+				.id("123")
 				.anchor("user.test")
 				.login("test")
 				.build();
-		when(repository.get(anyLong())).thenReturn(Optional.of(storedUser));
+		when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				roleAssigner,
 				accessControl,
 				extensionsNotifier);
 
 		User user = User.builder()
-				.id(123)
+				.id("123")
 				.anchor("user.test")
 				.login("test2")
 				.build();
@@ -136,7 +145,7 @@ class UpdateUserTest {
 			updateUserUseCase.updateUser(user);
 		});
 
-		assertEquals(55L, thrown.getOwner(), "unexpected owner");
+		assertEquals("55", thrown.getOwner(), "unexpected owner");
 		assertEquals("test2", thrown.getLogin(), "unexpected login");
 	}
 
@@ -145,36 +154,39 @@ class UpdateUserTest {
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testUpdateUnchanged() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 		RoleAssigner roleAssigner = mock();
 
 		UserRepository repository = mock(UserRepository.class);
-		when(repository.resolveLogin("test")).thenReturn(Optional.of(123L));
+		when(repository.resolveLogin("test")).thenReturn(Optional.of("123"));
 
 		User storedUser = User.builder()
-				.id(123)
+				.id("123")
 				.anchor("user.test")
 				.login("test")
 				.build();
-		when(repository.get(anyLong())).thenReturn(Optional.of(storedUser));
+		when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				roleAssigner,
 				accessControl,
 				extensionsNotifier);
 
 		User user = User.builder()
-				.id(123)
+				.id("123")
 				.anchor("user.test")
 				.login("test")
 				.build();
 
 		updateUserUseCase.updateUser(user);
 
-		verify(repository).get(anyLong());
+		verify(repository).get(anyString());
 		verify(repository).resolveLogin(anyString());
 
 		verifyNoMoreInteractions(repository);
@@ -184,30 +196,33 @@ class UpdateUserTest {
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testUpdateViaIdWithStoredAnchor() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 		RoleAssigner roleAssigner = mock();
 
 		UserRepository repository = mock(UserRepository.class);
-		when(repository.resolveLogin("test")).thenReturn(Optional.of(123L));
+		when(repository.resolveLogin("test")).thenReturn(Optional.of("123"));
 
 		User storedUser = User.builder()
-				.id(123)
+				.id("123")
 				.anchor("user.test")
 				.login("test")
 				.lastname("A")
 				.build();
-		when(repository.get(anyLong())).thenReturn(Optional.of(storedUser));
+		when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				roleAssigner,
 				accessControl,
 				extensionsNotifier);
 
 		User user = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.lastname("B")
 				.build();
@@ -215,13 +230,13 @@ class UpdateUserTest {
 		updateUserUseCase.updateUser(user);
 
 		User effectiveUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.anchor("user.test")
 				.lastname("B")
 				.build();
 
-		verify(repository).get(anyLong());
+		verify(repository).get(anyString());
 		verify(repository).resolveLogin(anyString());
 		verify(repository).update(effectiveUser);
 
@@ -231,25 +246,28 @@ class UpdateUserTest {
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testViaAnchor() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock();
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
-		when(repository.resolveLogin("test")).thenReturn(Optional.of(123L));
-		when(repository.resolveAnchor(Anchor.ofString("user.test"))).thenReturn(Optional.of(123L));
+		when(repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+		when(repository.resolveAnchor(Anchor.ofString("user.test"))).thenReturn(Optional.of("123"));
 		RoleAssigner roleAssigner = mock();
 
 		User storedUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.anchor("user.test")
 				.lastname("A")
 				.build();
-		when(repository.get(anyLong())).thenReturn(Optional.of(storedUser));
+		when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				roleAssigner,
 				accessControl,
 				extensionsNotifier);
@@ -263,14 +281,14 @@ class UpdateUserTest {
 		updateUserUseCase.updateUser(user);
 
 		User effectiveUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.anchor("user.test")
 				.lastname("B")
 				.build();
 
-		verify(repository).get(anyLong());
-		verify(repository).resolveAnchor(any());
+		verify(repository).get(anyString());
+		verify(identifierResolver).resolveIdentifier(any());
 		verify(repository).resolveLogin(anyString());
 		verify(repository).update(eq(effectiveUser));
 		verify(extensionsNotifier).notifyUpdated(any());
@@ -281,29 +299,32 @@ class UpdateUserTest {
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testUpdateAnchor() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock();
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
-		when(repository.resolveLogin("test")).thenReturn(Optional.of(123L));
+		when(repository.resolveLogin("test")).thenReturn(Optional.of("123"));
 		RoleAssigner roleAssigner = mock();
 
 		User storedUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.anchor("user.test")
 				.build();
-		when(repository.get(anyLong())).thenReturn(Optional.of(storedUser));
+		when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				roleAssigner,
 				accessControl,
 				extensionsNotifier);
 
 		User user = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.anchor("user.test2")
 				.build();
@@ -311,12 +332,12 @@ class UpdateUserTest {
 		updateUserUseCase.updateUser(user);
 
 		User effectiveUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.anchor("user.test2")
 				.build();
 
-		verify(repository).get(anyLong());
+		verify(repository).get(anyString());
 		verify(repository).resolveLogin(anyString());
 		verify(repository).update(eq(effectiveUser));
 		verify(extensionsNotifier).notifyUpdated(any());
@@ -327,40 +348,43 @@ class UpdateUserTest {
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testUpdateLogin() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		AccessControl accessControl = mock();
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
-		when(repository.resolveLogin("test")).thenReturn(Optional.of(55L));
+		when(repository.resolveLogin("test")).thenReturn(Optional.of("55"));
 		when(repository.resolveLogin("test2")).thenReturn(Optional.empty());
 		RoleAssigner roleAssigner = mock();
 
 		User storedUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
 				.build();
-		when(repository.get(anyLong())).thenReturn(Optional.of(storedUser));
+		when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				roleAssigner,
 				accessControl,
 				extensionsNotifier);
 
 		User user = User.builder()
-				.id(123)
+				.id("123")
 				.login("test2")
 				.build();
 
 		updateUserUseCase.updateUser(user);
 
 		User effectiveUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test2")
 				.build();
 
-		verify(repository).get(anyLong());
+		verify(repository).get(anyString());
 		verify(repository).resolveLogin(anyString());
 		verify(repository).update(eq(effectiveUser));
 		verify(extensionsNotifier).notifyUpdated(any());
@@ -370,8 +394,10 @@ class UpdateUserTest {
 	@Test
 	void testUpdateAnchorNotFound() {
 
+		IdentifierResolver identifierResolver = mock();
+		when(identifierResolver.resolveIdentifier(any())).thenThrow(AnchorNotFoundException.class);
 		AccessControl accessControl = mock();
-		when(accessControl.isUserWritable(anyLong())).thenReturn(true);
+		when(accessControl.isUserWritable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
@@ -380,6 +406,7 @@ class UpdateUserTest {
 
 		var updateUserUseCase = new UpdateUser(
 				repository,
+				identifierResolver,
 				roleAssigner,
 				accessControl,
 				extensionsNotifier);
@@ -389,11 +416,8 @@ class UpdateUserTest {
 				.anchor("user.test2")
 				.build();
 
-		AnchorNotFoundException e = assertThrows(AnchorNotFoundException.class, () -> {
+		assertThrows(AnchorNotFoundException.class, () -> {
 			updateUserUseCase.updateUser(user);
 		});
-
-		assertEquals(Anchor.ofString("user.test2"), e.getAnchor(), "unexpected anchor");
-		assertNotNull(e.getMessage(), "message is null");
 	}
 }

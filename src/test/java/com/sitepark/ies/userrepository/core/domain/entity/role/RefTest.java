@@ -60,17 +60,17 @@ class RefTest {
 	@Test
 	void testNullIdRef() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			Ref.ofId(0);
+			Ref.ofId("0");
 		});
 	}
 
 	@Test
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testIdRef() {
-		Ref ref = Ref.ofId(123L);
+		Ref ref = Ref.ofId("123");
 		assertEquals("REF(123)", ref.getName(), "unexpected name");
 		assertEquals(Optional.empty(), ref.getAnchor(), "empty anchor expected");
-		assertEquals(Optional.of(123L), ref.getId(), "unexpected id");
+		assertEquals(Optional.of("123"), ref.getId(), "unexpected id");
 	}
 
 	@Test

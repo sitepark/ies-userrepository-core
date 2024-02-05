@@ -60,7 +60,7 @@ class CreateUserTest {
 	void testWithId() {
 
 		User user = User.builder()
-				.id(123L)
+				.id("123")
 				.login("test")
 				.build();
 
@@ -81,7 +81,7 @@ class CreateUserTest {
 
 		UserRepository repository = mock();
 		when(repository.resolveAnchor(Anchor.ofString("test.user")))
-				.thenReturn(Optional.of(123L));
+				.thenReturn(Optional.of("123"));
 		AccessControl accessControl = mock(AccessControl.class);
 		when(accessControl.isUserCreateable()).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
@@ -103,7 +103,7 @@ class CreateUserTest {
 		});
 
 		assertEquals(Anchor.ofString("test.user"), e.getAnchor(), "unexpected anchor");
-		assertEquals(123L, e.getOwner(), "unexpected owner");
+		assertEquals("123", e.getOwner(), "unexpected owner");
 		assertNotNull(e.getMessage(), "message is null");
 	}
 
@@ -114,7 +114,7 @@ class CreateUserTest {
 		AccessControl accessControl = mock();
 		when(accessControl.isUserCreateable()).thenReturn(true);
 		IdGenerator idGenerator = mock();
-		when(idGenerator.generate()).thenReturn(123L);
+		when(idGenerator.generate()).thenReturn("123");
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
@@ -123,7 +123,7 @@ class CreateUserTest {
 
 		User user = User.builder()
 				.login("test")
-				.roleList(UserLevelRoles.USER, Ref.ofId(333L))
+				.roleList(UserLevelRoles.USER, Ref.ofId("333"))
 				.build();
 
 		var createUserUseCase = new CreateUser(
@@ -136,15 +136,15 @@ class CreateUserTest {
 		createUserUseCase.createUser(user);
 
 		User effectiveUser = User.builder()
-				.id(123)
+				.id("123")
 				.login("test")
-				.roleList(UserLevelRoles.USER, Ref.ofId(333L))
+				.roleList(UserLevelRoles.USER, Ref.ofId("333"))
 				.build();
 
 		verify(repository).create(eq(effectiveUser));
 		verify(roleAssigner).assignRoleToUser(
-				Arrays.asList(UserLevelRoles.USER, Ref.ofId(333L)),
-				Arrays.asList(123L));
+				Arrays.asList(UserLevelRoles.USER, Ref.ofId("333")),
+				Arrays.asList("123"));
 	}
 
 	@Test
@@ -154,7 +154,7 @@ class CreateUserTest {
 		AccessControl accessControl = mock();
 		when(accessControl.isUserCreateable()).thenReturn(true);
 		IdGenerator idGenerator = mock();
-		when(idGenerator.generate()).thenReturn(123L);
+		when(idGenerator.generate()).thenReturn("123");
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
@@ -177,7 +177,7 @@ class CreateUserTest {
 		createUserUseCase.createUser(user);
 
 		User effectiveUser = User.builder()
-				.id(123)
+				.id("123")
 				.anchor("test.anchor")
 				.login("test")
 				.build();
@@ -192,16 +192,16 @@ class CreateUserTest {
 		AccessControl accessControl = mock();
 		when(accessControl.isUserCreateable()).thenReturn(true);
 		IdGenerator idGenerator = mock();
-		when(idGenerator.generate()).thenReturn(123L);
+		when(idGenerator.generate()).thenReturn("123");
 		ExtensionsNotifier extensionsNotifier = mock();
 
 		UserRepository repository = mock();
-		when(repository.resolveLogin(anyString())).thenReturn(Optional.of(345L));
+		when(repository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
 		RoleAssigner roleAssigner = mock();
 
 		User user = User.builder()
 				.login("test")
-				.roleList(UserLevelRoles.USER, Ref.ofId(333L))
+				.roleList(UserLevelRoles.USER, Ref.ofId("333"))
 				.build();
 
 		var createUserUseCase = new CreateUser(
@@ -215,7 +215,7 @@ class CreateUserTest {
 			createUserUseCase.createUser(user);
 		});
 		assertEquals("test", e.getLogin(), "unexpected login");
-		assertEquals(345L, e.getOwner(), "unexpected owner");
+		assertEquals("345", e.getOwner(), "unexpected owner");
 		assertNotNull(e.getMessage(), "message is null");
 	}
 }

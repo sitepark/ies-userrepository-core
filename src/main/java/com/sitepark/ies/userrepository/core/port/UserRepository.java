@@ -8,8 +8,8 @@ import com.sitepark.ies.userrepository.core.domain.entity.User;
 public interface UserRepository {
 	void create(User entity);
 	void update(User entity);
-	Optional<User> get(long id);
-	void remove(long id);
-	Optional<Long> resolveLogin(String login);
-	Optional<Long> resolveAnchor(Anchor anchor);
+	Optional<User> get(String id);
+	void remove(String id);
+	Optional<String> resolveLogin(String login);
+	Optional<String> resolveAnchor(Anchor anchor);
 }

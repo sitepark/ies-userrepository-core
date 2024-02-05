@@ -17,13 +17,13 @@ public class IdentifierResolver {
 		this.repository = repository;
 	}
 
-	public long resolveIdentifier(Identifier identifier) {
+	public String resolveIdentifier(Identifier identifier) {
 
 		if (identifier.getId().isPresent()) {
 			return identifier.getId().get();
 		}
 
-		Optional<Long> id = this.repository.resolveAnchor(identifier.getAnchor().get());
+		Optional<String> id = this.repository.resolveAnchor(identifier.getAnchor().get());
 		if (id.isEmpty()) {
 			throw new AnchorNotFoundException(identifier.getAnchor().get());
 		}

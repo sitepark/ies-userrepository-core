@@ -12,9 +12,9 @@ public class AnchorAlreadyExistsException extends UserRepositoryException {
 
 	private final Anchor anchor;
 
-	private final long owner;
+	private final String owner;
 
-	public AnchorAlreadyExistsException(Anchor anchor, long owner) {
+	public AnchorAlreadyExistsException(Anchor anchor, String owner) {
 		super();
 		this.anchor = anchor;
 		this.owner = owner;
@@ -24,7 +24,7 @@ public class AnchorAlreadyExistsException extends UserRepositoryException {
 		return this.anchor;
 	}
 
-	public long getOwner() {
+	public String getOwner() {
 		return this.owner;
 	}
 

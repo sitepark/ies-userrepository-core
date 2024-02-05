@@ -20,13 +20,13 @@ class IdentifierResolverTest {
 	@Test
 	void testResolveWithId() {
 
-		Identifier identifier = Identifier.ofId(123L);
+		Identifier identifier = Identifier.ofId("123");
 		UserRepository repository = mock();
 		IdentifierResolver resolver = new IdentifierResolver(repository);
 
-		long id = resolver.resolveIdentifier(identifier);
+		String id = resolver.resolveIdentifier(identifier);
 
-		assertEquals(123L, id, "unexpected id");
+		assertEquals("123", id, "unexpected id");
 	}
 
 	@Test
@@ -35,12 +35,12 @@ class IdentifierResolverTest {
 		Anchor anchor = Anchor.ofString("abc");
 		Identifier identifier = Identifier.ofAnchor(anchor);
 		UserRepository repository = mock();
-		when(repository.resolveAnchor(any())).thenReturn(Optional.of(123L));
+		when(repository.resolveAnchor(any())).thenReturn(Optional.of("123"));
 		IdentifierResolver resolver = new IdentifierResolver(repository);
 
-		long id = resolver.resolveIdentifier(identifier);
+		String id = resolver.resolveIdentifier(identifier);
 
-		assertEquals(123L, id, "unexpected id");
+		assertEquals("123", id, "unexpected id");
 	}
 
 	@Test

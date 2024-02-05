@@ -6,15 +6,15 @@ import com.sitepark.ies.userrepository.core.domain.entity.Role;
 
 public interface RoleAssigner {
 
-	void assignRoleToUser(List<Role> roleList, List<Long> userList);
+	void assignRoleToUser(List<Role> roleList, List<String> userList);
 
-	void reassignRoleToUser(List<Role> roleList, List<Long> userList);
+	void reassignRoleToUser(List<Role> roleList, List<String> userList);
 
-	void revokeRoleFromUser(List<Role> roleList, List<Long> userList);
+	void revokeRoleFromUser(List<Role> roleList, List<String> userList);
 
-	void revokeAllRolesFromUser(List<Long> userList);
+	void revokeAllRolesFromUser(List<String> userList);
 
-	List<Role> getRolesAssignByUser(long id);
+	List<Role> getRolesAssignByUser(String id);
 
 	List<Long> getUserAssignByRole(Role role);
 

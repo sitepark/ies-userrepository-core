@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,9 +48,9 @@ class AuthenticateByTokenTest {
 	void testTokenNotActive() {
 
 		AccessToken accessToken = AccessToken.builder()
-				.id(1)
+				.id("1")
 				.name(TOKEN_NAME)
-				.user(2)
+				.user("2")
 				.active(false)
 				.build();
 
@@ -71,9 +71,9 @@ class AuthenticateByTokenTest {
 	void testTokenRevoked() {
 
 		AccessToken accessToken = AccessToken.builder()
-				.id(1)
+				.id("1")
 				.name(TOKEN_NAME)
-				.user(2)
+				.user("2")
 				.revoked(true)
 				.build();
 
@@ -96,9 +96,9 @@ class AuthenticateByTokenTest {
 		OffsetDateTime expiredAt = OffsetDateTime.now().minusDays(1);
 
 		AccessToken accessToken = AccessToken.builder()
-				.id(1)
+				.id("1")
 				.name(TOKEN_NAME)
-				.user(2)
+				.user("2")
 				.expiresAt(expiredAt)
 				.build();
 
@@ -121,9 +121,9 @@ class AuthenticateByTokenTest {
 	void testUserNotFound() {
 
 		AccessToken accessToken = AccessToken.builder()
-				.id(1)
+				.id("1")
 				.name(TOKEN_NAME)
-				.user(2)
+				.user("2")
 				.build();
 
 		AccessTokenRepository accessTokenRepository = mock();
@@ -131,7 +131,7 @@ class AuthenticateByTokenTest {
 
 		UserRepository userRepository = mock();
 
-		when(userRepository.get(anyLong())).thenReturn(Optional.empty());
+		when(userRepository.get(anyString())).thenReturn(Optional.empty());
 
 		var authenticateByToken = new AuthenticateByToken(
 				accessTokenRepository,
@@ -146,13 +146,13 @@ class AuthenticateByTokenTest {
 	void testValidAutentification() {
 
 		AccessToken accessToken = AccessToken.builder()
-				.id(1)
+				.id("1")
 				.name(TOKEN_NAME)
-				.user(2)
+				.user("2")
 				.build();
 
 		User user = User.builder()
-				.id(1)
+				.id("1")
 				.login("test")
 				.build();
 
@@ -161,7 +161,7 @@ class AuthenticateByTokenTest {
 
 		UserRepository userRepository = mock();
 
-		when(userRepository.get(anyLong())).thenReturn(Optional.of(user));
+		when(userRepository.get(anyString())).thenReturn(Optional.of(user));
 
 		var authenticateByToken = new AuthenticateByToken(
 				accessTokenRepository,
@@ -177,14 +177,14 @@ class AuthenticateByTokenTest {
 		OffsetDateTime expiredAt = OffsetDateTime.now().plusDays(1);
 
 		AccessToken accessToken = AccessToken.builder()
-				.id(1)
+				.id("1")
 				.name(TOKEN_NAME)
 				.expiresAt(expiredAt)
-				.user(2)
+				.user("2")
 				.build();
 
 		User user = User.builder()
-				.id(1)
+				.id("1")
 				.login("test")
 				.build();
 
@@ -193,7 +193,7 @@ class AuthenticateByTokenTest {
 
 		UserRepository userRepository = mock();
 
-		when(userRepository.get(anyLong())).thenReturn(Optional.of(user));
+		when(userRepository.get(anyString())).thenReturn(Optional.of(user));
 
 		var authenticateByToken = new AuthenticateByToken(
 				accessTokenRepository,

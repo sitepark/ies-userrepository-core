@@ -11,9 +11,9 @@ public class LoginAlreadyExistsException extends UserRepositoryException {
 
 	private final String login;
 
-	private final long owner;
+	private final String owner;
 
-	public LoginAlreadyExistsException(String login, long owner) {
+	public LoginAlreadyExistsException(String login, String owner) {
 		super();
 		this.login = login;
 		this.owner = owner;
@@ -23,7 +23,7 @@ public class LoginAlreadyExistsException extends UserRepositoryException {
 		return this.login;
 	}
 
-	public long getOwner() {
+	public String getOwner() {
 		return this.owner;
 	}
 

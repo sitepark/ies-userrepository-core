@@ -33,7 +33,7 @@ public class RefFactory implements RoleFactory {
 
 		Matcher idMatcher = PATTERN_ID.matcher(role);
 		if (idMatcher.matches()) {
-			long id = Long.valueOf(idMatcher.group(1), 10);
+			String id = idMatcher.group(1);
 			return Ref.ofId(id);
 		}
 

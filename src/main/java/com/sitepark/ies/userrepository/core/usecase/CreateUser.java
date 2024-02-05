@@ -46,7 +46,7 @@ public final class CreateUser {
 		this.extensionsNotifier = extensionsNotifier;
 	}
 
-	public long createUser(User newUser) {
+	public String createUser(User newUser) {
 
 		if (newUser.getId().isPresent()) {
 			throw new IllegalArgumentException("The ID of the user must not be set when creating.");
@@ -60,7 +60,7 @@ public final class CreateUser {
 			throw new AccessDeniedException("Not allowed to create user " + newUser);
 		}
 
-		long generatedId = this.idGenerator.generate();
+		String generatedId = this.idGenerator.generate();
 
 		User userWithId = newUser.toBuilder().id(generatedId).build();
 
@@ -81,7 +81,7 @@ public final class CreateUser {
 
 	private void validateAnchor(User newUser) {
 		if (newUser.getAnchor().isPresent()) {
-			Optional<Long> anchorOwner = this.repository.resolveAnchor(newUser.getAnchor().get());
+			Optional<String> anchorOwner = this.repository.resolveAnchor(newUser.getAnchor().get());
 			if (anchorOwner.isPresent()) {
 				throw new AnchorAlreadyExistsException(newUser.getAnchor().get(), anchorOwner.get());
 			}
@@ -89,7 +89,7 @@ public final class CreateUser {
 	}
 
 	private void validateLogin(User newUser) {
-		Optional<Long> resolveLogin = this.repository.resolveLogin(newUser.getLogin());
+		Optional<String> resolveLogin = this.repository.resolveLogin(newUser.getLogin());
 		if (resolveLogin.isPresent()) {
 			throw new LoginAlreadyExistsException(newUser.getLogin(), resolveLogin.get());
 		}

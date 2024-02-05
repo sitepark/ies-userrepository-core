@@ -20,9 +20,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @JsonDeserialize(builder = AccessToken.Builder.class)
 public final class AccessToken {
 
-	private final long id;
+	private final String id;
 
-	private final long user;
+	private final String user;
 
 	private final String name;
 
@@ -56,15 +56,15 @@ public final class AccessToken {
 		this.revoked = builder.revoked;
 	}
 
-	public Optional<Long> getId() {
-		if (this.id == 0) {
+	public Optional<String> getId() {
+		if (this.id == null) {
 			return Optional.empty();
 		} else {
 			return Optional.of(this.id);
 		}
 	}
 
-	public long getUser() {
+	public String getUser() {
 		return this.user;
 	}
 
@@ -173,9 +173,9 @@ public final class AccessToken {
 	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
 	public static final class Builder {
 
-		private long id;
+		private String id;
 
-		private long user;
+		private String user;
 
 		private String name;
 
@@ -212,17 +212,23 @@ public final class AccessToken {
 			this.revoked = accessToken.revoked;
 		}
 
-		public Builder id(long id) {
-			if (id <= 0) {
-				throw new IllegalArgumentException("id should be greater than 0");
+		public Builder id(String id) {
+			if (id == null) {
+				throw new NullPointerException("id is null");
+			}
+			if (!Identifier.isId(id)) {
+				throw new IllegalArgumentException(id + " is not an id");
 			}
 			this.id = id;
 			return this;
 		}
 
-		public Builder user(long user) {
-			if (user <= 0) {
-				throw new IllegalArgumentException("user should be greater than 0");
+		public Builder user(String user) {
+			if (user == null) {
+				throw new NullPointerException("user is null");
+			}
+			if (!Identifier.isId(user)) {
+				throw new IllegalArgumentException(user + " is not an user id");
 			}
 			this.user = user;
 			return this;
@@ -303,7 +309,7 @@ public final class AccessToken {
 
 		public AccessToken build() {
 
-			if (this.user == 0) {
+			if (this.user == null) {
 				throw new IllegalStateException("user is not set");
 			}
 			if (this.name == null) {

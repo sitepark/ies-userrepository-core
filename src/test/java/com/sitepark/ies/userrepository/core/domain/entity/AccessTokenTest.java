@@ -40,23 +40,23 @@ class AccessTokenTest {
 	@Test
 	void testSetUser() throws JsonProcessingException {
 		AccessToken accessToken = AccessToken.builder()
-				.user(345)
+				.user("345")
 				.name(TOKEN_NAME)
 				.build();
-		assertEquals(345, accessToken.getUser(), "wrong user");
+		assertEquals("345", accessToken.getUser(), "wrong user");
 	}
 
 	@Test
 	void testSetInvalidUser() throws JsonProcessingException {
 		assertThrows(IllegalArgumentException.class, () -> {
-			AccessToken.builder().user(0);
+			AccessToken.builder().user("0");
 		});
 	}
 
 	@Test
 	void testSetName() throws JsonProcessingException {
 		AccessToken accessToken = AccessToken.builder()
-				.user(345)
+				.user("345")
 				.name(TOKEN_NAME)
 				.build();
 		assertEquals(TOKEN_NAME, accessToken.getName(), "wrong name");
@@ -89,7 +89,7 @@ class AccessTokenTest {
 	void testBuildNameNotSet() throws JsonProcessingException {
 		assertThrows(IllegalStateException.class, () -> {
 			AccessToken.builder()
-				.user(123)
+				.user("123")
 				.build();
 		});
 	}
@@ -97,9 +97,9 @@ class AccessTokenTest {
 	@Test
 	void testSetId() throws JsonProcessingException {
 		AccessToken accessToken = this.createBuilderWithRequiredValues()
-				.id(123)
+				.id("123")
 				.build();
-		assertEquals(123, accessToken.getId().get(), "wrong id");
+		assertEquals("123", accessToken.getId().get(), "wrong id");
 	}
 
 	@Test
@@ -112,7 +112,7 @@ class AccessTokenTest {
 	@Test
 	void testSetInvalidId() throws JsonProcessingException {
 		assertThrows(IllegalArgumentException.class, () -> {
-			AccessToken.builder().id(0);
+			AccessToken.builder().id("0");
 		});
 	}
 
@@ -375,8 +375,8 @@ class AccessTokenTest {
 		OffsetDateTime lastUpdate = LocalDate.of(2023, 8, 25).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
 		AccessToken accessToken = AccessToken.builder()
-				.id(123)
-				.user(345)
+				.id("123")
+				.user("345")
 				.name(TOKEN_NAME)
 				.createdAt(createdAt)
 				.expiresAt(expiredAt)
@@ -387,8 +387,8 @@ class AccessTokenTest {
 		String json = mapper.writeValueAsString(accessToken);
 
 		String expected = "{" +
-				"\"id\":123," +
-				"\"user\":345," +
+				"\"id\":\"123\"," +
+				"\"user\":\"345\"," +
 				"\"name\":\"Test Token\"," +
 				"\"createdAt\":\"2023-08-21T00:00:00+02:00\"," +
 				"\"expiresAt\":\"2023-12-12T00:00:00+01:00\"," +
@@ -440,8 +440,8 @@ class AccessTokenTest {
 				.withOffsetSameInstant(ZoneOffset.UTC);
 
 		AccessToken expected = AccessToken.builder()
-				.id(123)
-				.user(345)
+				.id("123")
+				.user("345")
 				.name(TOKEN_NAME)
 				.createdAt(createdAt)
 				.expiresAt(expiredAt)
@@ -454,7 +454,7 @@ class AccessTokenTest {
 
 	private AccessToken.Builder createBuilderWithRequiredValues() {
 		return AccessToken.builder()
-				.user(345)
+				.user("345")
 				.name(TOKEN_NAME);
 	}
 

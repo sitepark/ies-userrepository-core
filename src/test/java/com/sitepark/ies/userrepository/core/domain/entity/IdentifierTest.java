@@ -7,12 +7,33 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 class IdentifierTest {
+
+	@Test
+	@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
+	void testEquals() {
+		EqualsVerifier.forClass(Identifier.class)
+			.verify();
+	}
+
+	@Test
+	void testToStringWithId() {
+		Identifier identifier = Identifier.ofString("123");
+		assertEquals("123", identifier.toString());
+	}
+
+	@Test
+	void testToStringWithAnchor() {
+		Identifier identifier = Identifier.ofString("abc");
+		assertEquals("abc", identifier.toString());
+	}
 
 	@Test
 	void testOfStringToId() {
 		Identifier identifier = Identifier.ofString("123");
-		assertEquals(Optional.of(123L), identifier.getId(), "id exprected");
+		assertEquals(Optional.of("123"), identifier.getId(), "id exprected");
 	}
 
 	@Test
@@ -38,8 +59,8 @@ class IdentifierTest {
 
 	@Test
 	void testOfId() {
-		Identifier identifier = Identifier.ofId(123L);
-		assertEquals(Optional.of(123L), identifier.getId(), "id exprected");
+		Identifier identifier = Identifier.ofId("123");
+		assertEquals(Optional.of("123"), identifier.getId(), "id exprected");
 	}
 
 	@Test

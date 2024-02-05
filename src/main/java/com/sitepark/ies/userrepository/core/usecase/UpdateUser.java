@@ -12,9 +12,9 @@ import org.apache.logging.log4j.Logger;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
+import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -23,6 +23,8 @@ import com.sitepark.ies.userrepository.core.port.UserRepository;
 public final class UpdateUser {
 
 	private final UserRepository repository;
+
+	private final IdentifierResolver identifierResolver;
 
 	private final RoleAssigner roleAssigner;
 
@@ -35,19 +37,21 @@ public final class UpdateUser {
 	@Inject
 	protected UpdateUser(
 			UserRepository repository,
+			IdentifierResolver identifierResolver,
 			RoleAssigner roleAssigner,
 			AccessControl accessControl,
 			ExtensionsNotifier extensionsNotifier) {
 		this.repository = repository;
+		this.identifierResolver = identifierResolver;
 		this.roleAssigner = roleAssigner;
 		this.accessControl = accessControl;
 		this.extensionsNotifier = extensionsNotifier;
 	}
 
-	public long updateUser(User user) {
+	public String updateUser(User user) {
 
 		User updateUser = this.buildUserWithId(user);
-		long id = updateUser.getId().get();
+		String id = updateUser.getId().get();
 		this.validateWritable(id);
 		User storedUser = this.loadStoredUser(id);
 		this.validateLogin(updateUser);
@@ -77,24 +81,23 @@ public final class UpdateUser {
 	}
 
 	private User buildUserWithId(User user) {
-		if (user.getId().isPresent()) {
-			return user;
-		} else if (user.getAnchor().isPresent()) {
-			long id = this.repository.resolveAnchor(user.getAnchor().get())
-					.orElseThrow(() -> new AnchorNotFoundException(user.getAnchor().get()));
-			return user.toBuilder().id(id).build();
-		} else {
+
+		if (user.getIdentifier().isEmpty()) {
 			throw new IllegalArgumentException("For users to be updated neither an id nor an anchor is set");
 		}
+
+		String id = this.identifierResolver.resolveIdentifier(user.getIdentifier().get());
+
+		return user.toBuilder().id(id).build();
 	}
 
-	private void validateWritable(long id) {
+	private void validateWritable(String id) {
 		if (!this.accessControl.isUserWritable(id)) {
 			throw new AccessDeniedException("Not allowed to update user " + id);
 		}
 	}
 
-	private User loadStoredUser(long id) {
+	private User loadStoredUser(String id) {
 		User storedUser = this.repository.get(id)
 				.orElseThrow(() -> new UserNotFoundException(id));
 
@@ -105,7 +108,7 @@ public final class UpdateUser {
 	}
 
 	private void validateLogin(User user) {
-		Optional<Long> resolveLogin = this.repository.resolveLogin(user.getLogin());
+		Optional<String> resolveLogin = this.repository.resolveLogin(user.getLogin());
 		if (resolveLogin.isPresent() && !resolveLogin.equals(user.getId())) {
 			throw new LoginAlreadyExistsException(user.getLogin(), resolveLogin.get());
 		}

@@ -59,9 +59,9 @@ class UserTest {
 	@Test
 	void testSetId() {
 		User user = this.createBuilderWithRequiredValues()
-				.id(123)
+				.id("123")
 				.build();
-		assertEquals(123, user.getId().get(), "unexpected id");
+		assertEquals("123", user.getId().get(), "unexpected id");
 	}
 
 	@Test
@@ -74,7 +74,7 @@ class UserTest {
 	@Test
 	void testSetInvalidId() {
 		assertThrows(IllegalArgumentException.class, () -> {
-			User.builder().id(0);
+			User.builder().id("0");
 		}, "id 0 should't be allowed");
 	}
 
@@ -99,7 +99,7 @@ class UserTest {
 	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testToBuilder() {
 		User user = User.builder()
-				.id(100560100000014842L)
+				.id("100560100000014842")
 				.anchor("user.peterpan")
 				.firstname("Peter")
 				.lastname("Pan")
@@ -110,7 +110,7 @@ class UserTest {
 		User changedUser = user.toBuilder()
 				.build();
 
-		assertEquals(100560100000014842L, changedUser.getId().get(), "unexpected id");
+		assertEquals("100560100000014842", changedUser.getId().get(), "unexpected id");
 		assertEquals(Optional.of(Anchor.ofString("user.peterpan")), changedUser.getAnchor(), "unexpected anchor");
 		assertEquals(Optional.of("Peter"), changedUser.getFirstname(), "unexpected firstname");
 		assertEquals(Optional.of("Pan"), changedUser.getLastname(), "unexpected lastname");
@@ -219,20 +219,20 @@ class UserTest {
 	@Test
 	void testSetRoleListAsList() {
 		User user = this.createBuilderWithRequiredValues()
-				.roleList(Arrays.asList(Ref.ofId(123L)))
+				.roleList(Arrays.asList(Ref.ofId("123")))
 				.build();
-		assertEquals(Arrays.asList(Ref.ofId(123L)), user.getRoleList(), "unexpected roleList");
+		assertEquals(Arrays.asList(Ref.ofId("123")), user.getRoleList(), "unexpected roleList");
 	}
 
 	@Test
 	void testSetOverwriteRoleListAsList() {
 		User user = this.createBuilderWithRequiredValues()
-				.roleList(Arrays.asList(Ref.ofId(123L)))
+				.roleList(Arrays.asList(Ref.ofId("123")))
 				.build();
 		User overwritter = user.toBuilder()
-				.roleList(Arrays.asList(Ref.ofId(345L)))
+				.roleList(Arrays.asList(Ref.ofId("345")))
 				.build();
-		assertEquals(Arrays.asList(Ref.ofId(345L)), overwritter.getRoleList(), "unexpected roleList");
+		assertEquals(Arrays.asList(Ref.ofId("345")), overwritter.getRoleList(), "unexpected roleList");
 	}
 
 	@Test
@@ -245,27 +245,27 @@ class UserTest {
 	@Test
 	void testSetNullRoleInList() {
 		assertThrows(NullPointerException.class, () -> {
-			User.builder().roleList(Arrays.asList(Ref.ofId(345L), null));
+			User.builder().roleList(Arrays.asList(Ref.ofId("345"), null));
 		});
 	}
 
 	@Test
 	void testSetRoleListAsVArgs() {
 		User user = this.createBuilderWithRequiredValues()
-				.roleList(Ref.ofId(123L))
+				.roleList(Ref.ofId("123"))
 				.build();
-		assertEquals(Arrays.asList(Ref.ofId(123L)), user.getRoleList(), "unexpected roleList");
+		assertEquals(Arrays.asList(Ref.ofId("123")), user.getRoleList(), "unexpected roleList");
 	}
 
 	@Test
 	void testSetOverwriteRoleListAsVArgs() {
 		User user = this.createBuilderWithRequiredValues()
-				.roleList(Ref.ofId(123L))
+				.roleList(Ref.ofId("123"))
 				.build();
 		User overwritter = user.toBuilder()
-				.roleList(Ref.ofId(345L))
+				.roleList(Ref.ofId("345"))
 				.build();
-		assertEquals(Arrays.asList(Ref.ofId(345L)), overwritter.getRoleList(), "unexpected roleList");
+		assertEquals(Arrays.asList(Ref.ofId("345")), overwritter.getRoleList(), "unexpected roleList");
 	}
 
 	@Test
@@ -278,28 +278,28 @@ class UserTest {
 	@Test
 	void testSetNullRoleInVArgs() {
 		assertThrows(NullPointerException.class, () -> {
-			User.builder().roleList(Ref.ofId(345L), null);
+			User.builder().roleList(Ref.ofId("345"), null);
 		});
 	}
 
 	@Test
 	void testSetRole() {
 		User user = this.createBuilderWithRequiredValues()
-				.role(Ref.ofId(123L))
+				.role(Ref.ofId("123"))
 				.build();
-		assertEquals(Arrays.asList(Ref.ofId(123L)), user.getRoleList(), "unexpected roleList");
+		assertEquals(Arrays.asList(Ref.ofId("123")), user.getRoleList(), "unexpected roleList");
 	}
 
 	@Test
 	void testAddRole() {
 		User user = this.createBuilderWithRequiredValues()
-				.role(Ref.ofId(123L))
+				.role(Ref.ofId("123"))
 				.build();
 		User added = user.toBuilder()
-				.role(Ref.ofId(456L))
+				.role(Ref.ofId("456"))
 				.build();
 
-		List<Role> expected = Arrays.asList(Ref.ofId(123L), Ref.ofId(456L));
+		List<Role> expected = Arrays.asList(Ref.ofId("123"), Ref.ofId("456"));
 
 		assertEquals(expected, added.getRoleList(), "unexpected roleList");
 	}
@@ -503,7 +503,7 @@ class UserTest {
 	@Test
 	void testToString() {
 		User user = User.builder()
-				.id(100560100000014842L)
+				.id("100560100000014842")
 				.anchor("user.peterpan")
 				.firstname("Peter")
 				.lastname("Pan")
@@ -513,7 +513,7 @@ class UserTest {
 				.roleList(
 						UserLevelRoles.USER,
 						Ref.ofAnchor("test.anchor"),
-						Ref.ofId(123L))
+						Ref.ofId("123"))
 				.identity(TEST_IDENTITY)
 				.note("a note")
 				.build();
@@ -533,7 +533,7 @@ class UserTest {
 		mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
 		User user = User.builder()
-				.id(100560100000014842L)
+				.id("100560100000014842")
 				.anchor("user.peterpan")
 				.firstname("Peter")
 				.lastname("Pan")
@@ -543,14 +543,14 @@ class UserTest {
 				.roleList(
 						UserLevelRoles.USER,
 						Ref.ofAnchor("test.anchor"),
-						Ref.ofId(123L))
+						Ref.ofId("123"))
 				.identity(TEST_IDENTITY)
 				.note("a note")
 				.build();
 
 		String json = mapper.writeValueAsString(user);
 
-		String expected = "{\"id\":100560100000014842," +
+		String expected = "{\"id\":\"100560100000014842\"," +
 				"\"anchor\":\"user.peterpan\"," +
 				"\"login\":\"peterpan\"," +
 				"\"firstname\":\"Peter\"," +
@@ -589,7 +589,7 @@ class UserTest {
 		User user = mapper.readValue(json, User.class);
 
 		User expected = User.builder()
-				.id(100560100000014842L)
+				.id("100560100000014842")
 				.anchor("user.peterpan")
 				.firstname("Peter")
 				.lastname("Pan")
@@ -599,7 +599,7 @@ class UserTest {
 				.roleList(
 						UserLevelRoles.USER,
 						Ref.ofAnchor("test.anchor"),
-						Ref.ofId(123L))
+						Ref.ofId("123"))
 				.identity(TEST_IDENTITY)
 				.note("a note")
 				.build();

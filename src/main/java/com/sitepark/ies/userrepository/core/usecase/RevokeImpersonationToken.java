@@ -25,7 +25,7 @@ public class RevokeImpersonationToken {
 		this.accessControl = accessControl;
 	}
 
-	public void revokeImpersonationToken(long user, long id) {
+	public void revokeImpersonationToken(String user, String id) {
 
 		if (!this.accessControl.isImpersonationTokensManageable()) {
 			throw new AccessDeniedException("Not allowed manage impersonation tokens");

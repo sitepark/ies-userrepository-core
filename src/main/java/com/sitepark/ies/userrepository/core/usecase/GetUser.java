@@ -38,7 +38,7 @@ public final class GetUser {
 
 	public User getUser(Identifier identifier) {
 
-		long id = this.identifierResolver.resolveIdentifier(identifier);
+		String id = this.identifierResolver.resolveIdentifier(identifier);
 
 		if (!this.accessControl.isUserReadable(id)) {
 			throw new AccessDeniedException("Not allowed to reat user " + id);

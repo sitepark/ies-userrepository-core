@@ -44,7 +44,7 @@ public final class PurgeUser {
 
 	public void purgeUser(Identifier identifier) {
 
-		long id = this.identifierResolver.resolveIdentifier(identifier);
+		String id = this.identifierResolver.resolveIdentifier(identifier);
 
 		if (!this.accessControl.isUserRemovable(id)) {
 			throw new AccessDeniedException("Not allowed to remove user " + id);

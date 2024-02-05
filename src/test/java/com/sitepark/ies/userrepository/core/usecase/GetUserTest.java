@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,10 +31,10 @@ class GetUserTest {
 
 		UserRepository userRepository = mock();
 		IdentifierResolver identifierResolver = mock();
-		when(identifierResolver.resolveIdentifier(any())).thenReturn(123L);
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		RoleAssigner roleAssigner = mock();
 		AccessControl accessControl = mock();
-		when(accessControl.isUserReadable(123L)).thenReturn(false);
+		when(accessControl.isUserReadable("123")).thenReturn(false);
 
 		GetUser getUserUseCase = new GetUser(
 				userRepository,
@@ -52,10 +52,10 @@ class GetUserTest {
 
 		UserRepository userRepository = mock();
 		IdentifierResolver identifierResolver = mock();
-		when(identifierResolver.resolveIdentifier(any())).thenReturn(123L);
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		RoleAssigner roleAssigner = mock();
 		AccessControl accessControl = mock();
-		when(accessControl.isUserReadable(123L)).thenReturn(false);
+		when(accessControl.isUserReadable("123")).thenReturn(false);
 
 		GetUser getUserUseCase = new GetUser(
 				userRepository,
@@ -73,19 +73,19 @@ class GetUserTest {
 
 		UserRepository userRepository = mock();
 		User storedUser = User.builder()
-				.id(123L)
+				.id("123")
 				.login("test")
 				.build();
-		when(userRepository.get(123L)).thenReturn(Optional.of(storedUser));
+		when(userRepository.get("123")).thenReturn(Optional.of(storedUser));
 		IdentifierResolver identifierResolver = mock();
-		when(identifierResolver.resolveIdentifier(any())).thenReturn(123L);
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		RoleAssigner roleAssigner = mock();
-		when(roleAssigner.getRolesAssignByUser(123L)).thenReturn(Arrays.asList(
+		when(roleAssigner.getRolesAssignByUser("123")).thenReturn(Arrays.asList(
 				UserLevelRoles.USER,
 				Ref.ofAnchor("role.a")
 		));
 		AccessControl accessControl = mock();
-		when(accessControl.isUserReadable(anyLong())).thenReturn(true);
+		when(accessControl.isUserReadable(anyString())).thenReturn(true);
 
 		GetUser getUserUseCase = new GetUser(
 				userRepository,
@@ -94,7 +94,7 @@ class GetUserTest {
 				accessControl);
 
 		User expectedUser = User.builder()
-				.id(123L)
+				.id("123")
 				.login("test")
 				.roleList(UserLevelRoles.USER, Ref.ofAnchor("role.a"))
 				.build();
@@ -109,10 +109,10 @@ class GetUserTest {
 
 		UserRepository userRepository = mock();
 		IdentifierResolver identifierResolver = mock();
-		when(identifierResolver.resolveIdentifier(any())).thenReturn(123L);
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
 		RoleAssigner roleAssigner = mock();
 		AccessControl accessControl = mock();
-		when(accessControl.isUserReadable(anyLong())).thenReturn(true);
+		when(accessControl.isUserReadable(anyString())).thenReturn(true);
 
 		GetUser getUserUseCase = new GetUser(
 				userRepository,
@@ -123,7 +123,7 @@ class GetUserTest {
 		UserNotFoundException e = assertThrows(UserNotFoundException.class, () -> {
 			getUserUseCase.getUser(Identifier.ofString("123"));
 		});
-		assertEquals(123L, e.getId(), "unexpected user");
+		assertEquals("123", e.getId(), "unexpected user");
 		assertNotNull(e.getMessage(), "message is null");
 	}
 }

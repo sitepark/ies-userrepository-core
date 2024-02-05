@@ -1,14 +1,17 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
+import java.util.Objects;
 import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 public final class Identifier {
 
-	private final Long id;
+	private final String id;
 
 	private final Anchor anchor;
 
-	private Identifier(Long id) {
+	private Identifier(String id) {
 		this.id = id;
 		this.anchor = null;
 	}
@@ -18,7 +21,7 @@ public final class Identifier {
 		this.anchor = anchor;
 	}
 
-	public static Identifier ofId(long id) {
+	public static Identifier ofId(String id) {
 		return new Identifier(id);
 	}
 
@@ -29,14 +32,21 @@ public final class Identifier {
 		return new Identifier(anchor);
 	}
 
+	@JsonCreator
 	public static Identifier ofString(String identifier) {
+		if (identifier == null) {
+			throw new NullPointerException("identifier is null");
+		}
+		if (identifier.isBlank()) {
+			throw new IllegalArgumentException("identifier is blank");
+		}
 		if (isId(identifier)) {
-			return new Identifier(Long.valueOf(identifier));
+			return new Identifier(identifier);
 		}
 		return new Identifier(Anchor.ofString(identifier));
 	}
 
-	public Optional<Long> getId() {
+	public Optional<String> getId() {
 		return Optional.ofNullable(this.id);
 	}
 
@@ -44,7 +54,11 @@ public final class Identifier {
 		return Optional.ofNullable(this.anchor);
 	}
 
-	private static boolean isId(String str) {
+	public static boolean isId(String str) {
+
+		if (str.equals("0")) {
+			throw new IllegalArgumentException("id should be greater than 0");
+		}
 
 		int length = str.length();
 		if (length > 19) {
@@ -58,5 +72,32 @@ public final class Identifier {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.id, this.anchor);
+	}
+
+
+	@Override
+	public boolean equals(Object o) {
+
+		if (!(o instanceof Identifier)) {
+			return false;
+		}
+
+		Identifier that = (Identifier)o;
+		return
+				Objects.equals(this.id, that.id) &&
+				Objects.equals(this.anchor, that.anchor);
+	}
+
+	@Override
+	public String toString() {
+		if (this.id != null) {
+			return this.id.toString();
+		}
+		return this.anchor.toString();
 	}
 }

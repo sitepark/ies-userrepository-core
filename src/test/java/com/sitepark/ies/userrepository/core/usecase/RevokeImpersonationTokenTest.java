@@ -25,7 +25,7 @@ class RevokeImpersonationTokenTest {
 				accessControl);
 
 		assertThrows(AccessDeniedException.class, () -> {
-			revokeImpersonationToken.revokeImpersonationToken(1L, 2L);
+			revokeImpersonationToken.revokeImpersonationToken("1", "2");
 		});
 
 		verify(accessControl).isImpersonationTokensManageable();
@@ -42,9 +42,9 @@ class RevokeImpersonationTokenTest {
 				accessTokenRepository,
 				accessControl);
 
-		revokeImpersonationToken.revokeImpersonationToken(1L, 2L);
+		revokeImpersonationToken.revokeImpersonationToken("1", "2");
 
-		verify(accessTokenRepository).revoke(1L, 2L);
+		verify(accessTokenRepository).revoke("1", "2");
 	}
 
 

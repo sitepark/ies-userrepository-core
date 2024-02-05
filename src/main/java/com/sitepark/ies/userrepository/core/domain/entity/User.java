@@ -19,7 +19,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
-	private final long id;
+	private final String id;
 
 	private final Anchor anchor;
 
@@ -55,12 +55,23 @@ public final class User {
 		this.roleList = Collections.unmodifiableList(builder.roleList);
 	}
 
-	public Optional<Long> getId() {
-		if (this.id == 0) {
+	public Optional<String> getId() {
+		if (this.id == null) {
 			return Optional.empty();
 		} else {
 			return Optional.of(this.id);
 		}
+	}
+
+	@JsonIgnore
+	public Optional<Identifier> getIdentifier() {
+		if (this.id != null) {
+			return Optional.of(Identifier.ofId(this.id));
+		}
+		if (this.anchor != null) {
+			return Optional.of(Identifier.ofAnchor(this.anchor));
+		}
+		return Optional.empty();
 	}
 
 	public Optional<Anchor> getAnchor() {
@@ -187,7 +198,7 @@ public final class User {
 	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
 	public static final class Builder {
 
-		private long id;
+		private String id;
 
 		private Anchor anchor;
 
@@ -226,11 +237,23 @@ public final class User {
 			this.roleList.addAll(user.roleList);
 		}
 
-		public Builder id(long id) {
-			if (id <= 0) {
-				throw new IllegalArgumentException("id should be greater than 0");
+		public Builder id(String id) {
+			if (id == null) {
+				throw new NullPointerException("id is null");
+			}
+			if (!Identifier.isId(id)) {
+				throw new IllegalArgumentException(id + " is not an id");
 			}
 			this.id = id;
+			return this;
+		}
+
+		public Builder identifier(Identifier identifier) {
+			if (identifier.getId().isPresent()) {
+				this.id = identifier.getId().get();
+				return this;
+			}
+			this.anchor = identifier.getAnchor().get();
 			return this;
 		}
 

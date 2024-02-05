@@ -2,7 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,7 +26,7 @@ class PurgeUserTest {
 		IdentifierResolver identifierResolver = mock();
 		AccessTokenRepository accessTokenRepository = mock(AccessTokenRepository.class);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
-		when(accessControl.isUserRemovable(anyLong())).thenReturn(false);
+		when(accessControl.isUserRemovable(anyString())).thenReturn(false);
 
 		var purgeEntity = new PurgeUser(
 				null,
@@ -35,7 +35,7 @@ class PurgeUserTest {
 				accessControl,
 				accessTokenRepository);
 		assertThrows(AccessDeniedException.class, () -> {
-			purgeEntity.purgeUser(Identifier.ofId(10L));
+			purgeEntity.purgeUser(Identifier.ofId("10"));
 		});
 	}
 
@@ -44,10 +44,10 @@ class PurgeUserTest {
 	void testPurge() {
 
 		IdentifierResolver identifierResolver = mock();
-		when(identifierResolver.resolveIdentifier(any())).thenReturn(10L);
+		when(identifierResolver.resolveIdentifier(any())).thenReturn("10");
 		AccessControl accessControl = mock(AccessControl.class);
 		AccessTokenRepository accessTokenRepository = mock(AccessTokenRepository.class);
-		when(accessControl.isUserRemovable(anyLong())).thenReturn(true);
+		when(accessControl.isUserRemovable(anyString())).thenReturn(true);
 		ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
 		UserRepository repository = mock(UserRepository.class);
@@ -58,10 +58,10 @@ class PurgeUserTest {
 				extensionsNotifier,
 				accessControl,
 				accessTokenRepository);
-		purgeEntity.purgeUser(Identifier.ofId(10L));
+		purgeEntity.purgeUser(Identifier.ofId("10"));
 
-		verify(repository).remove(10L);
-		verify(extensionsNotifier).notifyPurge(10L);
-		verify(accessTokenRepository).purgeByUser(10L);
+		verify(repository).remove("10");
+		verify(extensionsNotifier).notifyPurge("10");
+		verify(accessTokenRepository).purgeByUser("10");
 	}
 }

@@ -31,7 +31,7 @@ class RefFactoryTest {
 	void testCreateWithId() {
 		RefFactory factory = new RefFactory();
 		Ref ref = factory.create("REF(123)");
-		assertEquals(123, ref.getId().get(), "unexpected id");
+		assertEquals("123", ref.getId().get(), "unexpected id");
 		assertTrue(ref.getAnchor().isEmpty(), "anchor should be empty");
 	}
 

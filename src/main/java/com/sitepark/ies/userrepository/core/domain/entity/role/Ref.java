@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
+import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 
 /**
@@ -13,7 +14,7 @@ import com.sitepark.ies.userrepository.core.domain.entity.Role;
  */
 public final class Ref extends Role {
 
-	private final long id;
+	private final String id;
 
 	private final Anchor anchor;
 
@@ -26,16 +27,16 @@ public final class Ref extends Role {
 	@SuppressWarnings("PMD.NullAssignment")
 	protected Ref() {
 		super("NONE");
-		this.id = 0L;
+		this.id = null;
 		this.anchor = null;
 	}
 
 	// A ref has either an id or an anchor.
 	@SuppressWarnings("PMD.NullAssignment")
-	private Ref(long id) {
+	private Ref(String id) {
 		super("REF(" + id + ")");
-		if (id <= 0) {
-			throw new IllegalArgumentException("id must be greater than 0");
+		if (!Identifier.isId(id)) {
+			throw new IllegalArgumentException(id + " not an id");
 		}
 		this.id = id;
 		this.anchor = null;
@@ -44,11 +45,11 @@ public final class Ref extends Role {
 	private Ref(Anchor anchor) {
 		super("REF(" + anchor + ")");
 		Objects.requireNonNull(anchor, "anchor is null");
-		this.id = 0;
+		this.id = null;
 		this.anchor = anchor;
 	}
 
-	public static Ref ofId(long id) {
+	public static Ref ofId(String id) {
 		return new Ref(id);
 	}
 
@@ -61,8 +62,8 @@ public final class Ref extends Role {
 		return new Ref(Anchor.ofString(anchor));
 	}
 
-	public Optional<Long> getId() {
-		if (this.id == 0) {
+	public Optional<String> getId() {
+		if (this.id == null) {
 			return Optional.empty();
 		}
 		return Optional.of(this.id);

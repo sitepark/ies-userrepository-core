@@ -9,14 +9,14 @@ public class UserNotFoundException extends UserRepositoryException {
 
 	private static final long serialVersionUID = 1L;
 
-	private final long id;
+	private final String id;
 
-	public UserNotFoundException(long id) {
+	public UserNotFoundException(String id) {
 		super();
 		this.id = id;
 	}
 
-	public long getId() {
+	public String getId() {
 		return this.id;
 	}
 
