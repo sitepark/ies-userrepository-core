@@ -9,8 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
+@SuppressFBWarnings({
+	"PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
+	"NP_NULL_PARAM_DEREF_NONVIRTUAL"
+})
 class RefTest {
 
 	@Test

@@ -96,7 +96,7 @@ public final class Identifier {
 	@Override
 	public String toString() {
 		if (this.id != null) {
-			return this.id.toString();
+			return this.id;
 		}
 		return this.anchor.toString();
 	}
