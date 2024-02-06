@@ -10,12 +10,6 @@ public class InvalidAnchorException extends UserRepositoryException {
 
 	private static final long serialVersionUID = 1L;
 
-	public InvalidAnchorException(String name) {
-		super();
-		this.name = name;
-	}
-
-
 	public InvalidAnchorException(String name, String message) {
 		super(message);
 		this.name = name;

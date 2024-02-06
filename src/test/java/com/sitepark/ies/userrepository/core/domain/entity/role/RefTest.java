@@ -79,6 +79,13 @@ class RefTest {
 	}
 
 	@Test
+	void testIdRefWithInvalidId() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Ref.ofId("1x");
+		});
+	}
+
+	@Test
 	void testWorkarroundConstructor() {
 		Ref ref = new Ref();
 		assertEquals("NONE", ref.getName(), "unexpected role name");

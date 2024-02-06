@@ -213,9 +213,7 @@ public final class AccessToken {
 		}
 
 		public Builder id(String id) {
-			if (id == null) {
-				throw new NullPointerException("id is null");
-			}
+			Objects.requireNonNull(id, "id is null");
 			if (!Identifier.isId(id)) {
 				throw new IllegalArgumentException(id + " is not an id");
 			}
@@ -224,9 +222,7 @@ public final class AccessToken {
 		}
 
 		public Builder user(String user) {
-			if (user == null) {
-				throw new NullPointerException("user is null");
-			}
+			Objects.requireNonNull(user, "user is null");
 			if (!Identifier.isId(user)) {
 				throw new IllegalArgumentException(user + " is not an user id");
 			}

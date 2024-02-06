@@ -238,9 +238,7 @@ public final class User {
 		}
 
 		public Builder id(String id) {
-			if (id == null) {
-				throw new NullPointerException("id is null");
-			}
+			Objects.requireNonNull(id, "id is null");
 			if (!Identifier.isId(id)) {
 				throw new IllegalArgumentException(id + " is not an id");
 			}

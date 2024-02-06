@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public final class Identifier {
 
+	private static final int MAX_ID_LENGTH = 19;
+
+	private static final String ZERO_ID = "0";
+
 	private final String id;
 
 	private final Anchor anchor;
@@ -22,21 +26,20 @@ public final class Identifier {
 	}
 
 	public static Identifier ofId(String id) {
+		if (!isId(id)) {
+			throw new IllegalArgumentException("invalid id: " + id);
+		}
 		return new Identifier(id);
 	}
 
 	public static Identifier ofAnchor(Anchor anchor) {
-		if (anchor == null) {
-			throw new NullPointerException("anchor is null");
-		}
+		Objects.requireNonNull(anchor, "anchor is null");
 		return new Identifier(anchor);
 	}
 
 	@JsonCreator
 	public static Identifier ofString(String identifier) {
-		if (identifier == null) {
-			throw new NullPointerException("identifier is null");
-		}
+		Objects.requireNonNull(identifier, "identifier is null");
 		if (identifier.isBlank()) {
 			throw new IllegalArgumentException("identifier is blank");
 		}
@@ -56,12 +59,12 @@ public final class Identifier {
 
 	public static boolean isId(String str) {
 
-		if (str.equals("0")) {
+		if (ZERO_ID.equals(str)) {
 			throw new IllegalArgumentException("id should be greater than 0");
 		}
 
 		int length = str.length();
-		if (length > 19) {
+		if (length > MAX_ID_LENGTH) {
 			return false;
 		}
 

@@ -27,7 +27,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 @SuppressWarnings("PMD.TooManyMethods")
 @SuppressFBWarnings({
 	"PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
-	"NP_NULL_PARAM_DEREF_NONVIRTUAL"
+	"NP_NULL_PARAM_DEREF_NONVIRTUAL",
+	"NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS"
 })
 class AccessTokenTest {
 
@@ -52,9 +53,23 @@ class AccessTokenTest {
 	}
 
 	@Test
-	void testSetInvalidUser() throws JsonProcessingException {
+	void testSetUserWithNull() throws JsonProcessingException {
+		assertThrows(NullPointerException.class, () -> {
+			AccessToken.builder().user(null);
+		});
+	}
+
+	@Test
+	void testSetUserWithZero() throws JsonProcessingException {
 		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().user("0");
+		});
+	}
+
+	@Test
+	void testSetUserWithInvalidValue() throws JsonProcessingException {
+		assertThrows(IllegalArgumentException.class, () -> {
+			AccessToken.builder().user("1x");
 		});
 	}
 
@@ -115,9 +130,23 @@ class AccessTokenTest {
 	}
 
 	@Test
-	void testSetInvalidId() throws JsonProcessingException {
+	void testSetIdWithNull() throws JsonProcessingException {
+		assertThrows(NullPointerException.class, () -> {
+			AccessToken.builder().id(null);
+		});
+	}
+
+	@Test
+	void testSetIdWithZero() throws JsonProcessingException {
 		assertThrows(IllegalArgumentException.class, () -> {
 			AccessToken.builder().id("0");
+		});
+	}
+
+	@Test
+	void testSetIdWithInvalidValue() throws JsonProcessingException {
+		assertThrows(IllegalArgumentException.class, () -> {
+			AccessToken.builder().id("1x");
 		});
 	}
 

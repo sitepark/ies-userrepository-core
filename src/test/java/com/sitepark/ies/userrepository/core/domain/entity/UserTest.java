@@ -63,6 +63,24 @@ class UserTest {
 	}
 
 	@Test
+	void testSetIdentifierWithId() {
+		Identifier id = Identifier.ofId("123");
+		User user = this.createBuilderWithRequiredValues()
+				.identifier(id)
+				.build();
+		assertEquals("123", user.getId().get(), "unexpected id");
+	}
+
+	@Test
+	void testSetIdentifierWithAnchor() {
+		Identifier anchor = Identifier.ofAnchor(Anchor.ofString("abc"));
+		User user = this.createBuilderWithRequiredValues()
+				.identifier(anchor)
+				.build();
+		assertEquals("abc", user.getAnchor().get().getName(), "unexpected anchor");
+	}
+
+	@Test
 	void testSetId() {
 		User user = this.createBuilderWithRequiredValues()
 				.id("123")
@@ -78,10 +96,55 @@ class UserTest {
 	}
 
 	@Test
-	void testSetInvalidId() {
+	void testGetIdentifierWithId() {
+		User user = this.createBuilderWithRequiredValues()
+				.id("123")
+				.build();
+		assertEquals(
+				Identifier.ofId("123"),
+				user.getIdentifier().get(),
+				"unexpected identifier");
+	}
+
+	@Test
+	void testGetIdentifierWithAnchor() {
+		User user = this.createBuilderWithRequiredValues()
+				.anchor("abc")
+				.build();
+		assertEquals(
+				Identifier.ofAnchor(Anchor.ofString("abc")),
+				user.getIdentifier().get(),
+				"unexpected identifier");
+	}
+
+	@Test
+	void testGetEmptyIdentifier() {
+		User user = this.createBuilderWithRequiredValues()
+				.build();
+		assertTrue(
+				user.getIdentifier().isEmpty(),
+				"identifier should be empty");
+	}
+
+	@Test
+	void testSetIdWithZero() {
 		assertThrows(IllegalArgumentException.class, () -> {
 			User.builder().id("0");
 		}, "id 0 should't be allowed");
+	}
+
+	@Test
+	void testSetIdWithNull() {
+		assertThrows(NullPointerException.class, () -> {
+			User.builder().id(null);
+		}, "null should't be allowed");
+	}
+
+	@Test
+	void testSeIdWithInvalidValue() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			User.builder().id("0x");
+		}, "invalid id should't be allowed");
 	}
 
 	@Test

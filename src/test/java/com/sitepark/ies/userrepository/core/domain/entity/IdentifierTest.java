@@ -63,9 +63,37 @@ class IdentifierTest {
 	}
 
 	@Test
+	void testOfStringWithNull() {
+		assertThrows(NullPointerException.class, () -> {
+			Identifier.ofString(null);
+		});
+	}
+
+	@Test
+	void testOfStringWithBlank() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Identifier.ofString(" ");
+		});
+	}
+
+	@Test
 	void testOfId() {
 		Identifier identifier = Identifier.ofId("123");
 		assertEquals(Optional.of("123"), identifier.getId(), "id exprected");
+	}
+
+	@Test
+	void testOfIdWithZero() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Identifier.ofId("0");
+		});
+	}
+
+	@Test
+	void testOfIdWithInvalidId() {
+		assertThrows(IllegalArgumentException.class, () -> {
+			Identifier.ofId("0x");
+		});
 	}
 
 	@Test
