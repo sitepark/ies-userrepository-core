@@ -11,7 +11,7 @@ module com.sitepark.ies.userrepository.core {
 	exports com.sitepark.ies.userrepository.core.usecase;
 	requires org.apache.logging.log4j;
 	requires com.github.spotbugs.annotations;
-	requires javax.inject;
+	requires jakarta.inject;
 	requires transitive com.fasterxml.jackson.databind;
 	requires com.fasterxml.jackson.annotation;
 	requires com.fasterxml.jackson.datatype.jdk8;

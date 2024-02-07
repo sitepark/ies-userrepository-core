@@ -2,7 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;

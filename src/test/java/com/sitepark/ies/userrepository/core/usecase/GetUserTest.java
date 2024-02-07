@@ -24,6 +24,7 @@ import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class GetUserTest {
 
 	@Test
@@ -105,6 +106,7 @@ class GetUserTest {
 	}
 
 	@Test
+	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testGetUserNotFound() {
 
 		UserRepository userRepository = mock();

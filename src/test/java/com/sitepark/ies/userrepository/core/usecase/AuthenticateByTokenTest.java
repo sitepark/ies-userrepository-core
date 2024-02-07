@@ -90,6 +90,7 @@ class AuthenticateByTokenTest {
 		});
 	}
 
+	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	@Test
 	void testTokenExpired() {
 

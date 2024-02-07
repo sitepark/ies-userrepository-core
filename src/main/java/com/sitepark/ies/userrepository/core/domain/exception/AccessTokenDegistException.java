@@ -13,6 +13,6 @@ public class AccessTokenDegistException extends UserRepositoryException {
 	}
 
 	public AccessTokenDegistException(String message, Throwable t) {
-		super(message);
+		super(message, t);
 	}
 }

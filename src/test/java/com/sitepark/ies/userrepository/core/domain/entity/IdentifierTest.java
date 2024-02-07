@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @SuppressFBWarnings({
 	"PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
 	"NP_NULL_PARAM_DEREF_NONVIRTUAL"
@@ -26,13 +27,13 @@ class IdentifierTest {
 	@Test
 	void testToStringWithId() {
 		Identifier identifier = Identifier.ofString("123");
-		assertEquals("123", identifier.toString());
+		assertEquals("123", identifier.toString(), "unexpecated identifier");
 	}
 
 	@Test
 	void testToStringWithAnchor() {
 		Identifier identifier = Identifier.ofString("abc");
-		assertEquals("abc", identifier.toString());
+		assertEquals("abc", identifier.toString(), "unexpecated identifier");
 	}
 
 	@Test

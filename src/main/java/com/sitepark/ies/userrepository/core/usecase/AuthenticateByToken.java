@@ -3,7 +3,7 @@ package com.sitepark.ies.userrepository.core.usecase;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
 import com.sitepark.ies.userrepository.core.domain.entity.User;

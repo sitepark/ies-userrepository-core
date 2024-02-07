@@ -14,6 +14,7 @@ import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchorExcept
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class AnchorTest {
 
 	@Test
@@ -43,19 +44,21 @@ class AnchorTest {
 	}
 
 	@Test
+	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testValidateOnlyDigits() {
 		InvalidAnchorException e = assertThrows(InvalidAnchorException.class, () -> {
 			Anchor.ofString("1234556789012345");
-		});
+		}, "anchor must not only contain numbers");
 		assertEquals("1234556789012345", e.getName(), "unexpected name");
 		assertNotNull(e.getMessage(), "message is null");
 	}
 
 	@Test
+	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 	void testValidateInvalidChars() {
 		InvalidAnchorException e = assertThrows(InvalidAnchorException.class, () -> {
 			Anchor.ofString("a.b,c");
-		});
+		}, "anchor must not contain commas");
 		assertEquals("a.b,c", e.getName(), "unexpected name");
 		assertNotNull(e.getMessage(), "message is null");
 	}

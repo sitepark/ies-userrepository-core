@@ -15,6 +15,7 @@ import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class IdentifierResolverTest {
 
 	@Test

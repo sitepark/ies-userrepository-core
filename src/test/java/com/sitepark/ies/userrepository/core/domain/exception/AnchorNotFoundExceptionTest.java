@@ -15,6 +15,9 @@ class AnchorNotFoundExceptionTest {
 		Anchor anchor = Anchor.ofString("abc");
 		AnchorNotFoundException e = new AnchorNotFoundException(anchor);
 		assertEquals(anchor, e.getAnchor(), "unexpecatd anchor");
-		assertThat(e.getMessage(), containsString(" abc "));
+		assertThat(
+				"message should contains 'abc'",
+				e.getMessage(),
+				containsString(" abc "));
 	}
 }

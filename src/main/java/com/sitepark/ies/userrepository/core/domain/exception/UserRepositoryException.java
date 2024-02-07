@@ -15,4 +15,7 @@ public abstract class UserRepositoryException extends RuntimeException {
 	public UserRepositoryException(String message) {
 		super(message);
 	}
+	public UserRepositoryException(String message, Throwable t) {
+		super(message, t);
+	}
 }

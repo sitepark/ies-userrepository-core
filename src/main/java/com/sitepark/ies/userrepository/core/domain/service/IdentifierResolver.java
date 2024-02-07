@@ -2,7 +2,7 @@ package com.sitepark.ies.userrepository.core.domain.service;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;

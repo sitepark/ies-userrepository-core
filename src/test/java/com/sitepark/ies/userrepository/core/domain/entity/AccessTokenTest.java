@@ -24,7 +24,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-@SuppressWarnings("PMD.TooManyMethods")
+@SuppressWarnings({
+		"PMD.TooManyMethods",
+		"PMD.AvoidDuplicateLiterals"
+})
 @SuppressFBWarnings({
 	"PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
 	"NP_NULL_PARAM_DEREF_NONVIRTUAL",
