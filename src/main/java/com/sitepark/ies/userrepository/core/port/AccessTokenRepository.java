@@ -1,20 +1,19 @@
 package com.sitepark.ies.userrepository.core.port;
 
-import java.util.Optional;
-
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
+import java.util.Optional;
 
 public interface AccessTokenRepository {
 
-	AccessToken create(AccessToken accessToken);
+  AccessToken create(AccessToken accessToken);
 
-	void revoke(String user, String id);
+  void revoke(String user, String id);
 
-	void purge(String user, String id);
+  void purge(String user, String id);
 
-	void purgeByUser(String user);
+  void purgeByUser(String user);
 
-	void touch(String user, String id);
+  void touch(String user, String id);
 
-	Optional<AccessToken> getByToken(String token);
+  Optional<AccessToken> getByToken(String token);
 }

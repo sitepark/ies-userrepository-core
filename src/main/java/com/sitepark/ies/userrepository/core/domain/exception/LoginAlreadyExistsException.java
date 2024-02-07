@@ -7,29 +7,28 @@ package com.sitepark.ies.userrepository.core.domain.exception;
  */
 public class LoginAlreadyExistsException extends UserRepositoryException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private final String login;
+  private final String login;
 
-	private final String owner;
+  private final String owner;
 
-	public LoginAlreadyExistsException(String login, String owner) {
-		super();
-		this.login = login;
-		this.owner = owner;
-	}
+  public LoginAlreadyExistsException(String login, String owner) {
+    super();
+    this.login = login;
+    this.owner = owner;
+  }
 
-	public String getLogin() {
-		return this.login;
-	}
+  public String getLogin() {
+    return this.login;
+  }
 
-	public String getOwner() {
-		return this.owner;
-	}
+  public String getOwner() {
+    return this.owner;
+  }
 
-	@Override
-	public String getMessage() {
-		return "Login " + this.login + " already exists for user " + this.owner;
-	}
-
+  @Override
+  public String getMessage() {
+    return "Login " + this.login + " already exists for user " + this.owner;
+  }
 }

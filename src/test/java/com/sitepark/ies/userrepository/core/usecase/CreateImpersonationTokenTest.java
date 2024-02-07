@@ -7,10 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
@@ -18,72 +14,71 @@ import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundExcepti
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
 
 class CreateImpersonationTokenTest {
 
-	@Test
-	void testAccessDenied() {
+  @Test
+  void testAccessDenied() {
 
-		AccessTokenRepository accessTokenRepository = mock();
-		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isImpersonationTokensManageable()).thenReturn(false);
-		UserRepository userRepository = mock(UserRepository.class);
+    AccessTokenRepository accessTokenRepository = mock();
+    AccessControl accessControl = mock(AccessControl.class);
+    when(accessControl.isImpersonationTokensManageable()).thenReturn(false);
+    UserRepository userRepository = mock(UserRepository.class);
 
-		AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
+    AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
 
-		var createImpersonationToken = new CreateImpersonationToken(
-				accessTokenRepository,
-				accessControl,
-				userRepository);
+    var createImpersonationToken =
+        new CreateImpersonationToken(accessTokenRepository, accessControl, userRepository);
 
-		assertThrows(AccessDeniedException.class, () -> {
-			createImpersonationToken.createPersonalAccessToken(accessToken);
-		});
+    assertThrows(
+        AccessDeniedException.class,
+        () -> {
+          createImpersonationToken.createPersonalAccessToken(accessToken);
+        });
 
-		verify(accessControl).isImpersonationTokensManageable();
-	}
+    verify(accessControl).isImpersonationTokensManageable();
+  }
 
-	@Test
-	void testUserNotFound() {
+  @Test
+  void testUserNotFound() {
 
-		AccessTokenRepository accessTokenRepository = mock();
-		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isImpersonationTokensManageable()).thenReturn(true);
-		UserRepository userRepository = mock(UserRepository.class);
-		when(userRepository.get(anyString())).thenReturn(Optional.empty());
+    AccessTokenRepository accessTokenRepository = mock();
+    AccessControl accessControl = mock(AccessControl.class);
+    when(accessControl.isImpersonationTokensManageable()).thenReturn(true);
+    UserRepository userRepository = mock(UserRepository.class);
+    when(userRepository.get(anyString())).thenReturn(Optional.empty());
 
-		AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
+    AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
 
-		var createImpersonationToken = new CreateImpersonationToken(
-				accessTokenRepository,
-				accessControl,
-				userRepository);
+    var createImpersonationToken =
+        new CreateImpersonationToken(accessTokenRepository, accessControl, userRepository);
 
-		assertThrows(UserNotFoundException.class, () -> {
-			createImpersonationToken.createPersonalAccessToken(accessToken);
-		});
-	}
+    assertThrows(
+        UserNotFoundException.class,
+        () -> {
+          createImpersonationToken.createPersonalAccessToken(accessToken);
+        });
+  }
 
-	@Test
-	void testCreate() {
+  @Test
+  void testCreate() {
 
-		AccessTokenRepository accessTokenRepository = mock();
-		AccessControl accessControl = mock(AccessControl.class);
-		when(accessControl.isImpersonationTokensManageable()).thenReturn(true);
-		UserRepository userRepository = mock(UserRepository.class);
-		User user = mock(User.class);
-		when(userRepository.get(anyString())).thenReturn(Optional.of(user));
+    AccessTokenRepository accessTokenRepository = mock();
+    AccessControl accessControl = mock(AccessControl.class);
+    when(accessControl.isImpersonationTokensManageable()).thenReturn(true);
+    UserRepository userRepository = mock(UserRepository.class);
+    User user = mock(User.class);
+    when(userRepository.get(anyString())).thenReturn(Optional.of(user));
 
-		AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
+    AccessToken accessToken = AccessToken.builder().user("123").name("Test Token").build();
 
-		var createImpersonationToken = new CreateImpersonationToken(
-				accessTokenRepository,
-				accessControl,
-				userRepository);
+    var createImpersonationToken =
+        new CreateImpersonationToken(accessTokenRepository, accessControl, userRepository);
 
-		createImpersonationToken.createPersonalAccessToken(accessToken);
+    createImpersonationToken.createPersonalAccessToken(accessToken);
 
-		verify(accessTokenRepository).create(any());
-	}
-
+    verify(accessTokenRepository).create(any());
+  }
 }
