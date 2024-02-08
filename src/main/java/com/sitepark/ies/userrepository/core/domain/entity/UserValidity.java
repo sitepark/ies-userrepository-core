@@ -46,15 +46,11 @@ public class UserValidity {
 
     Objects.requireNonNull(base, "base is null");
 
-    if (this.blocked) {
+    if (this.blocked || ((this.validFrom != null) && this.validFrom.isAfter(base))) {
       return false;
     }
 
-    if (this.validFrom != null && this.validFrom.isAfter(base)) {
-      return false;
-    }
-
-    if (this.validTo != null && this.validTo.isBefore(base)) {
+    if ((this.validTo != null) && this.validTo.isBefore(base)) {
       return false;
     }
 
@@ -78,27 +74,23 @@ public class UserValidity {
   public final int hashCode() {
 
     int hash = Boolean.hashCode(this.blocked);
-    hash = (this.validFrom != null) ? 31 * hash + this.validFrom.hashCode() : hash;
-    hash = (this.validTo != null) ? 31 * hash + this.validTo.hashCode() : hash;
-
-    return hash;
+    hash = (this.validFrom != null) ? (31 * hash) + this.validFrom.hashCode() : hash;
+    return (this.validTo != null) ? (31 * hash) + this.validTo.hashCode() : hash;
   }
 
   @Override
   @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public final boolean equals(Object o) {
 
-    if (!(o instanceof UserValidity)) {
+    if (!(o instanceof UserValidity validity)) {
       return false;
     }
 
-    UserValidity validity = (UserValidity) o;
-
     if (!Objects.equals(this.blocked, validity.blocked)) {
       return false;
-    } else if (!Objects.equals(this.validFrom, validity.validFrom)) {
-      return false;
-    } else if (!Objects.equals(this.validTo, validity.validTo)) {
+    }
+    if (!Objects.equals(this.validFrom, validity.validFrom)
+        || !Objects.equals(this.validTo, validity.validTo)) {
       return false;
     }
 
@@ -108,11 +100,11 @@ public class UserValidity {
   @Override
   public String toString() {
     return "UserValidity [blocked="
-        + blocked
+        + this.blocked
         + ", validFrom="
-        + validFrom
+        + this.validFrom
         + ", validTo="
-        + validTo
+        + this.validTo
         + "]";
   }
 

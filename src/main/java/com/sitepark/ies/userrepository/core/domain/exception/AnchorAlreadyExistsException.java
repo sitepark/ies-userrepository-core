@@ -15,7 +15,6 @@ public class AnchorAlreadyExistsException extends UserRepositoryException {
   private final String owner;
 
   public AnchorAlreadyExistsException(Anchor anchor, String owner) {
-    super();
     this.anchor = anchor;
     this.owner = owner;
   }

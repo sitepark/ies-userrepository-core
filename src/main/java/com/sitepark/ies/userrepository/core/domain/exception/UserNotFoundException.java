@@ -12,7 +12,6 @@ public class UserNotFoundException extends UserRepositoryException {
   private final String id;
 
   public UserNotFoundException(String id) {
-    super();
     this.id = id;
   }
 

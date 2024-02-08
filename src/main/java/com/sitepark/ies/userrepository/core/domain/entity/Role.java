@@ -41,11 +41,10 @@ public class Role {
   @Override
   public final boolean equals(Object o) {
 
-    if (!(o instanceof Role)) {
+    if (!(o instanceof Role other)) {
       return false;
     }
 
-    Role other = (Role) o;
     return Objects.equals(this.name, other.name);
   }
 

@@ -94,11 +94,10 @@ public final class Anchor implements Serializable {
   @Override
   public boolean equals(Object o) {
 
-    if (!(o instanceof Anchor)) {
+    if (!(o instanceof Anchor anchor)) {
       return false;
     }
 
-    Anchor anchor = (Anchor) o;
     return Objects.equals(this.name, anchor.name);
   }
 

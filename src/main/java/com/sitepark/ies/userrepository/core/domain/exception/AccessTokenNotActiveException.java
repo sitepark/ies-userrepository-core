@@ -9,7 +9,5 @@ public class AccessTokenNotActiveException extends AuthenticationFailedException
 
   private static final long serialVersionUID = 1L;
 
-  public AccessTokenNotActiveException() {
-    super();
-  }
+  public AccessTokenNotActiveException() {}
 }

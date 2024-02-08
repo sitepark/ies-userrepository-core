@@ -11,10 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * An access token enables authentication as a user
- * without specifying a username and password.
- */
+/** An access token enables authentication as a user without specifying a username and password. */
 @JsonDeserialize(builder = AccessToken.Builder.class)
 public final class AccessToken {
 
@@ -57,9 +54,8 @@ public final class AccessToken {
   public Optional<String> getId() {
     if (this.id == null) {
       return Optional.empty();
-    } else {
-      return Optional.of(this.id);
     }
+    return Optional.of(this.id);
   }
 
   public String getUser() {
@@ -112,7 +108,7 @@ public final class AccessToken {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(
         this.id,
         this.user,
@@ -128,40 +124,23 @@ public final class AccessToken {
   }
 
   @Override
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
 
-    if (!(o instanceof AccessToken)) {
+    if (!(o instanceof AccessToken that)) {
       return false;
     }
 
-    AccessToken accessToken = (AccessToken) o;
-
-    if (!Objects.equals(this.id, accessToken.id)) {
-      return false;
-    } else if (!Objects.equals(this.user, accessToken.user)) {
-      return false;
-    } else if (!Objects.equals(this.name, accessToken.name)) {
-      return false;
-    } else if (!Objects.equals(this.token, accessToken.token)) {
-      return false;
-    } else if (!Objects.equals(this.createdAt, accessToken.createdAt)) {
-      return false;
-    } else if (!Objects.equals(this.expiresAt, accessToken.expiresAt)) {
-      return false;
-    } else if (!Objects.equals(this.lastUsed, accessToken.lastUsed)) {
-      return false;
-    } else if (!Objects.equals(this.scopeList, accessToken.scopeList)) {
-      return false;
-    } else if (!Objects.equals(this.impersonation, accessToken.impersonation)) {
-      return false;
-    } else if (!Objects.equals(this.active, accessToken.active)) {
-      return false;
-    } else if (!Objects.equals(this.revoked, accessToken.revoked)) {
-      return false;
-    }
-
-    return true;
+    return Objects.equals(this.id, that.id)
+        && Objects.equals(this.user, that.user)
+        && Objects.equals(this.name, that.name)
+        && Objects.equals(this.token, that.token)
+        && Objects.equals(this.createdAt, that.createdAt)
+        && Objects.equals(this.expiresAt, that.expiresAt)
+        && Objects.equals(this.lastUsed, that.lastUsed)
+        && Objects.equals(this.scopeList, that.scopeList)
+        && Objects.equals(this.impersonation, that.impersonation)
+        && Objects.equals(this.active, that.active)
+        && Objects.equals(this.revoked, that.revoked);
   }
 
   @SuppressWarnings("PMD.TooManyMethods")

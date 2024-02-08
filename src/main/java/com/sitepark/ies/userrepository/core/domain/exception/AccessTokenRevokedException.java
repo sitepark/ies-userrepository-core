@@ -8,7 +8,5 @@ public class AccessTokenRevokedException extends AuthenticationFailedException {
 
   private static final long serialVersionUID = 1L;
 
-  public AccessTokenRevokedException() {
-    super();
-  }
+  public AccessTokenRevokedException() {}
 }

@@ -56,9 +56,8 @@ public final class User {
   public Optional<String> getId() {
     if (this.id == null) {
       return Optional.empty();
-    } else {
-      return Optional.of(this.id);
     }
+    return Optional.of(this.id);
   }
 
   @JsonIgnore
@@ -147,7 +146,7 @@ public final class User {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(
         this.id,
         this.anchor,
@@ -163,13 +162,11 @@ public final class User {
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
 
-    if (!(o instanceof User)) {
+    if (!(o instanceof User entity)) {
       return false;
     }
-
-    User entity = (User) o;
 
     return Objects.equals(this.id, entity.id)
         && Objects.equals(this.anchor, entity.anchor)
@@ -187,27 +184,27 @@ public final class User {
   @Override
   public String toString() {
     return "User [id="
-        + id
+        + this.id
         + ", anchor="
-        + anchor
+        + this.anchor
         + ", login="
-        + login
+        + this.login
         + ", firstname="
-        + firstname
+        + this.firstname
         + ", lastname="
-        + lastname
+        + this.lastname
         + ", email="
-        + email
+        + this.email
         + ", gender="
-        + gender
+        + this.gender
         + ", note="
-        + note
+        + this.note
         + ", validity="
-        + validity
+        + this.validity
         + ", identityList="
-        + identityList
+        + this.identityList
         + ", roleList="
-        + roleList
+        + this.roleList
         + "]";
   }
 
@@ -384,7 +381,7 @@ public final class User {
 
     @JsonIgnore
     private String trimToNull(String str) {
-      return (str == null || str.isBlank()) ? null : str.trim();
+      return ((str == null) || str.isBlank()) ? null : str.trim();
     }
   }
 }

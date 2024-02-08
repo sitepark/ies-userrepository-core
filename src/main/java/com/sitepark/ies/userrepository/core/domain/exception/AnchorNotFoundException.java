@@ -14,7 +14,6 @@ public class AnchorNotFoundException extends UserRepositoryException {
   private final Anchor anchor;
 
   public AnchorNotFoundException(Anchor anchor) {
-    super();
     this.anchor = anchor;
   }
 

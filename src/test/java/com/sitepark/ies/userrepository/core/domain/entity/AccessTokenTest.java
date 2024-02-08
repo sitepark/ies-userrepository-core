@@ -422,17 +422,18 @@ class AccessTokenTest {
     String json = mapper.writeValueAsString(accessToken);
 
     String expected =
-        "{"
-            + "\"id\":\"123\","
-            + "\"user\":\"345\","
-            + "\"name\":\"Test Token\","
-            + "\"createdAt\":\"2023-08-21T00:00:00+02:00\","
-            + "\"expiresAt\":\"2023-12-12T00:00:00+01:00\","
-            + "\"lastUsed\":\"2023-08-25T00:00:00+02:00\","
-            + "\"impersonation\":true,"
-            + "\"active\":true,"
-            + "\"revoked\":false"
-            + "}";
+        """
+    	{\
+    	"id":"123",\
+    	"user":"345",\
+    	"name":"Test Token",\
+    	"createdAt":"2023-08-21T00:00:00+02:00",\
+    	"expiresAt":"2023-12-12T00:00:00+01:00",\
+    	"lastUsed":"2023-08-25T00:00:00+02:00",\
+    	"impersonation":true,\
+    	"active":true,\
+    	"revoked":false\
+    	}""";
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -446,17 +447,18 @@ class AccessTokenTest {
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     String json =
-        "{"
-            + "\"id\":123,"
-            + "\"user\":345,"
-            + "\"name\":\"Test Token\","
-            + "\"createdAt\":\"2023-08-21T00:00:00+02:00\","
-            + "\"expiresAt\":\"2023-12-12T00:00:00+01:00\","
-            + "\"lastUsed\":\"2023-08-25T00:00:00+02:00\","
-            + "\"impersonation\":true,"
-            + "\"active\":true,"
-            + "\"revoked\":false"
-            + "}";
+        """
+    	{\
+    	"id":123,\
+    	"user":345,\
+    	"name":"Test Token",\
+    	"createdAt":"2023-08-21T00:00:00+02:00",\
+    	"expiresAt":"2023-12-12T00:00:00+01:00",\
+    	"lastUsed":"2023-08-25T00:00:00+02:00",\
+    	"impersonation":true,\
+    	"active":true,\
+    	"revoked":false\
+    	}""";
 
     AccessToken accessToken = mapper.readValue(json, AccessToken.class);
 

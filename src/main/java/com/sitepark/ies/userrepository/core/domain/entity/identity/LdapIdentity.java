@@ -39,29 +39,24 @@ public final class LdapIdentity implements Identity {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     int hash = this.server;
-    hash = (this.dn != null) ? 31 * hash + this.dn.hashCode() : hash;
-    return hash;
+    return (this.dn != null) ? (31 * hash) + this.dn.hashCode() : hash;
   }
 
   @Override
   public String toString() {
-    return "LdapIdentity [server=" + server + ", dn=" + dn + "]";
+    return "LdapIdentity [server=" + this.server + ", dn=" + this.dn + "]";
   }
 
   @Override
-  public final boolean equals(Object o) {
+  public boolean equals(Object o) {
 
-    if (!(o instanceof LdapIdentity)) {
+    if (!(o instanceof LdapIdentity entity)) {
       return false;
     }
 
-    LdapIdentity entity = (LdapIdentity) o;
-
-    if (this.server != entity.server) {
-      return false;
-    } else if (!Objects.equals(this.dn, entity.dn)) {
+    if ((this.server != entity.server) || !Objects.equals(this.dn, entity.dn)) {
       return false;
     }
 

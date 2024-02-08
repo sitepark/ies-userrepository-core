@@ -69,7 +69,7 @@ public final class Identifier {
 
     for (int i = 0; i < length; i++) {
       char c = str.charAt(i);
-      if (c < '0' || c > '9') {
+      if ((c < '0') || (c > '9')) {
         return false;
       }
     }
@@ -84,11 +84,10 @@ public final class Identifier {
   @Override
   public boolean equals(Object o) {
 
-    if (!(o instanceof Identifier)) {
+    if (!(o instanceof Identifier that)) {
       return false;
     }
 
-    Identifier that = (Identifier) o;
     return Objects.equals(this.id, that.id) && Objects.equals(this.anchor, that.anchor);
   }
 

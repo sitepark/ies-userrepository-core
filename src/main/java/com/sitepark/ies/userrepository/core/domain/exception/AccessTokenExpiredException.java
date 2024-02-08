@@ -14,7 +14,6 @@ public class AccessTokenExpiredException extends AuthenticationFailedException {
   private final OffsetDateTime expiredAt;
 
   public AccessTokenExpiredException(OffsetDateTime expiredAt) {
-    super();
     this.expiredAt = expiredAt;
   }
 
