@@ -8,11 +8,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.OffsetDateTime;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenExpiredException;
@@ -21,187 +16,156 @@ import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenRevokedE
 import com.sitepark.ies.userrepository.core.domain.exception.InvalidAccessTokenException;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import java.time.OffsetDateTime;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
 
 class AuthenticateByTokenTest {
 
-	private static final String TOKEN_NAME = "Test Token";
+  private static final String TOKEN_NAME = "Test Token";
 
-	private static final String TOKEN_STRING = "abc";
+  private static final String TOKEN_STRING = "abc";
 
-	@Test
-	void testTokenNotFound() {
+  @Test
+  void testTokenNotFound() {
 
-		AccessTokenRepository accessTokenRepository = mock();
-		when(accessTokenRepository.getByToken(any())).thenReturn(Optional.empty());
-		UserRepository userRepository = mock();
+    AccessTokenRepository accessTokenRepository = mock();
+    when(accessTokenRepository.getByToken(any())).thenReturn(Optional.empty());
+    UserRepository userRepository = mock();
 
-		var authenticateByToken = new AuthenticateByToken(
-				accessTokenRepository,
-				userRepository);
+    var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-		assertThrows(InvalidAccessTokenException.class, () -> {
-			authenticateByToken.authenticateByToken(TOKEN_STRING);
-		});
-	}
+    assertThrows(
+        InvalidAccessTokenException.class,
+        () -> {
+          authenticateByToken.authenticateByToken(TOKEN_STRING);
+        });
+  }
 
-	@Test
-	void testTokenNotActive() {
+  @Test
+  void testTokenNotActive() {
 
-		AccessToken accessToken = AccessToken.builder()
-				.id("1")
-				.name(TOKEN_NAME)
-				.user("2")
-				.active(false)
-				.build();
+    AccessToken accessToken =
+        AccessToken.builder().id("1").name(TOKEN_NAME).user("2").active(false).build();
 
-		AccessTokenRepository accessTokenRepository = mock();
-		when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
-		UserRepository userRepository = mock();
+    AccessTokenRepository accessTokenRepository = mock();
+    when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
+    UserRepository userRepository = mock();
 
-		var authenticateByToken = new AuthenticateByToken(
-				accessTokenRepository,
-				userRepository);
+    var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-		assertThrows(AccessTokenNotActiveException.class, () -> {
-			authenticateByToken.authenticateByToken(TOKEN_STRING);
-		});
-	}
+    assertThrows(
+        AccessTokenNotActiveException.class,
+        () -> {
+          authenticateByToken.authenticateByToken(TOKEN_STRING);
+        });
+  }
 
-	@Test
-	void testTokenRevoked() {
+  @Test
+  void testTokenRevoked() {
 
-		AccessToken accessToken = AccessToken.builder()
-				.id("1")
-				.name(TOKEN_NAME)
-				.user("2")
-				.revoked(true)
-				.build();
+    AccessToken accessToken =
+        AccessToken.builder().id("1").name(TOKEN_NAME).user("2").revoked(true).build();
 
-		AccessTokenRepository accessTokenRepository = mock();
-		when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
-		UserRepository userRepository = mock();
+    AccessTokenRepository accessTokenRepository = mock();
+    when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
+    UserRepository userRepository = mock();
 
-		var authenticateByToken = new AuthenticateByToken(
-				accessTokenRepository,
-				userRepository);
+    var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-		assertThrows(AccessTokenRevokedException.class, () -> {
-			authenticateByToken.authenticateByToken("abc");
-		});
-	}
+    assertThrows(
+        AccessTokenRevokedException.class,
+        () -> {
+          authenticateByToken.authenticateByToken("abc");
+        });
+  }
 
-	@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
-	@Test
-	void testTokenExpired() {
+  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @Test
+  void testTokenExpired() {
 
-		OffsetDateTime expiredAt = OffsetDateTime.now().minusDays(1);
+    OffsetDateTime expiredAt = OffsetDateTime.now().minusDays(1);
 
-		AccessToken accessToken = AccessToken.builder()
-				.id("1")
-				.name(TOKEN_NAME)
-				.user("2")
-				.expiresAt(expiredAt)
-				.build();
+    AccessToken accessToken =
+        AccessToken.builder().id("1").name(TOKEN_NAME).user("2").expiresAt(expiredAt).build();
 
-		AccessTokenRepository accessTokenRepository = mock();
-		when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
-		UserRepository userRepository = mock();
+    AccessTokenRepository accessTokenRepository = mock();
+    when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
+    UserRepository userRepository = mock();
 
-		var authenticateByToken = new AuthenticateByToken(
-				accessTokenRepository,
-				userRepository);
+    var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-		AccessTokenExpiredException e = assertThrows(AccessTokenExpiredException.class, () -> {
-			authenticateByToken.authenticateByToken(TOKEN_STRING);
-		});
-		assertNotNull(e.getExpiredAt(), "expiredAt expected");
-		assertNotNull(e.getMessage(), "message expected");
-	}
+    AccessTokenExpiredException e =
+        assertThrows(
+            AccessTokenExpiredException.class,
+            () -> {
+              authenticateByToken.authenticateByToken(TOKEN_STRING);
+            });
+    assertNotNull(e.getExpiredAt(), "expiredAt expected");
+    assertNotNull(e.getMessage(), "message expected");
+  }
 
-	@Test
-	void testUserNotFound() {
+  @Test
+  void testUserNotFound() {
 
-		AccessToken accessToken = AccessToken.builder()
-				.id("1")
-				.name(TOKEN_NAME)
-				.user("2")
-				.build();
+    AccessToken accessToken = AccessToken.builder().id("1").name(TOKEN_NAME).user("2").build();
 
-		AccessTokenRepository accessTokenRepository = mock();
-		when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
+    AccessTokenRepository accessTokenRepository = mock();
+    when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
 
-		UserRepository userRepository = mock();
+    UserRepository userRepository = mock();
 
-		when(userRepository.get(anyString())).thenReturn(Optional.empty());
+    when(userRepository.get(anyString())).thenReturn(Optional.empty());
 
-		var authenticateByToken = new AuthenticateByToken(
-				accessTokenRepository,
-				userRepository);
+    var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-		assertThrows(InvalidAccessTokenException.class, () -> {
-			authenticateByToken.authenticateByToken(TOKEN_STRING);
-		});
-	}
+    assertThrows(
+        InvalidAccessTokenException.class,
+        () -> {
+          authenticateByToken.authenticateByToken(TOKEN_STRING);
+        });
+  }
 
-	@Test
-	void testValidAutentification() {
+  @Test
+  void testValidAutentification() {
 
-		AccessToken accessToken = AccessToken.builder()
-				.id("1")
-				.name(TOKEN_NAME)
-				.user("2")
-				.build();
+    AccessToken accessToken = AccessToken.builder().id("1").name(TOKEN_NAME).user("2").build();
 
-		User user = User.builder()
-				.id("1")
-				.login("test")
-				.build();
+    User user = User.builder().id("1").login("test").build();
 
-		AccessTokenRepository accessTokenRepository = mock();
-		when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
+    AccessTokenRepository accessTokenRepository = mock();
+    when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
 
-		UserRepository userRepository = mock();
+    UserRepository userRepository = mock();
 
-		when(userRepository.get(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.get(anyString())).thenReturn(Optional.of(user));
 
-		var authenticateByToken = new AuthenticateByToken(
-				accessTokenRepository,
-				userRepository);
+    var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-		User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
-		assertEquals(user.getId().get(), authenticatedUser.getId().get(), "unexpected user");
-	}
+    User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
+    assertEquals(user.getId().get(), authenticatedUser.getId().get(), "unexpected user");
+  }
 
-	@Test
-	void testValidAutentificationWithExpiredDate() {
+  @Test
+  void testValidAutentificationWithExpiredDate() {
 
-		OffsetDateTime expiredAt = OffsetDateTime.now().plusDays(1);
+    OffsetDateTime expiredAt = OffsetDateTime.now().plusDays(1);
 
-		AccessToken accessToken = AccessToken.builder()
-				.id("1")
-				.name(TOKEN_NAME)
-				.expiresAt(expiredAt)
-				.user("2")
-				.build();
+    AccessToken accessToken =
+        AccessToken.builder().id("1").name(TOKEN_NAME).expiresAt(expiredAt).user("2").build();
 
-		User user = User.builder()
-				.id("1")
-				.login("test")
-				.build();
+    User user = User.builder().id("1").login("test").build();
 
-		AccessTokenRepository accessTokenRepository = mock();
-		when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
+    AccessTokenRepository accessTokenRepository = mock();
+    when(accessTokenRepository.getByToken(any())).thenReturn(Optional.of(accessToken));
 
-		UserRepository userRepository = mock();
+    UserRepository userRepository = mock();
 
-		when(userRepository.get(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.get(anyString())).thenReturn(Optional.of(user));
 
-		var authenticateByToken = new AuthenticateByToken(
-				accessTokenRepository,
-				userRepository);
+    var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-		User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
-		assertEquals(user.getId().get(), authenticatedUser.getId().get(), "unexpected user");
-	}
-
+    User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
+    assertEquals(user.getId().get(), authenticatedUser.getId().get(), "unexpected user");
+  }
 }

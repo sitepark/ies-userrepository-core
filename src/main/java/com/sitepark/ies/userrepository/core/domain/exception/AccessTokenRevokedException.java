@@ -6,9 +6,9 @@ package com.sitepark.ies.userrepository.core.domain.exception;
  */
 public class AccessTokenRevokedException extends AuthenticationFailedException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public AccessTokenRevokedException() {
-		super();
-	}
+  public AccessTokenRevokedException() {
+    super();
+  }
 }
