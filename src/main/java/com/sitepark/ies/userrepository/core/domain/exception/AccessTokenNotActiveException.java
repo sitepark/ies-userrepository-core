@@ -7,9 +7,7 @@ package com.sitepark.ies.userrepository.core.domain.exception;
  */
 public class AccessTokenNotActiveException extends AuthenticationFailedException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public AccessTokenNotActiveException() {
-		super();
-	}
+  public AccessTokenNotActiveException() {}
 }

@@ -6,9 +6,9 @@ package com.sitepark.ies.userrepository.core.domain.exception;
  * insufficient permissions or authorization.
  */
 public class AccessDeniedException extends UserRepositoryException {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public AccessDeniedException(String message) {
-		super(message);
-	}
+  public AccessDeniedException(String message) {
+    super(message);
+  }
 }

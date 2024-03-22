@@ -6,8 +6,8 @@ package com.sitepark.ies.userrepository.core.domain.entity;
  * for diverse gender expressions.
  */
 public enum GenderType {
-	UNKNOWN,
-	FEMALE,
-	MALE,
-	DIVERSE
+  UNKNOWN,
+  FEMALE,
+  MALE,
+  DIVERSE
 }

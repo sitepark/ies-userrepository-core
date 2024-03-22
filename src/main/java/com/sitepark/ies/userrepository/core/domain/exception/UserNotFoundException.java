@@ -7,21 +7,20 @@ package com.sitepark.ies.userrepository.core.domain.exception;
  */
 public class UserNotFoundException extends UserRepositoryException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private final String id;
+  private final String id;
 
-	public UserNotFoundException(String id) {
-		super();
-		this.id = id;
-	}
+  public UserNotFoundException(String id) {
+    this.id = id;
+  }
 
-	public String getId() {
-		return this.id;
-	}
+  public String getId() {
+    return this.id;
+  }
 
-	@Override
-	public String getMessage() {
-		return "User with id " + this.id + " not found";
-	}
+  @Override
+  public String getMessage() {
+    return "User with id " + this.id + " not found";
+  }
 }

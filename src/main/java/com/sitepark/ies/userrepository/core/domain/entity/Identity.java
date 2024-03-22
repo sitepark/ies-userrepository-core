@@ -11,8 +11,5 @@ import com.sitepark.ies.userrepository.core.domain.entity.identity.LdapIdentity;
  * authenticate themselves using different identity providers.
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-@JsonSubTypes({
-	@JsonSubTypes.Type(value = LdapIdentity.class, name = "ldap")
-})
-public interface Identity {
-}
+@JsonSubTypes({@JsonSubTypes.Type(value = LdapIdentity.class, name = "ldap")})
+public interface Identity {}

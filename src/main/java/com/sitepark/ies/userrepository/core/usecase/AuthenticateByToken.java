@@ -1,10 +1,5 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
-import java.time.OffsetDateTime;
-import java.util.Optional;
-
-import jakarta.inject.Inject;
-
 import com.sitepark.ies.userrepository.core.domain.entity.AccessToken;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenExpiredException;
@@ -13,54 +8,56 @@ import com.sitepark.ies.userrepository.core.domain.exception.AccessTokenRevokedE
 import com.sitepark.ies.userrepository.core.domain.exception.InvalidAccessTokenException;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import jakarta.inject.Inject;
+import java.time.OffsetDateTime;
+import java.util.Optional;
 
 public class AuthenticateByToken {
 
-	private final AccessTokenRepository accessTokenRepository;
+  private final AccessTokenRepository accessTokenRepository;
 
-	private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-	@Inject
-	protected AuthenticateByToken(
-			AccessTokenRepository accessTokenRepository,
-			UserRepository userRepository) {
-		this.accessTokenRepository = accessTokenRepository;
-		this.userRepository = userRepository;
-	}
+  @Inject
+  protected AuthenticateByToken(
+      AccessTokenRepository accessTokenRepository, UserRepository userRepository) {
+    this.accessTokenRepository = accessTokenRepository;
+    this.userRepository = userRepository;
+  }
 
-	public User authenticateByToken(String token) {
+  public User authenticateByToken(String token) {
 
-		Optional<AccessToken> accessTokenOptinal = this.accessTokenRepository.getByToken(token);
-		if (accessTokenOptinal.isEmpty()) {
-			throw new InvalidAccessTokenException("Token not found");
-		}
+    Optional<AccessToken> accessTokenOptinal = this.accessTokenRepository.getByToken(token);
+    if (accessTokenOptinal.isEmpty()) {
+      throw new InvalidAccessTokenException("Token not found");
+    }
 
-		AccessToken accessToken = accessTokenOptinal.get();
-		if (!accessToken.isActive()) {
-			throw new AccessTokenNotActiveException();
-		}
-		if (accessToken.isRevoked()) {
-			throw new AccessTokenRevokedException();
-		}
-		this.checkExpirationDate(accessToken.getExpiresAt());
+    AccessToken accessToken = accessTokenOptinal.get();
+    if (!accessToken.isActive()) {
+      throw new AccessTokenNotActiveException();
+    }
+    if (accessToken.isRevoked()) {
+      throw new AccessTokenRevokedException();
+    }
+    this.checkExpirationDate(accessToken.getExpiresAt());
 
-		Optional<User> user = this.userRepository.get(accessToken.getUser());
-		if (user.isEmpty()) {
-			throw new InvalidAccessTokenException("User " + accessToken.getUser() + " not found");
-		}
+    Optional<User> user = this.userRepository.get(accessToken.getUser());
+    if (user.isEmpty()) {
+      throw new InvalidAccessTokenException("User " + accessToken.getUser() + " not found");
+    }
 
-		return user.get();
-	}
+    return user.get();
+  }
 
-	public void checkExpirationDate(Optional<OffsetDateTime> expiredAt) {
+  public void checkExpirationDate(Optional<OffsetDateTime> expiredAt) {
 
-		if (expiredAt.isEmpty()) {
-			return;
-		}
+    if (expiredAt.isEmpty()) {
+      return;
+    }
 
-		OffsetDateTime now = OffsetDateTime.now();
-		if (expiredAt.get().isBefore(now)) {
-			throw new AccessTokenExpiredException(expiredAt.get());
-		}
-	}
+    OffsetDateTime now = OffsetDateTime.now();
+    if (expiredAt.get().isBefore(now)) {
+      throw new AccessTokenExpiredException(expiredAt.get());
+    }
+  }
 }

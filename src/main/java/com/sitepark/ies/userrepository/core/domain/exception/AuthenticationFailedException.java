@@ -6,14 +6,11 @@ package com.sitepark.ies.userrepository.core.domain.exception;
  * was unsuccessful for some reason.
  */
 public abstract class AuthenticationFailedException extends UserRepositoryException {
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public AuthenticationFailedException() {
-		super();
-	}
+  public AuthenticationFailedException() {}
 
-	public AuthenticationFailedException(String msg) {
-		super(msg);
-	}
-
+  public AuthenticationFailedException(String msg) {
+    super(msg);
+  }
 }

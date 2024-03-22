@@ -8,29 +8,27 @@ import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
  */
 public class AnchorAlreadyExistsException extends UserRepositoryException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private final Anchor anchor;
+  private final Anchor anchor;
 
-	private final String owner;
+  private final String owner;
 
-	public AnchorAlreadyExistsException(Anchor anchor, String owner) {
-		super();
-		this.anchor = anchor;
-		this.owner = owner;
-	}
+  public AnchorAlreadyExistsException(Anchor anchor, String owner) {
+    this.anchor = anchor;
+    this.owner = owner;
+  }
 
-	public Anchor getAnchor() {
-		return this.anchor;
-	}
+  public Anchor getAnchor() {
+    return this.anchor;
+  }
 
-	public String getOwner() {
-		return this.owner;
-	}
+  public String getOwner() {
+    return this.owner;
+  }
 
-	@Override
-	public String getMessage() {
-		return "Anchor " + this.anchor + " already exists for user " + this.owner;
-	}
-
+  @Override
+  public String getMessage() {
+    return "Anchor " + this.anchor + " already exists for user " + this.owner;
+  }
 }

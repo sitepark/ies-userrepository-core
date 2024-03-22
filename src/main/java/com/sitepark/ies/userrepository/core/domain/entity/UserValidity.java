@@ -1,12 +1,11 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
-import java.time.OffsetDateTime;
-import java.util.Objects;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import java.time.OffsetDateTime;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Encapsulates user properties indicating whether a user
@@ -15,142 +14,136 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 @JsonDeserialize(builder = UserValidity.Builder.class)
 public class UserValidity {
 
-	private final boolean blocked;
+  private final boolean blocked;
 
-	private final OffsetDateTime validFrom;
+  private final OffsetDateTime validFrom;
 
-	private final OffsetDateTime validTo;
+  private final OffsetDateTime validTo;
 
-	public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
+  public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
 
-	protected UserValidity(Builder builder) {
-		this.blocked = builder.blocked;
-		this.validFrom = builder.validFrom;
-		this.validTo = builder.validTo;
-	}
+  protected UserValidity(Builder builder) {
+    this.blocked = builder.blocked;
+    this.validFrom = builder.validFrom;
+    this.validTo = builder.validTo;
+  }
 
-	public boolean isBlocked() {
-		return this.blocked;
-	}
+  public boolean isBlocked() {
+    return this.blocked;
+  }
 
-	public Optional<OffsetDateTime> getValidFrom() {
-		return Optional.ofNullable(this.validFrom);
-	}
+  public Optional<OffsetDateTime> getValidFrom() {
+    return Optional.ofNullable(this.validFrom);
+  }
 
-	public Optional<OffsetDateTime> getValidTo() {
-		return Optional.ofNullable(this.validTo);
-	}
+  public Optional<OffsetDateTime> getValidTo() {
+    return Optional.ofNullable(this.validTo);
+  }
 
-	@JsonIgnore
-	@SuppressWarnings("PMD.SimplifyBooleanReturns")
-	public boolean isValid(OffsetDateTime base) {
+  @JsonIgnore
+  @SuppressWarnings("PMD.SimplifyBooleanReturns")
+  public boolean isValid(OffsetDateTime base) {
 
-		Objects.requireNonNull(base, "base is null");
+    Objects.requireNonNull(base, "base is null");
 
-		if (this.blocked) {
-			return false;
-		}
+    if (this.blocked || ((this.validFrom != null) && this.validFrom.isAfter(base))) {
+      return false;
+    }
 
-		if (this.validFrom != null && this.validFrom.isAfter(base)) {
-			return false;
-		}
+    if ((this.validTo != null) && this.validTo.isBefore(base)) {
+      return false;
+    }
 
-		if (this.validTo != null && this.validTo.isBefore(base)) {
-			return false;
-		}
+    return true;
+  }
 
-		return true;
-	}
+  @JsonIgnore
+  public boolean isNowValid() {
+    return this.isValid(OffsetDateTime.now());
+  }
 
-	@JsonIgnore
-	public boolean isNowValid() {
-		return this.isValid(OffsetDateTime.now());
-	}
+  public static Builder builder() {
+    return new Builder();
+  }
 
-	public static Builder builder() {
-		return new Builder();
-	}
+  public Builder toBuilder() {
+    return new Builder(this);
+  }
 
-	public Builder toBuilder() {
-		return new Builder(this);
-	}
+  @Override
+  public final int hashCode() {
 
-	@Override
-	public final int hashCode() {
+    int hash = Boolean.hashCode(this.blocked);
+    hash = (this.validFrom != null) ? (31 * hash) + this.validFrom.hashCode() : hash;
+    return (this.validTo != null) ? (31 * hash) + this.validTo.hashCode() : hash;
+  }
 
-		int hash = Boolean.hashCode(this.blocked);
-		hash = (this.validFrom != null) ? 31 * hash + this.validFrom.hashCode() : hash;
-		hash = (this.validTo != null) ? 31 * hash + this.validTo.hashCode() : hash;
+  @Override
+  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+  public final boolean equals(Object o) {
 
-		return hash;
-	}
+    if (!(o instanceof UserValidity validity)) {
+      return false;
+    }
 
-	@Override
-	@SuppressWarnings({
-		"PMD.CyclomaticComplexity",
-		"PMD.NPathComplexity"
-	})
-	public final boolean equals(Object o) {
+    if (!Objects.equals(this.blocked, validity.blocked)) {
+      return false;
+    }
+    if (!Objects.equals(this.validFrom, validity.validFrom)
+        || !Objects.equals(this.validTo, validity.validTo)) {
+      return false;
+    }
 
-		if (!(o instanceof UserValidity)) {
-			return false;
-		}
+    return true;
+  }
 
-		UserValidity validity = (UserValidity)o;
+  @Override
+  public String toString() {
+    return "UserValidity [blocked="
+        + this.blocked
+        + ", validFrom="
+        + this.validFrom
+        + ", validTo="
+        + this.validTo
+        + "]";
+  }
 
-		if (!Objects.equals(this.blocked, validity.blocked)) {
-			return false;
-		} else if (!Objects.equals(this.validFrom, validity.validFrom)) {
-			return false;
-		} else if (!Objects.equals(this.validTo, validity.validTo)) {
-			return false;
-		}
+  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  public static final class Builder {
 
-		return true;
-	}
+    private boolean blocked;
 
-	@Override
-	public String toString() {
-		return "UserValidity [blocked=" + blocked + ", validFrom=" + validFrom + ", validTo=" + validTo + "]";
-	}
+    private OffsetDateTime validFrom;
 
-	@JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
-	public static final class Builder {
+    private OffsetDateTime validTo;
 
-		private boolean blocked;
+    protected Builder() {}
 
-		private OffsetDateTime validFrom;
+    protected Builder(UserValidity userValidity) {
+      this.blocked = userValidity.blocked;
+      this.validFrom = userValidity.validFrom;
+      this.validTo = userValidity.validTo;
+    }
 
-		private OffsetDateTime validTo;
+    public Builder blocked(boolean blocked) {
+      this.blocked = blocked;
+      return this;
+    }
 
-		protected Builder() {
-		}
+    public Builder validFrom(OffsetDateTime validFrom) {
+      Objects.requireNonNull(validFrom, "validFrom is null");
+      this.validFrom = validFrom;
+      return this;
+    }
 
-		protected Builder(UserValidity userValidity) {
-			this.blocked = userValidity.blocked;
-			this.validFrom = userValidity.validFrom;
-			this.validTo = userValidity.validTo;
-		}
+    public Builder validTo(OffsetDateTime validTo) {
+      Objects.requireNonNull(validTo, "validTo is null");
+      this.validTo = validTo;
+      return this;
+    }
 
-		public Builder blocked(boolean blocked) {
-			this.blocked = blocked;
-			return this;
-		}
-
-		public Builder validFrom(OffsetDateTime validFrom) {
-			Objects.requireNonNull(validFrom, "validFrom is null");
-			this.validFrom = validFrom;
-			return this;
-		}
-
-		public Builder validTo(OffsetDateTime validTo) {
-			Objects.requireNonNull(validTo, "validTo is null");
-			this.validTo = validTo;
-			return this;
-		}
-
-		public UserValidity build() {
-			return new UserValidity(this);
-		}
-	}
+    public UserValidity build() {
+      return new UserValidity(this);
+    }
+  }
 }

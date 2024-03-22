@@ -1,8 +1,7 @@
 package com.sitepark.ies.userrepository.core.domain.entity.role;
 
-import java.io.Serializable;
-
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import java.io.Serializable;
 
 /**
  * The <code>RoleFactory</code> interface defines the contract for classes
@@ -11,6 +10,7 @@ import com.sitepark.ies.userrepository.core.domain.entity.Role;
  * and managing roles within the system.
  */
 public interface RoleFactory extends Serializable {
-	boolean accept(String role);
-	Role create(String role);
+  boolean accept(String role);
+
+  Role create(String role);
 }
