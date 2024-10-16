@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
+import com.sitepark.ies.userrepository.core.domain.entity.Password;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
 import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
@@ -20,6 +21,7 @@ import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsE
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.IdGenerator;
+import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.util.Arrays;
@@ -36,11 +38,12 @@ class CreateUserTest {
     AccessControl accessControl = mock(AccessControl.class);
     when(accessControl.isUserCreateable()).thenReturn(false);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
+    PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     User user = User.builder().login("test").build();
 
     var createUserUseCase =
-        new CreateUser(repository, null, accessControl, null, extensionsNotifier);
+        new CreateUser(repository, null, accessControl, null, extensionsNotifier, passwordHasher);
     assertThrows(
         AccessDeniedException.class,
         () -> {
@@ -55,7 +58,7 @@ class CreateUserTest {
 
     User user = User.builder().id("123").login("test").build();
 
-    var createUserUseCase = new CreateUser(null, null, null, null, null);
+    var createUserUseCase = new CreateUser(null, null, null, null, null, null);
     assertThrows(
         IllegalArgumentException.class,
         () -> {
@@ -72,11 +75,12 @@ class CreateUserTest {
     AccessControl accessControl = mock(AccessControl.class);
     when(accessControl.isUserCreateable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
+    PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     User user = User.builder().anchor("test.user").login("test").build();
 
     var createUserUseCase =
-        new CreateUser(repository, null, accessControl, null, extensionsNotifier);
+        new CreateUser(repository, null, accessControl, null, extensionsNotifier, passwordHasher);
 
     AnchorAlreadyExistsException e =
         assertThrows(
@@ -99,6 +103,7 @@ class CreateUserTest {
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
+    PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     UserRepository repository = mock();
     when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
@@ -107,7 +112,13 @@ class CreateUserTest {
     User user = User.builder().login("test").roleList(UserLevelRoles.USER, Ref.ofId("333")).build();
 
     var createUserUseCase =
-        new CreateUser(repository, roleAssigner, accessControl, idGenerator, extensionsNotifier);
+        new CreateUser(
+            repository,
+            roleAssigner,
+            accessControl,
+            idGenerator,
+            extensionsNotifier,
+            passwordHasher);
 
     createUserUseCase.createUser(user);
 
@@ -133,6 +144,7 @@ class CreateUserTest {
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
+    PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     UserRepository repository = mock();
     when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
@@ -142,13 +154,52 @@ class CreateUserTest {
     User user = User.builder().anchor("test.anchor").login("test").build();
 
     var createUserUseCase =
-        new CreateUser(repository, roleAssigner, accessControl, idGenerator, extensionsNotifier);
+        new CreateUser(
+            repository,
+            roleAssigner,
+            accessControl,
+            idGenerator,
+            extensionsNotifier,
+            passwordHasher);
 
     createUserUseCase.createUser(user);
 
     User effectiveUser = User.builder().id("123").anchor("test.anchor").login("test").build();
 
     verify(repository).create(eq(effectiveUser));
+  }
+
+  @Test
+  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  void testCreateWithPassword() {
+
+    AccessControl accessControl = mock();
+    when(accessControl.isUserCreateable()).thenReturn(true);
+    IdGenerator idGenerator = mock();
+    when(idGenerator.generate()).thenReturn("123");
+    ExtensionsNotifier extensionsNotifier = mock();
+    PasswordHasher passwordHasher = mock(PasswordHasher.class);
+
+    UserRepository repository = mock();
+    when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
+    when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
+    RoleAssigner roleAssigner = mock();
+
+    User user =
+        User.builder().login("test").password(Password.builder().clearText("text").build()).build();
+
+    var createUserUseCase =
+        new CreateUser(
+            repository,
+            roleAssigner,
+            accessControl,
+            idGenerator,
+            extensionsNotifier,
+            passwordHasher);
+
+    createUserUseCase.createUser(user);
+
+    verify(passwordHasher).hash("text");
   }
 
   @Test
@@ -160,6 +211,7 @@ class CreateUserTest {
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
+    PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     UserRepository repository = mock();
     when(repository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
@@ -168,7 +220,13 @@ class CreateUserTest {
     User user = User.builder().login("test").roleList(UserLevelRoles.USER, Ref.ofId("333")).build();
 
     var createUserUseCase =
-        new CreateUser(repository, roleAssigner, accessControl, idGenerator, extensionsNotifier);
+        new CreateUser(
+            repository,
+            roleAssigner,
+            accessControl,
+            idGenerator,
+            extensionsNotifier,
+            passwordHasher);
 
     LoginAlreadyExistsException e =
         assertThrows(

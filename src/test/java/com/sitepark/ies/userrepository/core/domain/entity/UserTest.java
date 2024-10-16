@@ -521,11 +521,11 @@ class UserTest {
             .build();
     String expected =
         """
-    	User [id=100560100000014842, anchor=user.peterpan, login=peterpan,\s\
-    	firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE,\s\
-    	note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null],\s\
-    	identityList=[LdapIdentity [server=2, dn=userdn]],\s\
-    	roleList=[USER, REF(test.anchor), REF(123)]]""";
+        User [id=100560100000014842, anchor=user.peterpan, login=peterpan,\s\
+        password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE,\s\
+        note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null],\s\
+        identityList=[LdapIdentity [server=2, dn=userdn]],\s\
+        roleList=[USER, REF(test.anchor), REF(123)]]""";
     assertEquals(expected, user.toString(), "unexpected string representation");
   }
 

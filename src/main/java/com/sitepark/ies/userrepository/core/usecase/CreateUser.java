@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
+import com.sitepark.ies.userrepository.core.domain.entity.Password;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExistsException;
@@ -7,6 +8,7 @@ import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsE
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.IdGenerator;
+import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
@@ -27,6 +29,8 @@ public final class CreateUser {
 
   private final ExtensionsNotifier extensionsNotifier;
 
+  private final PasswordHasher passwordHasher;
+
   private static Logger LOGGER = LogManager.getLogger();
 
   @Inject
@@ -35,12 +39,14 @@ public final class CreateUser {
       RoleAssigner roleAssigner,
       AccessControl accessControl,
       IdGenerator idGenerator,
-      ExtensionsNotifier extensionsNotifier) {
+      ExtensionsNotifier extensionsNotifier,
+      PasswordHasher passwordHasher) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
     this.accessControl = accessControl;
     this.idGenerator = idGenerator;
     this.extensionsNotifier = extensionsNotifier;
+    this.passwordHasher = passwordHasher;
   }
 
   public String createUser(User newUser) {
@@ -49,29 +55,36 @@ public final class CreateUser {
       throw new IllegalArgumentException("The ID of the user must not be set when creating.");
     }
 
-    this.validateAnchor(newUser);
-
-    this.validateLogin(newUser);
-
     if (!this.accessControl.isUserCreateable()) {
       throw new AccessDeniedException("Not allowed to create user " + newUser);
     }
 
-    String generatedId = this.idGenerator.generate();
+    this.validateAnchor(newUser);
 
-    User userWithId = newUser.toBuilder().id(generatedId).build();
+    this.validateLogin(newUser);
 
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("create user: {}", userWithId);
+    Password hashedPassword = null;
+    if (newUser.getPassword().isPresent()) {
+      hashedPassword = this.passwordHasher.hash(newUser.getPassword().get().getClearText());
     }
 
-    this.repository.create(userWithId);
+    String generatedId = this.idGenerator.generate();
 
-    this.roleAssigner.assignRoleToUser(userWithId.getRoleList(), Arrays.asList(generatedId));
+    User userWithIdAndHashPassword =
+        newUser.toBuilder().id(generatedId).password(hashedPassword).build();
 
-    this.extensionsNotifier.notifyCreated(userWithId);
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("create user: {}", userWithIdAndHashPassword);
+    }
 
-    return userWithId.getId().get();
+    this.repository.create(userWithIdAndHashPassword);
+
+    this.roleAssigner.assignRoleToUser(
+        userWithIdAndHashPassword.getRoleList(), Arrays.asList(generatedId));
+
+    this.extensionsNotifier.notifyCreated(userWithIdAndHashPassword);
+
+    return userWithIdAndHashPassword.getId().get();
   }
 
   private void validateAnchor(User newUser) {

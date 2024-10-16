@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Represents user
- */
+/** Represents user */
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
@@ -22,6 +20,8 @@ public final class User {
   private final Anchor anchor;
 
   private final String login;
+
+  private final Password password;
 
   private final String firstname;
 
@@ -43,6 +43,7 @@ public final class User {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.login = builder.login;
+    this.password = builder.password;
     this.firstname = builder.firstname;
     this.lastname = builder.lastname;
     this.email = builder.email;
@@ -77,6 +78,10 @@ public final class User {
 
   public String getLogin() {
     return this.login;
+  }
+
+  public Optional<Password> getPassword() {
+    return Optional.ofNullable(this.password);
   }
 
   @JsonIgnore
@@ -151,6 +156,7 @@ public final class User {
         this.id,
         this.anchor,
         this.login,
+        this.password,
         this.firstname,
         this.lastname,
         this.email,
@@ -171,6 +177,7 @@ public final class User {
     return Objects.equals(this.id, entity.id)
         && Objects.equals(this.anchor, entity.anchor)
         && Objects.equals(this.login, entity.login)
+        && Objects.equals(this.password, entity.password)
         && Objects.equals(this.firstname, entity.firstname)
         && Objects.equals(this.lastname, entity.lastname)
         && Objects.equals(this.email, entity.email)
@@ -189,6 +196,8 @@ public final class User {
         + this.anchor
         + ", login="
         + this.login
+        + ", password="
+        + this.password
         + ", firstname="
         + this.firstname
         + ", lastname="
@@ -218,6 +227,8 @@ public final class User {
 
     private String login;
 
+    private Password password;
+
     private String firstname;
 
     private String lastname;
@@ -240,6 +251,7 @@ public final class User {
       this.id = user.id;
       this.anchor = user.anchor;
       this.login = user.login;
+      this.password = user.password;
       this.firstname = user.firstname;
       this.lastname = user.lastname;
       this.email = user.email;
@@ -280,6 +292,11 @@ public final class User {
 
     public Builder login(String login) {
       this.login = this.trimToNull(login);
+      return this;
+    }
+
+    public Builder password(Password password) {
+      this.password = password;
       return this;
     }
 
