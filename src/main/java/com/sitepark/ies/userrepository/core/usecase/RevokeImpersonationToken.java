@@ -13,7 +13,7 @@ public class RevokeImpersonationToken {
 
   private final AccessControl accessControl;
 
-  private static Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
   protected RevokeImpersonationToken(

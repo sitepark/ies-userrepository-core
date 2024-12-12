@@ -72,7 +72,7 @@ public final class Password {
   }
 
   @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
-  public static class Builder {
+  public static final class Builder {
 
     private String hashAlgorithm;
     private String hash;

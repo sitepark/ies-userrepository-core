@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pmd>
-    <useProjectRuleSet>true</useProjectRuleSet>
-    <ruleSetFile>pmd-ruleset.xml</ruleSetFile>
+    <useProjectRuleSet>false</useProjectRuleSet>
+    <excludePatterns>
+        <excludePattern>.*/home/veltrup/git/ies-4-userrepository-core/target.*</excludePattern>
+    </excludePatterns>
+    <includePatterns/>
+    <rules/>
     <includeDerivedFiles>false</includeDerivedFiles>
     <violationsAsErrors>true</violationsAsErrors>
     <fullBuildEnabled>true</fullBuildEnabled>

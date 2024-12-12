@@ -4,7 +4,7 @@
 				name="pmd-ruleset"
 				xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
 
-	<description>User Repository Rules</description>
+	<description>Module-System Rules</description>
 
 	<exclude-pattern>.*/target/.*</exclude-pattern>
 

@@ -28,7 +28,8 @@ import org.junit.jupiter.api.Test;
 })
 class UserTest {
 
-  private static Identity TEST_IDENTITY = LdapIdentity.builder().server(2).dn("userdn").build();
+  private static final Identity TEST_IDENTITY =
+      LdapIdentity.builder().server(2).dn("userdn").build();
 
   @Test
   @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")

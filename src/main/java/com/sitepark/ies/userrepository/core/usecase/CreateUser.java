@@ -31,7 +31,7 @@ public final class CreateUser {
 
   private final PasswordHasher passwordHasher;
 
-  private static Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
   protected CreateUser(

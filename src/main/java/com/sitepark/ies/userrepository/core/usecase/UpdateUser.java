@@ -29,7 +29,7 @@ public final class UpdateUser {
 
   private final ExtensionsNotifier extensionsNotifier;
 
-  private static Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
   protected UpdateUser(

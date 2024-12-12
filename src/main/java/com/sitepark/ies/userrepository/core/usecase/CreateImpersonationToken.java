@@ -18,7 +18,7 @@ public class CreateImpersonationToken {
 
   private final UserRepository userRepository;
 
-  private static Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
   protected CreateImpersonationToken(
