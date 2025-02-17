@@ -38,8 +38,8 @@ public final class GetUser {
 
     String id = this.identifierResolver.resolveIdentifier(identifier);
 
-    if (!this.accessControl.isUserReadable(id)) {
-      throw new AccessDeniedException("Not allowed to reat user " + id);
+    if (!this.accessControl.isUserReadable()) {
+      throw new AccessDeniedException("Not allowed to reat user");
     }
 
     User user = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));

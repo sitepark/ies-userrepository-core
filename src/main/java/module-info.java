@@ -6,6 +6,10 @@ module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.domain.entity;
   exports com.sitepark.ies.userrepository.core.domain.entity.identity;
   exports com.sitepark.ies.userrepository.core.domain.entity.role;
+  exports com.sitepark.ies.userrepository.core.domain.entity.query;
+  exports com.sitepark.ies.userrepository.core.domain.entity.query.sort;
+  exports com.sitepark.ies.userrepository.core.domain.entity.query.filter;
+  exports com.sitepark.ies.userrepository.core.domain.entity.query.limit;
   exports com.sitepark.ies.userrepository.core.domain.exception;
   exports com.sitepark.ies.userrepository.core.port;
   exports com.sitepark.ies.userrepository.core.usecase;

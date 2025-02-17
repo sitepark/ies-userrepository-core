@@ -3,6 +3,7 @@
 .project
 .settings/
 .fbExcludeFilterFile
+.pmd
 .pmdruleset.xml
 
 # ? validate

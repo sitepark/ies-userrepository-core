@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,7 +24,7 @@ class PurgeUserTest {
     IdentifierResolver identifierResolver = mock();
     AccessTokenRepository accessTokenRepository = mock(AccessTokenRepository.class);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
-    when(accessControl.isUserRemovable(anyString())).thenReturn(false);
+    when(accessControl.isUserRemovable()).thenReturn(false);
 
     var purgeEntity =
         new PurgeUser(
@@ -45,7 +44,7 @@ class PurgeUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("10");
     AccessControl accessControl = mock(AccessControl.class);
     AccessTokenRepository accessTokenRepository = mock(AccessTokenRepository.class);
-    when(accessControl.isUserRemovable(anyString())).thenReturn(true);
+    when(accessControl.isUserRemovable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
     UserRepository repository = mock(UserRepository.class);

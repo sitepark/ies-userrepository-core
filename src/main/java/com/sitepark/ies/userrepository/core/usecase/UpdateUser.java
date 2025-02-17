@@ -88,8 +88,8 @@ public final class UpdateUser {
   }
 
   private void validateWritable(String id) {
-    if (!this.accessControl.isUserWritable(id)) {
-      throw new AccessDeniedException("Not allowed to update user " + id);
+    if (!this.accessControl.isUserWritable()) {
+      throw new AccessDeniedException("Not allowed to update user");
     }
   }
 

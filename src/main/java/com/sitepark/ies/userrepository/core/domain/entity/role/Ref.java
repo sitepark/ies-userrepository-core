@@ -7,9 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Represents a role that references a group,
- * allowing for the assignment of various
- * permissions within the context of the group.
+ * Represents a role that references a group, allowing for the assignment of various permissions
+ * within the context of the group.
  */
 @SuppressWarnings("PMD.CommentSize")
 public final class Ref extends Role {
@@ -19,12 +18,12 @@ public final class Ref extends Role {
   private final Anchor anchor;
 
   /**
-   * For object mapping with myBatis an objectfactory is used.
-   * However, this only takes effect if a default constructor exists.
-   * @see <a href="https://github.com/mybatis/mybatis-3/blob/mybatis-3.5.13/src/main/java/org/apache/ibatis/executor/resultset/DefaultResultSetHandler.java#L682">
-   * 	DefaultResultSetHandler.java
-   * </a>
+   * For object mapping with myBatis an objectfactory is used. However, this only takes effect if a
+   * default constructor exists.
    *
+   * @see <a
+   *     href="https://github.com/mybatis/mybatis-3/blob/mybatis-3.5.13/src/main/java/org/apache/ibatis/executor/resultset/DefaultResultSetHandler.java#L682">
+   *     DefaultResultSetHandler.java </a>
    */
   @SuppressWarnings("PMD.NullAssignment")
   protected Ref() {
