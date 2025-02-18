@@ -4,6 +4,7 @@
 .settings/
 .fbExcludeFilterFile
 .pmd
+.ruleset
 .pmdruleset.xml
 
 # ? validate
