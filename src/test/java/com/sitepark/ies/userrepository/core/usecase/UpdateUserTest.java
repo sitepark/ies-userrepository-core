@@ -33,7 +33,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
-    when(accessControl.isUserWritable(anyString())).thenReturn(false);
+    when(accessControl.isUserWritable()).thenReturn(false);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
     User user = User.builder().id("123").login("test").build();
@@ -46,7 +46,7 @@ class UpdateUserTest {
           updateUserUseCase.updateUser(user);
         });
 
-    verify(accessControl).isUserWritable("123");
+    verify(accessControl).isUserWritable();
   }
 
   @Test
@@ -68,7 +68,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
     UserRepository repository = mock(UserRepository.class);
@@ -95,7 +95,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     RoleAssigner roleAssigner = mock();
 
@@ -130,7 +130,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     RoleAssigner roleAssigner = mock();
 
@@ -161,7 +161,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     RoleAssigner roleAssigner = mock();
 
@@ -169,19 +169,19 @@ class UpdateUserTest {
     when(repository.resolveLogin("test")).thenReturn(Optional.of("123"));
 
     User storedUser =
-        User.builder().id("123").anchor("user.test").login("test").lastname("A").build();
+        User.builder().id("123").anchor("user.test").login("test").lastName("A").build();
     when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
     var updateUserUseCase =
         new UpdateUser(
             repository, identifierResolver, roleAssigner, accessControl, extensionsNotifier);
 
-    User user = User.builder().id("123").login("test").lastname("B").build();
+    User user = User.builder().id("123").login("test").lastName("B").build();
 
     updateUserUseCase.updateUser(user);
 
     User effectiveUser =
-        User.builder().id("123").login("test").anchor("user.test").lastname("B").build();
+        User.builder().id("123").login("test").anchor("user.test").lastName("B").build();
 
     verify(repository).get(anyString());
     verify(repository).resolveLogin(anyString());
@@ -197,7 +197,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock();
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock();
 
     UserRepository repository = mock();
@@ -206,19 +206,19 @@ class UpdateUserTest {
     RoleAssigner roleAssigner = mock();
 
     User storedUser =
-        User.builder().id("123").login("test").anchor("user.test").lastname("A").build();
+        User.builder().id("123").login("test").anchor("user.test").lastName("A").build();
     when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
     var updateUserUseCase =
         new UpdateUser(
             repository, identifierResolver, roleAssigner, accessControl, extensionsNotifier);
 
-    User user = User.builder().login("test").anchor("user.test").lastname("B").build();
+    User user = User.builder().login("test").anchor("user.test").lastName("B").build();
 
     updateUserUseCase.updateUser(user);
 
     User effectiveUser =
-        User.builder().id("123").login("test").anchor("user.test").lastname("B").build();
+        User.builder().id("123").login("test").anchor("user.test").lastName("B").build();
 
     verify(repository).get(anyString());
     verify(identifierResolver).resolveIdentifier(any());
@@ -235,7 +235,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock();
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock();
 
     UserRepository repository = mock();
@@ -269,7 +269,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock();
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock();
 
     UserRepository repository = mock();
@@ -303,7 +303,7 @@ class UpdateUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenThrow(AnchorNotFoundException.class);
     AccessControl accessControl = mock();
-    when(accessControl.isUserWritable(anyString())).thenReturn(true);
+    when(accessControl.isUserWritable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock();
 
     UserRepository repository = mock();

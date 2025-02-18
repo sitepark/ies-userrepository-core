@@ -1,8 +1,8 @@
 package com.sitepark.ies.userrepository.core.domain.exception;
 
 /**
- * The <code>InvalidAnchorException</code> exception is thrown when an anchor provided as a reference
- * is invalid, not recognized, or does not conform to the expected format or criteria.
+ * The <code>InvalidAnchorException</code> exception is thrown when an anchor provided as a
+ * reference is invalid, not recognized, or does not conform to the expected format or criteria.
  */
 public class InvalidAnchorException extends UserRepositoryException {
 
@@ -23,6 +23,7 @@ public class InvalidAnchorException extends UserRepositoryException {
   public String getMessage() {
     return "Invalid anchor '"
         + this.name
+        + "'"
         + (super.getMessage() != null ? ": " + super.getMessage() : "");
   }
 }

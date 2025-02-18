@@ -23,15 +23,15 @@ public final class User {
 
   private final Password password;
 
-  private final String firstname;
+  private final String firstName;
 
-  private final String lastname;
+  private final String lastName;
 
   private final String email;
 
   private final GenderType gender;
 
-  private final String note;
+  private final String description;
 
   private final UserValidity validity;
 
@@ -44,11 +44,11 @@ public final class User {
     this.anchor = builder.anchor;
     this.login = builder.login;
     this.password = builder.password;
-    this.firstname = builder.firstname;
-    this.lastname = builder.lastname;
+    this.firstName = builder.firstName;
+    this.lastName = builder.lastName;
     this.email = builder.email;
     this.gender = builder.gender;
-    this.note = builder.note;
+    this.description = builder.description;
     this.validity = builder.validity;
     this.identityList = builder.identityList;
     this.roleList = Collections.unmodifiableList(builder.roleList);
@@ -87,24 +87,24 @@ public final class User {
   @JsonIgnore
   public String getName() {
     StringBuilder name = new StringBuilder();
-    if (this.lastname != null) {
-      name.append(this.lastname);
+    if (this.lastName != null) {
+      name.append(this.lastName);
     }
-    if (this.firstname != null) {
+    if (this.firstName != null) {
       if (name.length() > 0) {
         name.append(", ");
       }
-      name.append(this.firstname);
+      name.append(this.firstName);
     }
     return name.toString();
   }
 
-  public Optional<String> getFirstname() {
-    return Optional.ofNullable(this.firstname);
+  public Optional<String> getFirstName() {
+    return Optional.ofNullable(this.firstName);
   }
 
-  public Optional<String> getLastname() {
-    return Optional.ofNullable(this.lastname);
+  public Optional<String> getLastName() {
+    return Optional.ofNullable(this.lastName);
   }
 
   public Optional<String> getEmail() {
@@ -115,8 +115,8 @@ public final class User {
     return this.gender;
   }
 
-  public Optional<String> getNote() {
-    return Optional.ofNullable(this.note);
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(this.description);
   }
 
   public UserValidity getValidity() {
@@ -157,13 +157,13 @@ public final class User {
         this.anchor,
         this.login,
         this.password,
-        this.firstname,
-        this.lastname,
+        this.firstName,
+        this.lastName,
         this.email,
         this.gender,
         this.validity,
         this.identityList,
-        this.note,
+        this.description,
         this.roleList);
   }
 
@@ -178,11 +178,11 @@ public final class User {
         && Objects.equals(this.anchor, entity.anchor)
         && Objects.equals(this.login, entity.login)
         && Objects.equals(this.password, entity.password)
-        && Objects.equals(this.firstname, entity.firstname)
-        && Objects.equals(this.lastname, entity.lastname)
+        && Objects.equals(this.firstName, entity.firstName)
+        && Objects.equals(this.lastName, entity.lastName)
         && Objects.equals(this.email, entity.email)
         && Objects.equals(this.gender, entity.gender)
-        && Objects.equals(this.note, entity.note)
+        && Objects.equals(this.description, entity.description)
         && Objects.equals(this.validity, entity.validity)
         && Objects.equals(this.identityList, entity.identityList)
         && Objects.equals(this.roleList, entity.roleList);
@@ -199,15 +199,15 @@ public final class User {
         + ", password="
         + this.password
         + ", firstname="
-        + this.firstname
+        + this.firstName
         + ", lastname="
-        + this.lastname
+        + this.lastName
         + ", email="
         + this.email
         + ", gender="
         + this.gender
         + ", note="
-        + this.note
+        + this.description
         + ", validity="
         + this.validity
         + ", identityList="
@@ -229,15 +229,15 @@ public final class User {
 
     private Password password;
 
-    private String firstname;
+    private String firstName;
 
-    private String lastname;
+    private String lastName;
 
     private String email;
 
     private GenderType gender = GenderType.UNKNOWN;
 
-    private String note;
+    private String description;
 
     private UserValidity validity = UserValidity.ALWAYS_VALID;
 
@@ -252,11 +252,11 @@ public final class User {
       this.anchor = user.anchor;
       this.login = user.login;
       this.password = user.password;
-      this.firstname = user.firstname;
-      this.lastname = user.lastname;
+      this.firstName = user.firstName;
+      this.lastName = user.lastName;
       this.email = user.email;
       this.gender = user.gender;
-      this.note = user.note;
+      this.description = user.description;
       this.validity = user.validity;
       this.identityList.addAll(user.identityList);
       this.roleList.addAll(user.roleList);
@@ -300,13 +300,13 @@ public final class User {
       return this;
     }
 
-    public Builder firstname(String firstname) {
-      this.firstname = this.trimToNull(firstname);
+    public Builder firstName(String firstname) {
+      this.firstName = this.trimToNull(firstname);
       return this;
     }
 
-    public Builder lastname(String lastname) {
-      this.lastname = this.trimToNull(lastname);
+    public Builder lastName(String lastname) {
+      this.lastName = this.trimToNull(lastname);
       return this;
     }
 
@@ -321,8 +321,8 @@ public final class User {
       return this;
     }
 
-    public Builder note(String note) {
-      this.note = this.trimToNull(note);
+    public Builder description(String note) {
+      this.description = this.trimToNull(note);
       return this;
     }
 

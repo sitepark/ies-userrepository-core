@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +32,7 @@ class GetUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     RoleAssigner roleAssigner = mock();
     AccessControl accessControl = mock();
-    when(accessControl.isUserReadable("123")).thenReturn(false);
+    when(accessControl.isUserReadable()).thenReturn(false);
 
     GetUser getUserUseCase =
         new GetUser(userRepository, identifierResolver, roleAssigner, accessControl);
@@ -53,7 +52,7 @@ class GetUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     RoleAssigner roleAssigner = mock();
     AccessControl accessControl = mock();
-    when(accessControl.isUserReadable("123")).thenReturn(false);
+    when(accessControl.isUserReadable()).thenReturn(false);
 
     GetUser getUserUseCase =
         new GetUser(userRepository, identifierResolver, roleAssigner, accessControl);
@@ -77,7 +76,7 @@ class GetUserTest {
     when(roleAssigner.getRolesAssignByUser("123"))
         .thenReturn(Arrays.asList(UserLevelRoles.USER, Ref.ofAnchor("role.a")));
     AccessControl accessControl = mock();
-    when(accessControl.isUserReadable(anyString())).thenReturn(true);
+    when(accessControl.isUserReadable()).thenReturn(true);
 
     GetUser getUserUseCase =
         new GetUser(userRepository, identifierResolver, roleAssigner, accessControl);
@@ -103,7 +102,7 @@ class GetUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     RoleAssigner roleAssigner = mock();
     AccessControl accessControl = mock();
-    when(accessControl.isUserReadable(anyString())).thenReturn(true);
+    when(accessControl.isUserReadable()).thenReturn(true);
 
     GetUser getUserUseCase =
         new GetUser(userRepository, identifierResolver, roleAssigner, accessControl);
