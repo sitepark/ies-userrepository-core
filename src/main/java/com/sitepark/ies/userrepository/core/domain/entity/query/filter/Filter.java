@@ -20,12 +20,12 @@ public interface Filter {
     return new AnchorList(anchorList);
   }
 
-  public static Firstname firstname(String firstname) {
-    return new Firstname(firstname);
+  public static FirstName firstName(String firstname) {
+    return new FirstName(firstname);
   }
 
-  public static Lastname lastname(String lastname) {
-    return new Lastname(lastname);
+  public static LastName lastName(String lastname) {
+    return new LastName(lastname);
   }
 
   public static Email email(String email) {

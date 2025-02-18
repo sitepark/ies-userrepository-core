@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @JsonDeserialize(builder = Query.Builder.class)
-public class Query {
+public final class Query {
 
   private final Filter filter;
 

@@ -25,5 +25,9 @@ module com.sitepark.ies.userrepository.core {
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
   opens com.sitepark.ies.userrepository.core.domain.entity.role;
+  opens com.sitepark.ies.userrepository.core.domain.entity.query;
+  opens com.sitepark.ies.userrepository.core.domain.entity.query.sort;
+  opens com.sitepark.ies.userrepository.core.domain.entity.query.filter;
+  opens com.sitepark.ies.userrepository.core.domain.entity.query.limit;
   opens com.sitepark.ies.userrepository.core.domain.entity.identity;
 }

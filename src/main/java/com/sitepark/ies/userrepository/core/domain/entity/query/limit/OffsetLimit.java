@@ -1,11 +1,10 @@
 package com.sitepark.ies.userrepository.core.domain.entity.query.limit;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 import java.util.Optional;
 
-@SuppressWarnings(
-    "PMD.AvoidFieldNameMatchingTypeName") // so that when deserializing it has the desired format
-public class OffsetLimit implements Limit {
+public final class OffsetLimit implements Limit {
 
   private final Integer offset;
 
@@ -17,11 +16,29 @@ public class OffsetLimit implements Limit {
     this.limit = limit;
   }
 
-  public Integer offset() {
+  public Integer getOffset() {
     return this.offset;
   }
 
-  public Optional<Integer> limit() {
+  public Optional<Integer> getLimit() {
     return Optional.ofNullable(this.limit);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.offset, this.limit);
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (!(other instanceof OffsetLimit that)) {
+      return false;
+    }
+    return Objects.equals(this.offset, that.offset) && Objects.equals(this.limit, that.limit);
+  }
+
+  @Override
+  public String toString() {
+    return "OffsetLimit [offset=" + offset + ", limit=" + limit + "]";
   }
 }

@@ -20,7 +20,7 @@ public final class GetAllUsers {
     this.accessControl = accessControl;
   }
 
-  public List<User> getAllUser(Query query) {
+  public List<User> getAllUsers(Query query) {
 
     if (!this.accessControl.isUserReadable()) {
       throw new AccessDeniedException("Not allowed to read users");
