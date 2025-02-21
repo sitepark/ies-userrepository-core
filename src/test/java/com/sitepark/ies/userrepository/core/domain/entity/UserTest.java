@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.userrepository.core.domain.entity.identity.LdapIdentity;
-import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
-import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -243,16 +241,21 @@ class UserTest {
   @Test
   void testSetRoleListAsList() {
     User user =
-        this.createBuilderWithRequiredValues().roleList(Arrays.asList(Ref.ofId("123"))).build();
-    assertEquals(Arrays.asList(Ref.ofId("123")), user.getRoleList(), "unexpected roleList");
+        this.createBuilderWithRequiredValues()
+            .roleList(Arrays.asList(Identifier.ofId("123")))
+            .build();
+    assertEquals(Arrays.asList(Identifier.ofId("123")), user.getRoleList(), "unexpected roleList");
   }
 
   @Test
   void testSetOverwriteRoleListAsList() {
     User user =
-        this.createBuilderWithRequiredValues().roleList(Arrays.asList(Ref.ofId("123"))).build();
-    User overwritter = user.toBuilder().roleList(Arrays.asList(Ref.ofId("345"))).build();
-    assertEquals(Arrays.asList(Ref.ofId("345")), overwritter.getRoleList(), "unexpected roleList");
+        this.createBuilderWithRequiredValues()
+            .roleList(Arrays.asList(Identifier.ofId("123")))
+            .build();
+    User overwritter = user.toBuilder().roleList(Arrays.asList(Identifier.ofId("345"))).build();
+    assertEquals(
+        Arrays.asList(Identifier.ofId("345")), overwritter.getRoleList(), "unexpected roleList");
   }
 
   @Test
@@ -260,7 +263,7 @@ class UserTest {
     assertThrows(
         NullPointerException.class,
         () -> {
-          User.builder().roleList((List<Role>) null);
+          User.builder().roleList((List<Identifier>) null);
         });
   }
 
@@ -269,21 +272,22 @@ class UserTest {
     assertThrows(
         NullPointerException.class,
         () -> {
-          User.builder().roleList(Arrays.asList(Ref.ofId("345"), null));
+          User.builder().roleList(Arrays.asList(Identifier.ofId("345"), null));
         });
   }
 
   @Test
   void testSetRoleListAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().roleList(Ref.ofId("123")).build();
-    assertEquals(Arrays.asList(Ref.ofId("123")), user.getRoleList(), "unexpected roleList");
+    User user = this.createBuilderWithRequiredValues().roleList(Identifier.ofId("123")).build();
+    assertEquals(Arrays.asList(Identifier.ofId("123")), user.getRoleList(), "unexpected roleList");
   }
 
   @Test
   void testSetOverwriteRoleListAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().roleList(Ref.ofId("123")).build();
-    User overwritter = user.toBuilder().roleList(Ref.ofId("345")).build();
-    assertEquals(Arrays.asList(Ref.ofId("345")), overwritter.getRoleList(), "unexpected roleList");
+    User user = this.createBuilderWithRequiredValues().roleList(Identifier.ofId("123")).build();
+    User overwritter = user.toBuilder().roleList(Identifier.ofId("345")).build();
+    assertEquals(
+        Arrays.asList(Identifier.ofId("345")), overwritter.getRoleList(), "unexpected roleList");
   }
 
   @Test
@@ -291,7 +295,7 @@ class UserTest {
     assertThrows(
         NullPointerException.class,
         () -> {
-          User.builder().roleList((Role[]) null);
+          User.builder().roleList((Identifier[]) null);
         });
   }
 
@@ -300,22 +304,22 @@ class UserTest {
     assertThrows(
         NullPointerException.class,
         () -> {
-          User.builder().roleList(Ref.ofId("345"), null);
+          User.builder().roleList(Identifier.ofId("345"), null);
         });
   }
 
   @Test
   void testSetRole() {
-    User user = this.createBuilderWithRequiredValues().role(Ref.ofId("123")).build();
-    assertEquals(Arrays.asList(Ref.ofId("123")), user.getRoleList(), "unexpected roleList");
+    User user = this.createBuilderWithRequiredValues().role(Identifier.ofId("123")).build();
+    assertEquals(Arrays.asList(Identifier.ofId("123")), user.getRoleList(), "unexpected roleList");
   }
 
   @Test
   void testAddRole() {
-    User user = this.createBuilderWithRequiredValues().role(Ref.ofId("123")).build();
-    User added = user.toBuilder().role(Ref.ofId("456")).build();
+    User user = this.createBuilderWithRequiredValues().role(Identifier.ofId("123")).build();
+    User added = user.toBuilder().role(Identifier.ofId("456")).build();
 
-    List<Role> expected = Arrays.asList(Ref.ofId("123"), Ref.ofId("456"));
+    List<Identifier> expected = Arrays.asList(Identifier.ofId("123"), Identifier.ofId("456"));
 
     assertEquals(expected, added.getRoleList(), "unexpected roleList");
   }
@@ -516,7 +520,7 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roleList(UserLevelRoles.USER, Ref.ofAnchor("test.anchor"), Ref.ofId("123"))
+            .roleList(Identifier.ofAnchor("test.anchor"), Identifier.ofId("123"))
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();
@@ -526,7 +530,7 @@ class UserTest {
 				password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE,\s\
 				note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null],\s\
 				identityList=[LdapIdentity [server=2, dn=userdn]],\s\
-				roleList=[USER, REF(test.anchor), REF(123)]]""";
+				roleList=[test.anchor, 123]]""";
     assertEquals(expected, user.toString(), "unexpected string representation");
   }
 
@@ -546,7 +550,7 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roleList(UserLevelRoles.USER, Ref.ofAnchor("test.anchor"), Ref.ofId("123"))
+            .roleList(Identifier.ofAnchor("test.anchor"), Identifier.ofId("123"))
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();
@@ -565,7 +569,7 @@ class UserTest {
 				"description":"a note",\
 				"validity":{"blocked":false},\
 				"identityList":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-				"roleList":["USER","REF(test.anchor)","REF(123)"]}\
+				"roleList":["test.anchor","123"]}\
 				""";
 
     assertEquals(expected, json, "unexpected json");
@@ -591,7 +595,7 @@ class UserTest {
 			"gender":"MALE",\
 			"description":"a note",\
 			"identityList":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-			"roleList":["USER","REF(test.anchor)","REF(123)"]\
+			"roleList":["test.anchor","123"]\
 			}""";
 
     User user = mapper.readValue(json, User.class);
@@ -605,7 +609,7 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roleList(UserLevelRoles.USER, Ref.ofAnchor("test.anchor"), Ref.ofId("123"))
+            .roleList(Identifier.ofAnchor("test.anchor"), Identifier.ofId("123"))
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();

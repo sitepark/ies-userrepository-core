@@ -10,4 +10,16 @@ public interface AccessControl {
   boolean isUserWritable();
 
   boolean isUserRemovable();
+
+  boolean isRoleReadable();
+
+  boolean isRoleWritable();
+
+  boolean isRoleRemovable();
+
+  boolean isPrivilegeReadable();
+
+  boolean isPrivilegeWritable();
+
+  boolean isPrivilegeRemovable();
 }

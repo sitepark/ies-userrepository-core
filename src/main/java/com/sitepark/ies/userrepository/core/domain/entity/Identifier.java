@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,6 +30,11 @@ public final class Identifier {
       throw new IllegalArgumentException("invalid id: " + id);
     }
     return new Identifier(id);
+  }
+
+  public static Identifier ofAnchor(String anchor) {
+    Objects.requireNonNull(anchor, "anchor is null");
+    return Identifier.ofAnchor(Anchor.ofString(anchor));
   }
 
   public static Identifier ofAnchor(Anchor anchor) {
@@ -91,6 +97,7 @@ public final class Identifier {
     return Objects.equals(this.id, that.id) && Objects.equals(this.anchor, that.anchor);
   }
 
+  @JsonValue
   @Override
   public String toString() {
     if (this.id != null) {

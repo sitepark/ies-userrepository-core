@@ -11,10 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
+import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.entity.Password;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
-import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
@@ -109,7 +108,7 @@ class CreateUserTest {
     when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roleList(UserLevelRoles.USER, Ref.ofId("333")).build();
+    User user = User.builder().login("test").roleList(Identifier.ofId("333")).build();
 
     var createUserUseCase =
         new CreateUser(
@@ -123,16 +122,11 @@ class CreateUserTest {
     createUserUseCase.createUser(user);
 
     User effectiveUser =
-        User.builder()
-            .id("123")
-            .login("test")
-            .roleList(UserLevelRoles.USER, Ref.ofId("333"))
-            .build();
+        User.builder().id("123").login("test").roleList(Identifier.ofId("333")).build();
 
     verify(repository).create(eq(effectiveUser));
     verify(roleAssigner)
-        .assignRoleToUser(
-            Arrays.asList(UserLevelRoles.USER, Ref.ofId("333")), Arrays.asList("123"));
+        .assignRoleToUser(Arrays.asList(Identifier.ofId("333")), Arrays.asList("123"));
   }
 
   @Test
@@ -217,7 +211,7 @@ class CreateUserTest {
     when(repository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roleList(UserLevelRoles.USER, Ref.ofId("333")).build();
+    User user = User.builder().login("test").roleList(Identifier.ofId("333")).build();
 
     var createUserUseCase =
         new CreateUser(

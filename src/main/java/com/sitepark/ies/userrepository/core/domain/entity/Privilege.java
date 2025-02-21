@@ -1,18 +1,13 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 /**
- * Defines user roles to manage permissions and access control based on the provided role name,
- * allowing for custom role definitions in the application logic.
+ * Defines user privileges to manage permissions and access control based on the provided privilege
  */
-public final class Role {
+public class Privilege {
 
   private final String id;
 
@@ -22,14 +17,11 @@ public final class Role {
 
   private final String description;
 
-  private final List<Identifier> privilegeList;
-
-  protected Role(Builder builder) {
+  protected Privilege(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
     this.description = builder.description;
-    this.privilegeList = Collections.unmodifiableList(builder.privilegeList);
   }
 
   public String getId() {
@@ -48,49 +40,29 @@ public final class Role {
     return this.description;
   }
 
-  public List<Identifier> getPrivilegeList() {
-    return this.privilegeList;
-  }
-
   public static Builder builder() {
     return new Builder();
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.id, this.anchor, this.name, this.description, this.privilegeList);
+    return Objects.hash(this.id, this.anchor, this.name, this.description);
   }
 
   @Override
   public boolean equals(Object o) {
 
-    if (!(o instanceof Role that)) {
+    if (!(o instanceof Privilege that)) {
       return false;
     }
 
     return Objects.equals(this.id, that.id)
         && Objects.equals(this.anchor, that.anchor)
         && Objects.equals(this.name, that.name)
-        && Objects.equals(this.description, that.description)
-        && Objects.equals(this.privilegeList, that.privilegeList);
+        && Objects.equals(this.description, that.description);
   }
 
-  @Override
-  public String toString() {
-    return "Role [id="
-        + id
-        + ", anchor="
-        + anchor
-        + ", name="
-        + name
-        + ", description="
-        + description
-        + ", privilegeList="
-        + privilegeList
-        + "]";
-  }
-
-  public static Builder builder(Role role) {
+  public static Builder builder(Privilege role) {
     return new Builder(role);
   }
 
@@ -106,11 +78,9 @@ public final class Role {
 
     private String description;
 
-    private final List<Identifier> privilegeList = new ArrayList<>();
-
     protected Builder() {}
 
-    protected Builder(Role role) {
+    protected Builder(Privilege role) {
       this.id = role.id;
       this.anchor = role.anchor;
       this.name = role.name;
@@ -155,36 +125,11 @@ public final class Role {
       return this;
     }
 
-    @JsonSetter
-    public Builder privilegeList(Identifier... privilegeList) {
-      Objects.requireNonNull(privilegeList, "privilegeList is null");
-      this.privilegeList.clear();
-      for (Identifier privilege : privilegeList) {
-        this.privilege(privilege);
-      }
-      return this;
-    }
-
-    public Builder privilegeList(List<Identifier> privilegeList) {
-      Objects.requireNonNull(privilegeList, "privilegeList is null");
-      this.privilegeList.clear();
-      for (Identifier role : privilegeList) {
-        this.privilege(role);
-      }
-      return this;
-    }
-
-    public Builder privilege(Identifier privilege) {
-      Objects.requireNonNull(privilege, "privilege is null");
-      this.privilegeList.add(privilege);
-      return this;
-    }
-
-    public Role build() {
+    public Privilege build() {
       if (this.name == null) {
         throw new IllegalStateException("name is not set");
       }
-      return new Role(this);
+      return new Privilege(this);
     }
 
     @JsonIgnore

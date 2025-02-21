@@ -1,19 +1,19 @@
 package com.sitepark.ies.userrepository.core.port;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import java.util.List;
 
 public interface RoleAssigner {
 
-  void assignRoleToUser(List<Role> roleList, List<String> userList);
+  void assignRoleToUser(List<Identifier> roleList, List<String> userList);
 
-  void reassignRoleToUser(List<Role> roleList, List<String> userList);
+  void reassignRoleToUser(List<Identifier> roleList, List<String> userList);
 
-  void revokeRoleFromUser(List<Role> roleList, List<String> userList);
+  void revokeRoleFromUser(List<Identifier> roleList, List<String> userList);
 
   void revokeAllRolesFromUser(List<String> userList);
 
-  List<Role> getRolesAssignByUser(String id);
+  List<Identifier> getRolesAssignByUser(String id);
 
-  List<Long> getUserAssignByRole(Role role);
+  List<String> getUserAssignByRole(Identifier role);
 }

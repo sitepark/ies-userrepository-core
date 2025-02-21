@@ -37,7 +37,7 @@ public final class User {
 
   private final List<Identity> identityList;
 
-  private final List<Role> roleList;
+  private final List<Identifier> roleList;
 
   protected User(Builder builder) {
     this.id = builder.id;
@@ -138,7 +138,7 @@ public final class User {
   }
 
   @SuppressFBWarnings("EI_EXPOSE_REP")
-  public List<Role> getRoleList() {
+  public List<Identifier> getRoleList() {
     return this.roleList;
   }
 
@@ -243,7 +243,7 @@ public final class User {
 
     private final List<Identity> identityList = new ArrayList<>();
 
-    private final List<Role> roleList = new ArrayList<>();
+    private final List<Identifier> roleList = new ArrayList<>();
 
     protected Builder() {}
 
@@ -365,25 +365,25 @@ public final class User {
     }
 
     @JsonSetter
-    public Builder roleList(Role... roleList) {
+    public Builder roleList(Identifier... roleList) {
       Objects.requireNonNull(roleList, "roleList is null");
       this.roleList.clear();
-      for (Role role : roleList) {
+      for (Identifier role : roleList) {
         this.role(role);
       }
       return this;
     }
 
-    public Builder roleList(List<Role> roleList) {
+    public Builder roleList(List<Identifier> roleList) {
       Objects.requireNonNull(roleList, "roleList is null");
       this.roleList.clear();
-      for (Role role : roleList) {
+      for (Identifier role : roleList) {
         this.role(role);
       }
       return this;
     }
 
-    public Builder role(Role role) {
+    public Builder role(Identifier role) {
       Objects.requireNonNull(role, "role is null");
       this.roleList.add(role);
       return this;

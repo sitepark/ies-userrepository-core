@@ -114,7 +114,7 @@ class IdentifierTest {
     assertThrows(
         NullPointerException.class,
         () -> {
-          Identifier.ofAnchor(null);
+          Identifier.ofAnchor((Anchor) null);
         });
   }
 }
