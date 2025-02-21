@@ -25,7 +25,7 @@ class RefTest {
   @SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts", "PMD.AvoidDuplicateLiterals"})
   void testAnchorRef() {
     Ref ref = Ref.ofAnchor(Anchor.ofString("role.a"));
-    assertEquals("REF(role.a)", ref.getName(), "unexpected name");
+    assertEquals("role.a", ref.getName(), "unexpected name");
     assertEquals(Optional.empty(), ref.getId(), "empty id expected");
     assertEquals(Optional.of(Anchor.ofString("role.a")), ref.getAnchor(), "unexpected anchor");
   }
@@ -34,7 +34,7 @@ class RefTest {
   @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testAnchorStringRef() {
     Ref ref = Ref.ofAnchor("role.a");
-    assertEquals("REF(role.a)", ref.getName(), "unexpected name");
+    assertEquals("role.a", ref.getName(), "unexpected name");
     assertEquals(Optional.empty(), ref.getId(), "empty id expected");
     assertEquals(Optional.of(Anchor.ofString("role.a")), ref.getAnchor(), "unexpected anchor");
   }
@@ -71,7 +71,7 @@ class RefTest {
   @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testIdRef() {
     Ref ref = Ref.ofId("123");
-    assertEquals("REF(123)", ref.getName(), "unexpected name");
+    assertEquals("123", ref.getName(), "unexpected name");
     assertEquals(Optional.empty(), ref.getAnchor(), "empty anchor expected");
     assertEquals(Optional.of("123"), ref.getId(), "unexpected id");
   }

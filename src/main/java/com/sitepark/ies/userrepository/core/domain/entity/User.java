@@ -35,9 +35,9 @@ public final class User {
 
   private final UserValidity validity;
 
-  private final List<Identity> identityList;
+  private final List<Identity> identities;
 
-  private final List<Role> roleList;
+  private final List<Role> roles;
 
   protected User(Builder builder) {
     this.id = builder.id;
@@ -50,8 +50,8 @@ public final class User {
     this.gender = builder.gender;
     this.description = builder.description;
     this.validity = builder.validity;
-    this.identityList = builder.identityList;
-    this.roleList = Collections.unmodifiableList(builder.roleList);
+    this.identities = builder.identities;
+    this.roles = Collections.unmodifiableList(builder.roles);
   }
 
   public Optional<String> getId() {
@@ -124,12 +124,12 @@ public final class User {
   }
 
   @SuppressFBWarnings("EI_EXPOSE_REP")
-  public List<Identity> getIdentityList() {
-    return this.identityList;
+  public List<Identity> getIdentities() {
+    return this.identities;
   }
 
   public <T extends Identity> Optional<T> getIdentity(Class<T> type) {
-    for (Identity identity : this.identityList) {
+    for (Identity identity : this.identities) {
       if (type.isInstance(identity)) {
         return Optional.of(type.cast(identity));
       }
@@ -138,8 +138,8 @@ public final class User {
   }
 
   @SuppressFBWarnings("EI_EXPOSE_REP")
-  public List<Role> getRoleList() {
-    return this.roleList;
+  public List<Role> getRoles() {
+    return this.roles;
   }
 
   public static Builder builder() {
@@ -162,9 +162,9 @@ public final class User {
         this.email,
         this.gender,
         this.validity,
-        this.identityList,
+        this.identities,
         this.description,
-        this.roleList);
+        this.roles);
   }
 
   @Override
@@ -184,8 +184,8 @@ public final class User {
         && Objects.equals(this.gender, entity.gender)
         && Objects.equals(this.description, entity.description)
         && Objects.equals(this.validity, entity.validity)
-        && Objects.equals(this.identityList, entity.identityList)
-        && Objects.equals(this.roleList, entity.roleList);
+        && Objects.equals(this.identities, entity.identities)
+        && Objects.equals(this.roles, entity.roles);
   }
 
   @Override
@@ -210,10 +210,10 @@ public final class User {
         + this.description
         + ", validity="
         + this.validity
-        + ", identityList="
-        + this.identityList
-        + ", roleList="
-        + this.roleList
+        + ", identities="
+        + this.identities
+        + ", roles="
+        + this.roles
         + "]";
   }
 
@@ -241,9 +241,9 @@ public final class User {
 
     private UserValidity validity = UserValidity.ALWAYS_VALID;
 
-    private final List<Identity> identityList = new ArrayList<>();
+    private final List<Identity> identities = new ArrayList<>();
 
-    private final List<Role> roleList = new ArrayList<>();
+    private final List<Role> roles = new ArrayList<>();
 
     protected Builder() {}
 
@@ -258,8 +258,8 @@ public final class User {
       this.gender = user.gender;
       this.description = user.description;
       this.validity = user.validity;
-      this.identityList.addAll(user.identityList);
-      this.roleList.addAll(user.roleList);
+      this.identities.addAll(user.identities);
+      this.roles.addAll(user.roles);
     }
 
     public Builder id(String id) {
@@ -340,19 +340,19 @@ public final class User {
     }
 
     @JsonSetter
-    public Builder identityList(List<Identity> identityList) {
-      Objects.requireNonNull(identityList, "identityList is null");
-      this.identityList.clear();
-      for (Identity identity : identityList) {
+    public Builder identities(List<Identity> identities) {
+      Objects.requireNonNull(identities, "identities is null");
+      this.identities.clear();
+      for (Identity identity : identities) {
         this.identity(identity);
       }
       return this;
     }
 
-    public Builder identityList(Identity... identityList) {
-      Objects.requireNonNull(identityList, "identityList is null");
-      this.identityList.clear();
-      for (Identity identity : identityList) {
+    public Builder identities(Identity... identities) {
+      Objects.requireNonNull(identities, "identities is null");
+      this.identities.clear();
+      for (Identity identity : identities) {
         this.identity(identity);
       }
       return this;
@@ -360,24 +360,24 @@ public final class User {
 
     public Builder identity(Identity identity) {
       Objects.requireNonNull(identity, "identity is null");
-      this.identityList.add(identity);
+      this.identities.add(identity);
       return this;
     }
 
     @JsonSetter
-    public Builder roleList(Role... roleList) {
-      Objects.requireNonNull(roleList, "roleList is null");
-      this.roleList.clear();
-      for (Role role : roleList) {
+    public Builder roles(Role... roles) {
+      Objects.requireNonNull(roles, "roles is null");
+      this.roles.clear();
+      for (Role role : roles) {
         this.role(role);
       }
       return this;
     }
 
-    public Builder roleList(List<Role> roleList) {
-      Objects.requireNonNull(roleList, "roleList is null");
-      this.roleList.clear();
-      for (Role role : roleList) {
+    public Builder roles(List<Role> roles) {
+      Objects.requireNonNull(roles, "roles is null");
+      this.roles.clear();
+      for (Role role : roles) {
         this.role(role);
       }
       return this;
@@ -385,7 +385,7 @@ public final class User {
 
     public Builder role(Role role) {
       Objects.requireNonNull(role, "role is null");
-      this.roleList.add(role);
+      this.roles.add(role);
       return this;
     }
 

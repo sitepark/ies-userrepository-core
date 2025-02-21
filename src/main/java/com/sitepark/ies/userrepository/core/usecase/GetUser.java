@@ -46,6 +46,6 @@ public final class GetUser {
 
     List<Role> roleList = this.roleAssigner.getRolesAssignByUser(id);
 
-    return user.toBuilder().roleList(roleList).build();
+    return user.toBuilder().roles(roleList).build();
   }
 }
