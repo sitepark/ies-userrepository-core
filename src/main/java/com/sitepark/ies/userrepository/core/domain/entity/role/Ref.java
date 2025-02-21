@@ -35,7 +35,7 @@ public final class Ref extends Role {
   // A ref has either an id or an anchor.
   @SuppressWarnings("PMD.NullAssignment")
   private Ref(String id) {
-    super("REF(" + id + ")");
+    super(id);
     if (!Identifier.isId(id)) {
       throw new IllegalArgumentException(id + " not an id");
     }
@@ -44,7 +44,7 @@ public final class Ref extends Role {
   }
 
   private Ref(Anchor anchor) {
-    super("REF(" + anchor + ")");
+    super(anchor.toString());
     Objects.requireNonNull(anchor, "anchor is null");
     this.id = null;
     this.anchor = anchor;

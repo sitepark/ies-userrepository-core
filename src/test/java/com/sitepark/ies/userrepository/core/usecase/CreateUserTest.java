@@ -109,7 +109,7 @@ class CreateUserTest {
     when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roleList(UserLevelRoles.USER, Ref.ofId("333")).build();
+    User user = User.builder().login("test").roles(UserLevelRoles.USER, Ref.ofId("333")).build();
 
     var createUserUseCase =
         new CreateUser(
@@ -123,11 +123,7 @@ class CreateUserTest {
     createUserUseCase.createUser(user);
 
     User effectiveUser =
-        User.builder()
-            .id("123")
-            .login("test")
-            .roleList(UserLevelRoles.USER, Ref.ofId("333"))
-            .build();
+        User.builder().id("123").login("test").roles(UserLevelRoles.USER, Ref.ofId("333")).build();
 
     verify(repository).create(eq(effectiveUser));
     verify(roleAssigner)
@@ -217,7 +213,7 @@ class CreateUserTest {
     when(repository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roleList(UserLevelRoles.USER, Ref.ofId("333")).build();
+    User user = User.builder().login("test").roles(UserLevelRoles.USER, Ref.ofId("333")).build();
 
     var createUserUseCase =
         new CreateUser(

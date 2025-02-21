@@ -85,7 +85,7 @@ class GetUserTest {
         User.builder()
             .id("123")
             .login("test")
-            .roleList(UserLevelRoles.USER, Ref.ofAnchor("role.a"))
+            .roles(UserLevelRoles.USER, Ref.ofAnchor("role.a"))
             .build();
 
     User user = getUserUseCase.getUser(Identifier.ofString("123"));
