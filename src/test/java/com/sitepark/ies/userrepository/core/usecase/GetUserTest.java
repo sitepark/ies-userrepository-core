@@ -70,7 +70,7 @@ class GetUserTest {
     GetUser getUserUseCase = new GetUser(userRepository, identifierResolver, accessControl);
 
     User expectedUser =
-        User.builder().id("123").login("test").roleList(Identifier.ofId("345")).build();
+        User.builder().id("123").login("test").roles(Identifier.ofId("345")).build();
 
     User user = getUserUseCase.getUser(Identifier.ofString("123"));
 

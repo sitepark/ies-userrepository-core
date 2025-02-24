@@ -66,7 +66,7 @@ public final class UpdateUser {
       LOGGER.info("update: {}", joinedUpdateUser);
     }
 
-    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoleList(), Arrays.asList(id));
+    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoles(), Arrays.asList(id));
 
     this.repository.update(joinedUpdateUser);
 
@@ -96,8 +96,8 @@ public final class UpdateUser {
   private User loadStoredUser(String id) {
     User storedUser = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));
 
-    List<Identifier> roleList = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
-    return storedUser.toBuilder().roleList(roleList).build();
+    List<Identifier> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
+    return storedUser.toBuilder().roles(roles).build();
   }
 
   private void validateLogin(User user) {

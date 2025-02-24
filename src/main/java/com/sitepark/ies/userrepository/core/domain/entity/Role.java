@@ -22,14 +22,14 @@ public final class Role {
 
   private final String description;
 
-  private final List<Identifier> privilegeList;
+  private final List<Identifier> privileges;
 
   protected Role(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
     this.description = builder.description;
-    this.privilegeList = Collections.unmodifiableList(builder.privilegeList);
+    this.privileges = Collections.unmodifiableList(builder.privileges);
   }
 
   public String getId() {
@@ -48,8 +48,8 @@ public final class Role {
     return this.description;
   }
 
-  public List<Identifier> getPrivilegeList() {
-    return this.privilegeList;
+  public List<Identifier> getPrivileges() {
+    return this.privileges;
   }
 
   public static Builder builder() {
@@ -58,7 +58,7 @@ public final class Role {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.id, this.anchor, this.name, this.description, this.privilegeList);
+    return Objects.hash(this.id, this.anchor, this.name, this.description, this.privileges);
   }
 
   @Override
@@ -72,7 +72,7 @@ public final class Role {
         && Objects.equals(this.anchor, that.anchor)
         && Objects.equals(this.name, that.name)
         && Objects.equals(this.description, that.description)
-        && Objects.equals(this.privilegeList, that.privilegeList);
+        && Objects.equals(this.privileges, that.privileges);
   }
 
   @Override
@@ -85,8 +85,8 @@ public final class Role {
         + name
         + ", description="
         + description
-        + ", privilegeList="
-        + privilegeList
+        + ", privileges="
+        + privileges
         + "]";
   }
 
@@ -106,7 +106,7 @@ public final class Role {
 
     private String description;
 
-    private final List<Identifier> privilegeList = new ArrayList<>();
+    private final List<Identifier> privileges = new ArrayList<>();
 
     protected Builder() {}
 
@@ -156,19 +156,19 @@ public final class Role {
     }
 
     @JsonSetter
-    public Builder privilegeList(Identifier... privilegeList) {
-      Objects.requireNonNull(privilegeList, "privilegeList is null");
-      this.privilegeList.clear();
-      for (Identifier privilege : privilegeList) {
+    public Builder privileges(Identifier... privileges) {
+      Objects.requireNonNull(privileges, "privileges is null");
+      this.privileges.clear();
+      for (Identifier privilege : privileges) {
         this.privilege(privilege);
       }
       return this;
     }
 
-    public Builder privilegeList(List<Identifier> privilegeList) {
-      Objects.requireNonNull(privilegeList, "privilegeList is null");
-      this.privilegeList.clear();
-      for (Identifier role : privilegeList) {
+    public Builder privileges(List<Identifier> privileges) {
+      Objects.requireNonNull(privileges, "privileges is null");
+      this.privileges.clear();
+      for (Identifier role : privileges) {
         this.privilege(role);
       }
       return this;
@@ -176,7 +176,7 @@ public final class Role {
 
     public Builder privilege(Identifier privilege) {
       Objects.requireNonNull(privilege, "privilege is null");
-      this.privilegeList.add(privilege);
+      this.privileges.add(privilege);
       return this;
     }
 

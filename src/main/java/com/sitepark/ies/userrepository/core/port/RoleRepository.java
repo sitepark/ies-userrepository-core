@@ -12,6 +12,8 @@ public interface RoleRepository {
 
   Optional<Role> get(String id);
 
+  List<Role> getByIds(List<String> ids);
+
   List<Role> getAll();
 
   void remove(String id);

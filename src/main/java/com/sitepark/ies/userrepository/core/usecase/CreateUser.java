@@ -80,7 +80,7 @@ public final class CreateUser {
     this.repository.create(userWithIdAndHashPassword);
 
     this.roleAssigner.assignRoleToUser(
-        userWithIdAndHashPassword.getRoleList(), Arrays.asList(generatedId));
+        userWithIdAndHashPassword.getRoles(), Arrays.asList(generatedId));
 
     this.extensionsNotifier.notifyCreated(userWithIdAndHashPassword);
 

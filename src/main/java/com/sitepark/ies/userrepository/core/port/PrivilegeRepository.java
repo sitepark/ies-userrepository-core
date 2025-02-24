@@ -14,6 +14,8 @@ public interface PrivilegeRepository {
 
   List<Privilege> getAll();
 
+  List<Privilege> getByIds(List<String> ids);
+
   void remove(String id);
 
   Optional<String> resolveAnchor(Anchor anchor);
