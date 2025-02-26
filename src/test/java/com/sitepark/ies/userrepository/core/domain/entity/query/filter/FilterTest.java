@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.ies.userrepository.core.domain.entity.databind.DatabindModule;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
@@ -21,7 +22,7 @@ class FilterTest {
   @Test
   void testIdList() {
     IdList filter = Filter.idList("123");
-    assertEquals(Arrays.asList("123"), filter.getIdList(), "unexpected idList");
+    assertEquals(List.of("123"), filter.getIdList(), "unexpected idList");
   }
 
   @Test
@@ -37,7 +38,7 @@ class FilterTest {
     com.sitepark.ies.userrepository.core.domain.entity.Anchor anchor =
         com.sitepark.ies.userrepository.core.domain.entity.Anchor.ofString("abc");
     AnchorList filter = Filter.anchorList(anchor);
-    assertEquals(Arrays.asList(anchor), filter.getAnchorList(), "unexpected anchorList");
+    assertEquals(List.of(anchor), filter.getAnchorList(), "unexpected anchorList");
   }
 
   @Test
@@ -62,6 +63,30 @@ class FilterTest {
   void getEmail() {
     Email filter = Filter.email("panpan@neverland.com");
     assertEquals("panpan@neverland.com", filter.getEmail(), "unexpected email");
+  }
+
+  @Test
+  void getRoleId() {
+    RoleId filter = Filter.roleId("123");
+    assertEquals("123", filter.getRoleId(), "unexpected roleId");
+  }
+
+  @Test
+  void getRoleIdList() {
+    RoleIdList filter = Filter.roleIdList("123");
+    assertEquals(List.of("123"), filter.getRoleIdList(), "unexpected roleIdList");
+  }
+
+  @Test
+  void getPrivilegeId() {
+    PrivilegeId filter = Filter.privilegeId("123");
+    assertEquals("123", filter.getPrivilegeId(), "unexpected privilegeId");
+  }
+
+  @Test
+  void getPrivilegeIdList() {
+    PrivilegeIdList filter = Filter.privilegeIdList("123");
+    assertEquals(List.of("123"), filter.getPrivilegedList(), "unexpected privilegeIdList");
   }
 
   @Test
@@ -102,7 +127,7 @@ class FilterTest {
 
     assertEquals(
         """
-        {\"or":[{"idList":["6"]},{"anchor":"abc"},{"and":[{"lastName":"test"},{"login":"test"}]}]}\
+        {"or":[{"idList":["6"]},{"anchor":"abc"},{"and":[{"lastName":"test"},{"login":"test"}]}]}\
         """,
         json,
         "unexpected json-data");

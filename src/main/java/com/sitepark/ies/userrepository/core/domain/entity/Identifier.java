@@ -26,6 +26,7 @@ public final class Identifier {
   }
 
   public static Identifier ofId(String id) {
+    Objects.requireNonNull(id, "id is null");
     if (!isId(id)) {
       throw new IllegalArgumentException("invalid id: " + id);
     }

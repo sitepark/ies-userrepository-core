@@ -3,6 +3,7 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +25,7 @@ public final class Role {
 
   private final List<Identifier> privileges;
 
-  protected Role(Builder builder) {
+  private Role(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
@@ -48,12 +49,17 @@ public final class Role {
     return this.description;
   }
 
+  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<Identifier> getPrivileges() {
     return this.privileges;
   }
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public Builder toBuilder() {
+    return new Builder(this);
   }
 
   @Override
@@ -90,12 +96,8 @@ public final class Role {
         + "]";
   }
 
-  public static Builder builder(Role role) {
-    return new Builder(role);
-  }
-
   @SuppressWarnings("PMD.TooManyMethods")
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private String id;
@@ -108,13 +110,14 @@ public final class Role {
 
     private final List<Identifier> privileges = new ArrayList<>();
 
-    protected Builder() {}
+    private Builder() {}
 
-    protected Builder(Role role) {
+    private Builder(Role role) {
       this.id = role.id;
       this.anchor = role.anchor;
       this.name = role.name;
       this.description = role.description;
+      this.privileges.addAll(role.privileges);
     }
 
     public Builder id(String id) {
@@ -127,11 +130,12 @@ public final class Role {
     }
 
     public Builder identifier(Identifier identifier) {
-      if (identifier.getId().isPresent()) {
-        this.id = identifier.getId().get();
+      assert identifier.getId().isPresent() || identifier.getAnchor().isPresent();
+      if (identifier.getAnchor().isPresent()) {
+        this.anchor = identifier.getAnchor().get();
         return this;
       }
-      this.anchor = identifier.getAnchor().get();
+      this.id = identifier.getId().get();
       return this;
     }
 

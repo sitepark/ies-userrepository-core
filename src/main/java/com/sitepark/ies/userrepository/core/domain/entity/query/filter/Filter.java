@@ -3,48 +3,64 @@ package com.sitepark.ies.userrepository.core.domain.entity.query.filter;
 @SuppressWarnings("PMD.TooManyMethods")
 public interface Filter {
 
-  public static Id id(String id) {
+  static Id id(String id) {
     return new Id(id);
   }
 
-  public static IdList idList(String... idlist) {
-    return new IdList(idlist);
+  static IdList idList(String... idList) {
+    return new IdList(idList);
   }
 
-  public static Anchor anchor(com.sitepark.ies.userrepository.core.domain.entity.Anchor anchor) {
+  static Anchor anchor(com.sitepark.ies.userrepository.core.domain.entity.Anchor anchor) {
     return new Anchor(anchor);
   }
 
-  public static AnchorList anchorList(
+  static AnchorList anchorList(
       com.sitepark.ies.userrepository.core.domain.entity.Anchor... anchorList) {
     return new AnchorList(anchorList);
   }
 
-  public static FirstName firstName(String firstname) {
+  static FirstName firstName(String firstname) {
     return new FirstName(firstname);
   }
 
-  public static LastName lastName(String lastname) {
+  static LastName lastName(String lastname) {
     return new LastName(lastname);
   }
 
-  public static Email email(String email) {
+  static Email email(String email) {
     return new Email(email);
   }
 
-  public static Login login(String login) {
+  static Login login(String login) {
     return new Login(login);
   }
 
-  public static Or or(Filter... filterList) {
+  static RoleId roleId(String roleId) {
+    return new RoleId(roleId);
+  }
+
+  static RoleIdList roleIdList(String... roleIdList) {
+    return new RoleIdList(roleIdList);
+  }
+
+  static PrivilegeId privilegeId(String privilegeId) {
+    return new PrivilegeId(privilegeId);
+  }
+
+  static PrivilegeIdList privilegeIdList(String... privilegeIdList) {
+    return new PrivilegeIdList(privilegeIdList);
+  }
+
+  static Or or(Filter... filterList) {
     return new Or(filterList);
   }
 
-  public static And and(Filter... filterList) {
+  static And and(Filter... filterList) {
     return new And(filterList);
   }
 
-  public static Not not(Filter filter) {
+  static Not not(Filter filter) {
     return new Not(filter);
   }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +40,11 @@ public final class User {
 
   private final List<Identifier> roles;
 
-  protected User(Builder builder) {
+  private final OffsetDateTime createdAt;
+
+  private final OffsetDateTime changedAt;
+
+  private User(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.login = builder.login;
@@ -52,13 +57,12 @@ public final class User {
     this.validity = builder.validity;
     this.identities = builder.identities;
     this.roles = Collections.unmodifiableList(builder.roles);
+    this.createdAt = builder.createdAt;
+    this.changedAt = builder.changedAt;
   }
 
   public Optional<String> getId() {
-    if (this.id == null) {
-      return Optional.empty();
-    }
-    return Optional.of(this.id);
+    return Optional.ofNullable(this.id);
   }
 
   @JsonIgnore
@@ -84,6 +88,14 @@ public final class User {
     return Optional.ofNullable(this.password);
   }
 
+  public Optional<OffsetDateTime> getCreatedAt() {
+    return Optional.ofNullable(this.createdAt);
+  }
+
+  public Optional<OffsetDateTime> getChangedAt() {
+    return Optional.ofNullable(this.changedAt);
+  }
+
   @JsonIgnore
   public String getName() {
     StringBuilder name = new StringBuilder();
@@ -91,7 +103,7 @@ public final class User {
       name.append(this.lastName);
     }
     if (this.firstName != null) {
-      if (name.length() > 0) {
+      if (!name.isEmpty()) {
         name.append(", ");
       }
       name.append(this.firstName);
@@ -164,7 +176,9 @@ public final class User {
         this.validity,
         this.identities,
         this.description,
-        this.roles);
+        this.roles,
+        this.createdAt,
+        this.changedAt);
   }
 
   @Override
@@ -185,7 +199,9 @@ public final class User {
         && Objects.equals(this.description, entity.description)
         && Objects.equals(this.validity, entity.validity)
         && Objects.equals(this.identities, entity.identities)
-        && Objects.equals(this.roles, entity.roles);
+        && Objects.equals(this.roles, entity.roles)
+        && Objects.equals(this.createdAt, entity.createdAt)
+        && Objects.equals(this.changedAt, entity.changedAt);
   }
 
   @Override
@@ -214,11 +230,15 @@ public final class User {
         + this.identities
         + ", roles="
         + this.roles
+        + ", createdAt="
+        + this.createdAt
+        + ", changedAt="
+        + this.changedAt
         + "]";
   }
 
   @SuppressWarnings("PMD.TooManyMethods")
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private String id;
@@ -245,9 +265,13 @@ public final class User {
 
     private final List<Identifier> roles = new ArrayList<>();
 
-    protected Builder() {}
+    private OffsetDateTime createdAt;
 
-    protected Builder(User user) {
+    private OffsetDateTime changedAt;
+
+    private Builder() {}
+
+    private Builder(User user) {
       this.id = user.id;
       this.anchor = user.anchor;
       this.login = user.login;
@@ -260,6 +284,8 @@ public final class User {
       this.validity = user.validity;
       this.identities.addAll(user.identities);
       this.roles.addAll(user.roles);
+      this.createdAt = user.createdAt;
+      this.changedAt = user.changedAt;
     }
 
     public Builder id(String id) {
@@ -272,11 +298,12 @@ public final class User {
     }
 
     public Builder identifier(Identifier identifier) {
-      if (identifier.getId().isPresent()) {
-        this.id = identifier.getId().get();
+      assert identifier.getId().isPresent() || identifier.getAnchor().isPresent();
+      if (identifier.getAnchor().isPresent()) {
+        this.anchor = identifier.getAnchor().get();
         return this;
       }
-      this.anchor = identifier.getAnchor().get();
+      this.id = identifier.getId().get();
       return this;
     }
 
@@ -386,6 +413,18 @@ public final class User {
     public Builder role(Identifier role) {
       Objects.requireNonNull(role, "role is null");
       this.roles.add(role);
+      return this;
+    }
+
+    public Builder createdAt(OffsetDateTime createdAt) {
+      Objects.requireNonNull(createdAt, "createdAt is null");
+      this.createdAt = createdAt;
+      return this;
+    }
+
+    public Builder changedAt(OffsetDateTime changedAt) {
+      Objects.requireNonNull(changedAt, "changedAt is null");
+      this.changedAt = changedAt;
       return this;
     }
 

@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Defines user privileges to manage permissions and access control based on the provided privilege
  */
-public class Privilege {
+public final class Privilege {
 
   private final String id;
 
@@ -17,7 +17,7 @@ public class Privilege {
 
   private final String description;
 
-  protected Privilege(Builder builder) {
+  private Privilege(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
@@ -44,6 +44,10 @@ public class Privilege {
     return new Builder();
   }
 
+  public Builder toBuilder() {
+    return new Builder(this);
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(this.id, this.anchor, this.name, this.description);
@@ -62,8 +66,21 @@ public class Privilege {
         && Objects.equals(this.description, that.description);
   }
 
-  public static Builder builder(Privilege role) {
-    return new Builder(role);
+  @Override
+  public String toString() {
+    return "Privilege{"
+        + "id='"
+        + id
+        + '\''
+        + ", anchor="
+        + anchor
+        + ", name='"
+        + name
+        + '\''
+        + ", description='"
+        + description
+        + '\''
+        + '}';
   }
 
   @SuppressWarnings("PMD.TooManyMethods")
@@ -78,13 +95,13 @@ public class Privilege {
 
     private String description;
 
-    protected Builder() {}
+    private Builder() {}
 
-    protected Builder(Privilege role) {
-      this.id = role.id;
-      this.anchor = role.anchor;
-      this.name = role.name;
-      this.description = role.description;
+    private Builder(Privilege privilege) {
+      this.id = privilege.id;
+      this.anchor = privilege.anchor;
+      this.name = privilege.name;
+      this.description = privilege.description;
     }
 
     public Builder id(String id) {
@@ -97,11 +114,12 @@ public class Privilege {
     }
 
     public Builder identifier(Identifier identifier) {
-      if (identifier.getId().isPresent()) {
-        this.id = identifier.getId().get();
+      assert identifier.getId().isPresent() || identifier.getAnchor().isPresent();
+      if (identifier.getAnchor().isPresent()) {
+        this.anchor = identifier.getAnchor().get();
         return this;
       }
-      this.anchor = identifier.getAnchor().get();
+      this.id = identifier.getId().get();
       return this;
     }
 

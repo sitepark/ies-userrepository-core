@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.userrepository.core.domain.entity.identity.LdapIdentity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -462,6 +463,20 @@ class UserTest {
   }
 
   @Test
+  void testSetCreatedAt() {
+    OffsetDateTime now = OffsetDateTime.now();
+    User user = this.createBuilderWithRequiredValues().createdAt(now).build();
+    assertEquals(now, user.getCreatedAt().get(), "unexpected createdAt");
+  }
+
+  @Test
+  void testSetChangedAt() {
+    OffsetDateTime now = OffsetDateTime.now();
+    User user = this.createBuilderWithRequiredValues().changedAt(now).build();
+    assertEquals(now, user.getChangedAt().get(), "unexpected changedAt");
+  }
+
+  @Test
   void testSetValiditiy() {
 
     User user =
@@ -518,11 +533,7 @@ class UserTest {
             .build();
     String expected =
         """
-				User [id=100560100000014842, anchor=user.peterpan, login=peterpan,\s\
-				password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE,\s\
-				note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null],\s\
-				identities=[LdapIdentity [server=2, dn=userdn]],\s\
-				roles=[test.anchor, 123]]""";
+		User [id=100560100000014842, anchor=user.peterpan, login=peterpan, password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE, note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null], identities=[LdapIdentity [server=2, dn=userdn]], roles=[test.anchor, 123], createdAt=null, changedAt=null]""";
     assertEquals(expected, user.toString(), "unexpected string representation");
   }
 
