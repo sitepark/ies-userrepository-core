@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.domain.entity.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.domain.entity.query.sort.SortCriteria;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +22,7 @@ public final class Query {
 
   private final Limit limit;
 
-  protected Query(Builder builder) {
+  private Query(Builder builder) {
     this.filter = builder.filter;
     this.sort = Collections.unmodifiableList(builder.sort);
     this.limit = builder.limit;
@@ -31,6 +32,7 @@ public final class Query {
     return Optional.ofNullable(this.filter);
   }
 
+  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<SortCriteria> getSort() {
     return this.sort;
   }
@@ -64,7 +66,7 @@ public final class Query {
     return new Builder(this);
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
   public static class Builder {
 
     protected Filter filter;
