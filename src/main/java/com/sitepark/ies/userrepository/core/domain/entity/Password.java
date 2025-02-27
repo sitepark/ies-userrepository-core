@@ -71,7 +71,8 @@ public final class Password {
         + "]";
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
+  @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   public static final class Builder {
 
     private String hashAlgorithm;

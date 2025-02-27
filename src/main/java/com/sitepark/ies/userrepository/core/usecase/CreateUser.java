@@ -12,7 +12,7 @@ import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,7 +34,7 @@ public final class CreateUser {
   private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
-  protected CreateUser(
+  CreateUser(
       UserRepository repository,
       RoleAssigner roleAssigner,
       AccessControl accessControl,
@@ -55,7 +55,7 @@ public final class CreateUser {
       throw new IllegalArgumentException("The ID of the user must not be set when creating.");
     }
 
-    if (!this.accessControl.isUserCreateable()) {
+    if (!this.accessControl.isUserCreatable()) {
       throw new AccessDeniedException("Not allowed to create user " + newUser);
     }
 
@@ -80,11 +80,11 @@ public final class CreateUser {
     this.repository.create(userWithIdAndHashPassword);
 
     this.roleAssigner.assignRoleToUser(
-        userWithIdAndHashPassword.getRoles(), Arrays.asList(generatedId));
+        userWithIdAndHashPassword.getRoles(), Collections.singletonList(generatedId));
 
     this.extensionsNotifier.notifyCreated(userWithIdAndHashPassword);
 
-    return userWithIdAndHashPassword.getId().get();
+    return userWithIdAndHashPassword.getId().orElse("");
   }
 
   private void validateAnchor(User newUser) {

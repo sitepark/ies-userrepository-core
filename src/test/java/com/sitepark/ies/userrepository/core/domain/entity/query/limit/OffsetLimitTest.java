@@ -25,24 +25,24 @@ class OffsetLimitTest {
   @Test
   void testNullOffset() {
     OffsetLimit offsetLimit = new OffsetLimit(null, null);
-    assertEquals(0, offsetLimit.getOffset());
+    assertEquals(0, offsetLimit.getOffset(), "Offset should be 0");
   }
 
   @Test
   void testNullLimit() {
     OffsetLimit offsetLimit = new OffsetLimit(null, null);
-    assertTrue(offsetLimit.getLimit().isEmpty());
+    assertTrue(offsetLimit.getLimit().isEmpty(), "Limit should be empty");
   }
 
   @Test
   void testOffset() {
     OffsetLimit offsetLimit = new OffsetLimit(1, 2);
-    assertEquals(1, offsetLimit.getOffset());
+    assertEquals(1, offsetLimit.getOffset(), "Offset should be 1");
   }
 
   @Test
   void testLimit() {
     OffsetLimit offsetLimit = new OffsetLimit(1, 2);
-    assertEquals(Optional.of(2), offsetLimit.getLimit());
+    assertEquals(Optional.of(2), offsetLimit.getLimit(), "Limit should be 2");
   }
 }

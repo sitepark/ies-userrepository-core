@@ -18,7 +18,7 @@ public final class GetUser {
   private final AccessControl accessControl;
 
   @Inject
-  protected GetUser(
+  GetUser(
       UserRepository repository,
       IdentifierResolver identifierResolver,
       AccessControl accessControl) {
@@ -32,7 +32,7 @@ public final class GetUser {
     String id = this.identifierResolver.resolveIdentifier(identifier);
 
     if (!this.accessControl.isUserReadable()) {
-      throw new AccessDeniedException("Not allowed to reat user");
+      throw new AccessDeniedException("Not allowed to read user");
     }
 
     return this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));

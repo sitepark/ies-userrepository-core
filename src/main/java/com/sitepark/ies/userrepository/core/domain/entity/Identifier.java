@@ -40,6 +40,9 @@ public final class Identifier {
 
   public static Identifier ofAnchor(Anchor anchor) {
     Objects.requireNonNull(anchor, "anchor is null");
+    if (anchor == Anchor.EMPTY) {
+      throw new IllegalArgumentException("anchor is empty");
+    }
     return new Identifier(anchor);
   }
 
@@ -104,6 +107,7 @@ public final class Identifier {
     if (this.id != null) {
       return this.id;
     }
+    assert this.anchor != null;
     return this.anchor.toString();
   }
 }

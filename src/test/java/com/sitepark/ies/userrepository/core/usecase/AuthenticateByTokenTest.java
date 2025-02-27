@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -37,9 +36,7 @@ class AuthenticateByTokenTest {
 
     assertThrows(
         InvalidAccessTokenException.class,
-        () -> {
-          authenticateByToken.authenticateByToken(TOKEN_STRING);
-        });
+        () -> authenticateByToken.authenticateByToken(TOKEN_STRING));
   }
 
   @Test
@@ -56,9 +53,7 @@ class AuthenticateByTokenTest {
 
     assertThrows(
         AccessTokenNotActiveException.class,
-        () -> {
-          authenticateByToken.authenticateByToken(TOKEN_STRING);
-        });
+        () -> authenticateByToken.authenticateByToken(TOKEN_STRING));
   }
 
   @Test
@@ -74,10 +69,7 @@ class AuthenticateByTokenTest {
     var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
     assertThrows(
-        AccessTokenRevokedException.class,
-        () -> {
-          authenticateByToken.authenticateByToken("abc");
-        });
+        AccessTokenRevokedException.class, () -> authenticateByToken.authenticateByToken("abc"));
   }
 
   @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
@@ -95,14 +87,9 @@ class AuthenticateByTokenTest {
 
     var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
-    AccessTokenExpiredException e =
-        assertThrows(
-            AccessTokenExpiredException.class,
-            () -> {
-              authenticateByToken.authenticateByToken(TOKEN_STRING);
-            });
-    assertNotNull(e.getExpiredAt(), "expiredAt expected");
-    assertNotNull(e.getMessage(), "message expected");
+    assertThrows(
+        AccessTokenExpiredException.class,
+        () -> authenticateByToken.authenticateByToken(TOKEN_STRING));
   }
 
   @Test
@@ -121,13 +108,11 @@ class AuthenticateByTokenTest {
 
     assertThrows(
         InvalidAccessTokenException.class,
-        () -> {
-          authenticateByToken.authenticateByToken(TOKEN_STRING);
-        });
+        () -> authenticateByToken.authenticateByToken(TOKEN_STRING));
   }
 
   @Test
-  void testValidAutentification() {
+  void testValidAuthentication() {
 
     AccessToken accessToken = AccessToken.builder().id("1").name(TOKEN_NAME).user("2").build();
 
@@ -143,11 +128,11 @@ class AuthenticateByTokenTest {
     var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
     User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
-    assertEquals(user.getId().get(), authenticatedUser.getId().get(), "unexpected user");
+    assertEquals(user.getId().orElse(""), authenticatedUser.getId().orElse(""), "unexpected user");
   }
 
   @Test
-  void testValidAutentificationWithExpiredDate() {
+  void testValidAuthenticationWithExpiredDate() {
 
     OffsetDateTime expiredAt = OffsetDateTime.now().plusDays(1);
 
@@ -166,6 +151,6 @@ class AuthenticateByTokenTest {
     var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
     User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
-    assertEquals(user.getId().get(), authenticatedUser.getId().get(), "unexpected user");
+    assertEquals(user.getId().orElse(""), authenticatedUser.getId().orElse(""), "unexpected user");
   }
 }

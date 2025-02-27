@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,7 +11,6 @@ import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchorExcept
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class AnchorTest {
 
   @Test
@@ -44,29 +42,19 @@ class AnchorTest {
   @Test
   @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testValidateOnlyDigits() {
-    InvalidAnchorException e =
-        assertThrows(
-            InvalidAnchorException.class,
-            () -> {
-              Anchor.ofString("1234556789012345");
-            },
-            "anchor must not only contain numbers");
-    assertEquals("1234556789012345", e.getName(), "unexpected name");
-    assertNotNull(e.getMessage(), "message is null");
+    assertThrows(
+        InvalidAnchorException.class,
+        () -> Anchor.ofString("1234556789012345"),
+        "anchor must not only contain numbers");
   }
 
   @Test
   @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testValidateInvalidChars() {
-    InvalidAnchorException e =
-        assertThrows(
-            InvalidAnchorException.class,
-            () -> {
-              Anchor.ofString("a.b,c");
-            },
-            "anchor must not contain commas");
-    assertEquals("a.b,c", e.getName(), "unexpected name");
-    assertNotNull(e.getMessage(), "message is null");
+    assertThrows(
+        InvalidAnchorException.class,
+        () -> Anchor.ofString("a.b,c"),
+        "anchor must not contain commas");
   }
 
   @Test

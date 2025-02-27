@@ -1,15 +1,15 @@
 package com.sitepark.ies.userrepository.core.domain.exception;
 
+import java.io.Serial;
 import java.time.OffsetDateTime;
 
 /**
- * The <code>AccessTokenExpiredException</code> exception is thrown when
- * an access token has expired and is no longer valid for
- * authentication purposes.
+ * The <code>AccessTokenExpiredException</code> exception is thrown when an access token has expired
+ * and is no longer valid for authentication purposes.
  */
 public class AccessTokenExpiredException extends AuthenticationFailedException {
 
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   private final OffsetDateTime expiredAt;
 

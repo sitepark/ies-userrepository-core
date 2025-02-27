@@ -21,8 +21,6 @@ import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({
   "PMD.JUnitTestContainsTooManyAsserts",
-  "PMD.AvoidDuplicateLiterals",
-  "PMD.TooManyMethods"
 })
 @SuppressFBWarnings({
   "PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
@@ -40,25 +38,28 @@ class UserValidityTest {
   }
 
   @Test
-  void testToBuilder() throws JsonProcessingException {
+  void testToBuilder() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
     OffsetDateTime validTo =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+        LocalDate.of(2023, 8, 22).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    OffsetDateTime validToChanged =
+        LocalDate.of(2023, 8, 23).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
     UserValidity userValidity =
         UserValidity.builder().blocked(false).validFrom(validFrom).validTo(validTo).build();
 
-    UserValidity copyOfUserValidity = userValidity.toBuilder().build();
+    UserValidity copy = userValidity.toBuilder().validTo(validToChanged).build();
 
-    assertFalse(copyOfUserValidity.isBlocked(), "blocked should be false");
-    assertEquals(validFrom, userValidity.getValidFrom().get(), "unexpected validFrom");
-    assertEquals(validTo, userValidity.getValidTo().get(), "unexpected validTo");
+    UserValidity expected =
+        UserValidity.builder().blocked(false).validFrom(validFrom).validTo(validToChanged).build();
+
+    assertEquals(expected, copy, "unexpected userValidity");
   }
 
   @Test
-  void testToString() throws JsonProcessingException {
+  void testToString() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -68,25 +69,24 @@ class UserValidityTest {
     UserValidity userValidity =
         UserValidity.builder().blocked(false).validFrom(validFrom).validTo(validTo).build();
 
-    String expecated =
+    String expected =
         "UserValidity [blocked=false, validFrom=2023-08-21T00:00+02:00, "
             + "validTo=2023-08-21T00:00+02:00]";
 
-    assertEquals(expecated, userValidity.toString(), "unexpected string representation");
+    assertEquals(expected, userValidity.toString(), "unexpected string representation");
   }
 
   @Test
-  void testAlwaysValid() throws JsonProcessingException {
+  void testAlwaysValid() {
 
     UserValidity userValidity = UserValidity.ALWAYS_VALID;
+    UserValidity expected = UserValidity.builder().blocked(false).build();
 
-    assertFalse(userValidity.isBlocked(), "blocked should be false");
-    assertTrue(userValidity.getValidFrom().isEmpty(), "validFrom should be empty");
-    assertTrue(userValidity.getValidTo().isEmpty(), "validTo should be empty");
+    assertEquals(expected, userValidity, "unexpected userValidity");
   }
 
   @Test
-  void testIsNowValid() throws JsonProcessingException {
+  void testIsNowValid() {
 
     UserValidity userValidity = UserValidity.builder().blocked(false).build();
 
@@ -94,27 +94,23 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsValidWithNullBase() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          UserValidity.ALWAYS_VALID.isValid(null);
-        });
+  void testIsValidWithNullBase() {
+    assertThrows(NullPointerException.class, () -> UserValidity.ALWAYS_VALID.isValid(null));
   }
 
   @Test
-  void testIsValidBlocked() throws JsonProcessingException {
+  void testIsValidBlocked() {
 
     UserValidity userValidity = UserValidity.builder().blocked(true).build();
 
     OffsetDateTime base =
         LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
-    assertFalse(userValidity.isValid(base), "validity should't be valid");
+    assertFalse(userValidity.isValid(base), "validity should not be valid");
   }
 
   @Test
-  void testIsValidFrom() throws JsonProcessingException {
+  void testIsValidFrom() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -128,7 +124,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsNotValidFrom() throws JsonProcessingException {
+  void testIsNotValidFrom() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -142,7 +138,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsValidTo() throws JsonProcessingException {
+  void testIsValidTo() {
 
     OffsetDateTime validTo =
         LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -156,7 +152,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsNotValidTo() throws JsonProcessingException {
+  void testIsNotValidTo() {
 
     OffsetDateTime validTo =
         LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -170,47 +166,35 @@ class UserValidityTest {
   }
 
   @Test
-  void testSetValidFrom() throws JsonProcessingException {
+  void testSetValidFrom() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
     UserValidity userValidity = UserValidity.builder().validFrom(validFrom).build();
 
-    assertFalse(userValidity.isBlocked(), "blocked should be false");
-    assertEquals(validFrom, userValidity.getValidFrom().get(), "unexpected validFrom");
-    assertTrue(userValidity.getValidTo().isEmpty(), "validTo should be empty");
+    assertEquals(validFrom, userValidity.getValidFrom().orElse(null), "unexpected validFrom");
   }
 
   @Test
-  void testSetValidFromToNull() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          UserValidity.builder().validFrom(null);
-        });
+  void testSetValidFromToNull() {
+    assertThrows(NullPointerException.class, () -> UserValidity.builder().validFrom(null));
   }
 
   @Test
-  void testSetValidTo() throws JsonProcessingException {
+  void testSetValidTo() {
 
     OffsetDateTime validTo =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
     UserValidity userValidity = UserValidity.builder().validTo(validTo).build();
 
-    assertFalse(userValidity.isBlocked(), "blocked should be false");
-    assertTrue(userValidity.getValidFrom().isEmpty(), "validFrom should be empty");
-    assertEquals(validTo, userValidity.getValidTo().get(), "unexpected validTo");
+    assertEquals(validTo, userValidity.getValidTo().orElse(null), "unexpected validTo");
   }
 
   @Test
-  void testSetValidToToNull() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          UserValidity.builder().validTo(null);
-        });
+  void testSetValidToToNull() {
+    assertThrows(NullPointerException.class, () -> UserValidity.builder().validTo(null));
   }
 
   @Test
@@ -233,10 +217,10 @@ class UserValidityTest {
 
     String expected =
         """
-    	{\
-    	"blocked":false,\
-    	"validFrom":"2023-08-21T00:00:00+02:00",\
-    	"validTo":"2023-10-01T00:00:00+02:00"}""";
+		{\
+		"blocked":false,\
+		"validFrom":"2023-08-21T00:00:00+02:00",\
+		"validTo":"2023-10-01T00:00:00+02:00"}""";
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -251,10 +235,10 @@ class UserValidityTest {
 
     String json =
         """
-    	{\
-    	"blocked":false,\
-    	"validFrom":"2023-08-21T00:00:00+02:00",\
-    	"validTo":"2023-10-01T00:00:00+02:00"}""";
+		{\
+		"blocked":false,\
+		"validFrom":"2023-08-21T00:00:00+02:00",\
+		"validTo":"2023-10-01T00:00:00+02:00"}""";
 
     UserValidity userValidity = mapper.readValue(json, UserValidity.class);
 

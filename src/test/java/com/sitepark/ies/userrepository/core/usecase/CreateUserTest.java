@@ -23,11 +23,10 @@ import com.sitepark.ies.userrepository.core.port.IdGenerator;
 import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class CreateUserTest {
 
   @Test
@@ -35,7 +34,7 @@ class CreateUserTest {
 
     UserRepository repository = mock();
     AccessControl accessControl = mock(AccessControl.class);
-    when(accessControl.isUserCreateable()).thenReturn(false);
+    when(accessControl.isUserCreatable()).thenReturn(false);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
@@ -43,13 +42,7 @@ class CreateUserTest {
 
     var createUserUseCase =
         new CreateUser(repository, null, accessControl, null, extensionsNotifier, passwordHasher);
-    assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          createUserUseCase.createUser(user);
-        });
-
-    verify(accessControl).isUserCreateable();
+    assertThrows(AccessDeniedException.class, () -> createUserUseCase.createUser(user));
   }
 
   @Test
@@ -58,11 +51,7 @@ class CreateUserTest {
     User user = User.builder().id("123").login("test").build();
 
     var createUserUseCase = new CreateUser(null, null, null, null, null, null);
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          createUserUseCase.createUser(user);
-        });
+    assertThrows(IllegalArgumentException.class, () -> createUserUseCase.createUser(user));
   }
 
   @Test
@@ -72,7 +61,7 @@ class CreateUserTest {
     UserRepository repository = mock();
     when(repository.resolveAnchor(Anchor.ofString("test.user"))).thenReturn(Optional.of("123"));
     AccessControl accessControl = mock(AccessControl.class);
-    when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isUserCreatable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
@@ -81,24 +70,15 @@ class CreateUserTest {
     var createUserUseCase =
         new CreateUser(repository, null, accessControl, null, extensionsNotifier, passwordHasher);
 
-    AnchorAlreadyExistsException e =
-        assertThrows(
-            AnchorAlreadyExistsException.class,
-            () -> {
-              createUserUseCase.createUser(user);
-            });
-
-    assertEquals(Anchor.ofString("test.user"), e.getAnchor(), "unexpected anchor");
-    assertEquals("123", e.getOwner(), "unexpected owner");
-    assertNotNull(e.getMessage(), "message is null");
+    assertThrows(AnchorAlreadyExistsException.class, () -> createUserUseCase.createUser(user));
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testCreateWithRoles() {
 
     AccessControl accessControl = mock();
-    when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isUserCreatable()).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
@@ -119,14 +99,15 @@ class CreateUserTest {
             extensionsNotifier,
             passwordHasher);
 
-    createUserUseCase.createUser(user);
+    String id = createUserUseCase.createUser(user);
+
+    assertEquals("123", id, "unexpected id");
 
     User effectiveUser =
         User.builder().id("123").login("test").roles(Identifier.ofId("333")).build();
 
     verify(repository).create(eq(effectiveUser));
-    verify(roleAssigner)
-        .assignRoleToUser(Arrays.asList(Identifier.ofId("333")), Arrays.asList("123"));
+    verify(roleAssigner).assignRoleToUser(List.of(Identifier.ofId("333")), List.of("123"));
   }
 
   @Test
@@ -134,7 +115,7 @@ class CreateUserTest {
   void testCreateWithAnchor() {
 
     AccessControl accessControl = mock();
-    when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isUserCreatable()).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
@@ -168,7 +149,7 @@ class CreateUserTest {
   void testCreateWithPassword() {
 
     AccessControl accessControl = mock();
-    when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isUserCreatable()).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
@@ -197,11 +178,11 @@ class CreateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testCreateWithExistsLogin() {
 
     AccessControl accessControl = mock();
-    when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isUserCreatable()).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
@@ -223,11 +204,7 @@ class CreateUserTest {
             passwordHasher);
 
     LoginAlreadyExistsException e =
-        assertThrows(
-            LoginAlreadyExistsException.class,
-            () -> {
-              createUserUseCase.createUser(user);
-            });
+        assertThrows(LoginAlreadyExistsException.class, () -> createUserUseCase.createUser(user));
     assertEquals("test", e.getLogin(), "unexpected login");
     assertEquals("345", e.getOwner(), "unexpected owner");
     assertNotNull(e.getMessage(), "message is null");

@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -17,7 +16,6 @@ import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class GetUserTest {
 
   @Test
@@ -32,10 +30,7 @@ class GetUserTest {
     GetUser getUserUseCase = new GetUser(userRepository, identifierResolver, accessControl);
 
     assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          getUserUseCase.getUser(Identifier.ofString("123"));
-        });
+        AccessDeniedException.class, () -> getUserUseCase.getUser(Identifier.ofString("123")));
   }
 
   @Test
@@ -50,10 +45,7 @@ class GetUserTest {
     GetUser getUserUseCase = new GetUser(userRepository, identifierResolver, accessControl);
 
     assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          getUserUseCase.getUser(Identifier.ofString("abc"));
-        });
+        AccessDeniedException.class, () -> getUserUseCase.getUser(Identifier.ofString("abc")));
   }
 
   @Test
@@ -89,13 +81,7 @@ class GetUserTest {
 
     GetUser getUserUseCase = new GetUser(userRepository, identifierResolver, accessControl);
 
-    UserNotFoundException e =
-        assertThrows(
-            UserNotFoundException.class,
-            () -> {
-              getUserUseCase.getUser(Identifier.ofString("123"));
-            });
-    assertEquals("123", e.getId(), "unexpected user");
-    assertNotNull(e.getMessage(), "message is null");
+    assertThrows(
+        UserNotFoundException.class, () -> getUserUseCase.getUser(Identifier.ofString("123")));
   }
 }

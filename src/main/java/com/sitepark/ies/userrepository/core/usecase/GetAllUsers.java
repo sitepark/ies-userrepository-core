@@ -15,7 +15,7 @@ public final class GetAllUsers {
   private final AccessControl accessControl;
 
   @Inject
-  protected GetAllUsers(UserRepository repository, AccessControl accessControl) {
+  GetAllUsers(UserRepository repository, AccessControl accessControl) {
     this.repository = repository;
     this.accessControl = accessControl;
   }

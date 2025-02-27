@@ -13,7 +13,6 @@ import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class IdentifierResolverTest {
 
   @Test
@@ -51,10 +50,6 @@ class IdentifierResolverTest {
     when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
     IdentifierResolver resolver = new IdentifierResolver(repository);
 
-    assertThrows(
-        AnchorNotFoundException.class,
-        () -> {
-          resolver.resolveIdentifier(identifier);
-        });
+    assertThrows(AnchorNotFoundException.class, () -> resolver.resolveIdentifier(identifier));
   }
 }

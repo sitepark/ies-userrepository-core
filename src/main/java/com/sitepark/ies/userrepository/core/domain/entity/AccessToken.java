@@ -13,6 +13,7 @@ import java.util.Optional;
 
 /** An access token enables authentication as a user without specifying a username and password. */
 @JsonDeserialize(builder = AccessToken.Builder.class)
+@SuppressWarnings("PMD.DataClass")
 public final class AccessToken {
 
   private final String id;
@@ -37,7 +38,8 @@ public final class AccessToken {
 
   private final boolean revoked;
 
-  protected AccessToken(Builder builder) {
+  @SuppressWarnings("PMD.LawOfDemeter")
+  private AccessToken(Builder builder) {
     this.id = builder.id;
     this.user = builder.user;
     this.name = builder.name;
@@ -144,7 +146,7 @@ public final class AccessToken {
   }
 
   @SuppressWarnings("PMD.TooManyMethods")
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private String id;
@@ -169,9 +171,10 @@ public final class AccessToken {
 
     private boolean revoked;
 
-    protected Builder() {}
+    private Builder() {}
 
-    protected Builder(AccessToken accessToken) {
+    @SuppressWarnings("PMD.LawOfDemeter")
+    private Builder(AccessToken accessToken) {
       this.id = accessToken.id;
       this.user = accessToken.user;
       this.name = accessToken.name;

@@ -11,7 +11,6 @@ import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -32,7 +31,7 @@ public final class UpdateUser {
   private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
-  protected UpdateUser(
+  UpdateUser(
       UserRepository repository,
       IdentifierResolver identifierResolver,
       RoleAssigner roleAssigner,
@@ -48,8 +47,9 @@ public final class UpdateUser {
   public String updateUser(User user) {
 
     User updateUser = this.buildUserWithId(user);
+    assert updateUser.getId().isPresent();
     String id = updateUser.getId().get();
-    this.validateWritable(id);
+    this.validateWritable();
     User storedUser = this.loadStoredUser(id);
     this.validateLogin(updateUser);
 
@@ -66,7 +66,7 @@ public final class UpdateUser {
       LOGGER.info("update: {}", joinedUpdateUser);
     }
 
-    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoles(), Arrays.asList(id));
+    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoles(), List.of(id));
 
     this.repository.update(joinedUpdateUser);
 
@@ -87,7 +87,7 @@ public final class UpdateUser {
     return user.toBuilder().id(id).build();
   }
 
-  private void validateWritable(String id) {
+  private void validateWritable() {
     if (!this.accessControl.isUserWritable()) {
       throw new AccessDeniedException("Not allowed to update user");
     }
@@ -96,6 +96,7 @@ public final class UpdateUser {
   private User loadStoredUser(String id) {
     User storedUser = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));
 
+    assert storedUser.getId().isPresent();
     List<Identifier> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
     return storedUser.toBuilder().roles(roles).build();
   }

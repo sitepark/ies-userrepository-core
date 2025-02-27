@@ -14,7 +14,7 @@ public final class GetRolesByIds {
   private final AccessControl accessControl;
 
   @Inject
-  protected GetRolesByIds(RoleRepository repository, AccessControl accessControl) {
+  GetRolesByIds(RoleRepository repository, AccessControl accessControl) {
     this.repository = repository;
     this.accessControl = accessControl;
   }

@@ -2,40 +2,38 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchorException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * <p>An "anchor" in the IES system is an additional optional field that
- * serves as an alternative identifier.
- * This identifier, like an ID, is unique. An anchor may only use
- * the following characters:
- * </p>
+ * An "anchor" in the IES system is an additional optional field that serves as an alternative
+ * identifier. This identifier, like an ID, is unique. An anchor may only use the following
+ * characters:
+ *
  * <ul>
- * <li><code>A-Z</code></li>
- * <li><code>a-z</code></li>
- * <li><code>0-9</code></li>
- * <li><code>_</code> (underscore)</li>
- * <li><code>-</code> (minus)</li>
- * <li><code>.</code> (dot)</li>
+ *   <li><code>A-Z</code>
+ *   <li><code>a-z</code>
+ *   <li><code>0-9</code>
+ *   <li><code>_</code> (underscore)
+ *   <li><code>-</code> (minus)
+ *   <li><code>.</code> (dot)
  * </ul>
  *
- * <p>
- * An anchor can be assigned for each user or content entity. Anchors can be
- * changed or transferred to other entities. However, they must always be unique.
- * </p>
+ * <p>An anchor can be assigned for each user or content entity. Anchors can be changed or
+ * transferred to other entities. However, they must always be unique. For anchor there are several
+ * use cases:
  *
- * For anchor there are several use cases:
  * <ul>
- * <li>Foreign key mapping for data imports from external systems</li>
- * <li>Id mappings for data imports from other IES installations</li>
- * <li>As coded reference application logic or search queries</li>
+ *   <li>Foreign key mapping for data imports from external systems
+ *   <li>ID mappings for data imports from other IES installations
+ *   <li>As coded reference application logic or search queries
  * </ul>
  */
 public final class Anchor implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   public static final String VALID_CHARS_REGEX = "[a-zA-Z0-9_.\\-]+";
 
@@ -43,9 +41,7 @@ public final class Anchor implements Serializable {
 
   private static final Pattern ONLY_NUMBERS_PATTERN = Pattern.compile("[0-9]+");
 
-  /**
-   * Used to reset anchor when saving entries.
-   */
+  /** Used to reset anchor when saving entries. */
   public static final Anchor EMPTY = new Anchor("");
 
   @JsonValue private final String name;
@@ -73,7 +69,7 @@ public final class Anchor implements Serializable {
   }
 
   /**
-   * @throws InvalidAnchorException
+   * @throws InvalidAnchorException if the anchor is invalid
    */
   private static void validate(String name) {
 
@@ -93,12 +89,7 @@ public final class Anchor implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-
-    if (!(o instanceof Anchor anchor)) {
-      return false;
-    }
-
-    return Objects.equals(this.name, anchor.name);
+    return (o instanceof Anchor anchor) && Objects.equals(this.name, anchor.name);
   }
 
   @Override

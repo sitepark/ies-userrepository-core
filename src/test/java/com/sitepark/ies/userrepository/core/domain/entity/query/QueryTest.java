@@ -24,14 +24,14 @@ class QueryTest {
   void testSetFilter() {
     Filter filter = mock();
     Query query = Query.builder().filter(filter).build();
-    assertEquals(filter, query.getFilter().get(), "Unexpected filter");
+    assertEquals(filter, query.getFilter().orElse(null), "Unexpected filter");
   }
 
   @Test
   void testSetLimit() {
     Limit limit = mock();
     Query query = Query.builder().limit(limit).build();
-    assertEquals(limit, query.getLimit().get(), "Unexpected limit");
+    assertEquals(limit, query.getLimit().orElse(null), "Unexpected limit");
   }
 
   @Test
@@ -43,7 +43,7 @@ class QueryTest {
   }
 
   @Test
-  void testAddSortCriteriasAsCollection() {
+  void testAddSortCriteriaAsCollection() {
     List<SortCriteria> a = List.of(mock(SortCriteria.class), mock(SortCriteria.class));
     List<SortCriteria> b = List.of(mock(SortCriteria.class));
 
@@ -55,7 +55,7 @@ class QueryTest {
   }
 
   @Test
-  void testAddSortCriteriasAsArray() {
+  void testAddSortCriteriaAsArray() {
     SortCriteria[] a = new SortCriteria[] {mock(SortCriteria.class), mock(SortCriteria.class)};
     SortCriteria[] b = new SortCriteria[] {mock(SortCriteria.class)};
 

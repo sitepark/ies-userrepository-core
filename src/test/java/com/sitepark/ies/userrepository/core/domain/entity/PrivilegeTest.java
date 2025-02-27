@@ -31,7 +31,7 @@ class PrivilegeTest {
     assertThrows(
         IllegalStateException.class,
         () -> Privilege.builder().build(),
-        "privilege without name should't be allowed");
+        "Privileges without a name should not be allowed");
   }
 
   @Test
@@ -46,7 +46,7 @@ class PrivilegeTest {
     assertThrows(
         IllegalArgumentException.class,
         () -> Privilege.builder().name("privilegerole").id("a").build(),
-        "id 0 should't be allowed");
+        "id 0 should not be allowed");
   }
 
   @Test

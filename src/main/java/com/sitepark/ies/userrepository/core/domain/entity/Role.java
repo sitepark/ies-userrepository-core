@@ -25,6 +25,7 @@ public final class Role {
 
   private final List<Identifier> privileges;
 
+  @SuppressWarnings("PMD.LawOfDemeter")
   private Role(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
@@ -112,6 +113,7 @@ public final class Role {
 
     private Builder() {}
 
+    @SuppressWarnings("PMD.LawOfDemeter")
     private Builder(Role role) {
       this.id = role.id;
       this.anchor = role.anchor;

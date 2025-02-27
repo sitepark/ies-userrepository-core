@@ -20,7 +20,6 @@ module com.sitepark.ies.userrepository.core {
   requires com.fasterxml.jackson.annotation;
   requires com.fasterxml.jackson.datatype.jdk8;
   requires com.fasterxml.jackson.datatype.jsr310;
-  requires org.eclipse.jdt.annotation;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
   opens com.sitepark.ies.userrepository.core.domain.entity.query;

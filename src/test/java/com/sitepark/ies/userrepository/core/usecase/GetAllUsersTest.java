@@ -26,10 +26,7 @@ class GetAllUsersTest {
     GetAllUsers getAllUsersUseCase = new GetAllUsers(userRepository, accessControl);
 
     assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          getAllUsersUseCase.getAllUsers(Query.builder().build());
-        });
+        AccessDeniedException.class, () -> getAllUsersUseCase.getAllUsers(Query.builder().build()));
   }
 
   @Test

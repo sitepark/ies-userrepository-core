@@ -26,7 +26,7 @@ public final class PurgeUser {
   private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
-  protected PurgeUser(
+  PurgeUser(
       UserRepository repository,
       IdentifierResolver identifierResolver,
       ExtensionsNotifier extensionsNotifier,

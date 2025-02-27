@@ -19,7 +19,7 @@ import java.util.Optional;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods", "PMD.GodClass"})
+@SuppressWarnings({"PMD.GodClass"})
 @SuppressFBWarnings({
   "PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
   "NP_NULL_PARAM_DEREF_NONVIRTUAL",
@@ -38,11 +38,7 @@ class UserTest {
 
   @Test
   void testBuildWithoutLogin() {
-    assertThrows(
-        IllegalStateException.class,
-        () -> {
-          User.builder().build();
-        });
+    assertThrows(IllegalStateException.class, () -> User.builder().build());
   }
 
   @Test
@@ -55,20 +51,20 @@ class UserTest {
   void testSetIdentifierWithId() {
     Identifier id = Identifier.ofId("123");
     User user = this.createBuilderWithRequiredValues().identifier(id).build();
-    assertEquals("123", user.getId().get(), "unexpected id");
+    assertEquals("123", user.getId().orElse(""), "unexpected id");
   }
 
   @Test
   void testSetIdentifierWithAnchor() {
     Identifier anchor = Identifier.ofAnchor(Anchor.ofString("abc"));
     User user = this.createBuilderWithRequiredValues().identifier(anchor).build();
-    assertEquals("abc", user.getAnchor().get().getName(), "unexpected anchor");
+    assertEquals("abc", user.getAnchor().orElse(Anchor.EMPTY).getName(), "unexpected anchor");
   }
 
   @Test
   void testSetId() {
     User user = this.createBuilderWithRequiredValues().id("123").build();
-    assertEquals("123", user.getId().get(), "unexpected id");
+    assertEquals("123", user.getId().orElse(""), "unexpected id");
   }
 
   @Test
@@ -80,7 +76,8 @@ class UserTest {
   @Test
   void testGetIdentifierWithId() {
     User user = this.createBuilderWithRequiredValues().id("123").build();
-    assertEquals(Identifier.ofId("123"), user.getIdentifier().get(), "unexpected identifier");
+    assertEquals(
+        Identifier.ofId("123"), user.getIdentifier().orElse(null), "unexpected identifier");
   }
 
   @Test
@@ -88,7 +85,7 @@ class UserTest {
     User user = this.createBuilderWithRequiredValues().anchor("abc").build();
     assertEquals(
         Identifier.ofAnchor(Anchor.ofString("abc")),
-        user.getIdentifier().get(),
+        user.getIdentifier().orElse(null),
         "unexpected identifier");
   }
 
@@ -101,30 +98,20 @@ class UserTest {
   @Test
   void testSetIdWithZero() {
     assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          User.builder().id("0");
-        },
-        "id 0 should't be allowed");
+        IllegalArgumentException.class, () -> User.builder().id("0"), "id 0 should't be allowed");
   }
 
   @Test
   void testSetIdWithNull() {
     assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().id(null);
-        },
-        "null should't be allowed");
+        NullPointerException.class, () -> User.builder().id(null), "null should't be allowed");
   }
 
   @Test
   void testSeIdWithInvalidValue() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> {
-          User.builder().id("0x");
-        },
+        () -> User.builder().id("0x"),
         "invalid id should't be allowed");
   }
 
@@ -132,17 +119,19 @@ class UserTest {
   void testSetAnchor() {
     Anchor anchor = Anchor.ofString("user.pan.peter");
     User user = this.createBuilderWithRequiredValues().anchor(anchor).build();
-    assertEquals("user.pan.peter", user.getAnchor().get().getName(), "unexpected anchor");
+    assertEquals(
+        "user.pan.peter", user.getAnchor().orElse(Anchor.EMPTY).getName(), "unexpected anchor");
   }
 
   @Test
   void testSetAnchorString() {
     User user = this.createBuilderWithRequiredValues().anchor("user.pan.peter").build();
-    assertEquals("user.pan.peter", user.getAnchor().get().getName(), "unexpected anchor");
+    assertEquals(
+        "user.pan.peter", user.getAnchor().orElse(Anchor.EMPTY).getName(), "unexpected anchor");
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testToBuilder() {
     User user =
         User.builder()
@@ -156,7 +145,7 @@ class UserTest {
 
     User changedUser = user.toBuilder().build();
 
-    assertEquals("100560100000014842", changedUser.getId().get(), "unexpected id");
+    assertEquals("100560100000014842", changedUser.getId().orElse(""), "unexpected id");
     assertEquals(
         Optional.of(Anchor.ofString("user.peterpan")),
         changedUser.getAnchor(),
@@ -170,7 +159,7 @@ class UserTest {
   @Test
   void testSetFirstname() {
     User user = this.createBuilderWithRequiredValues().firstName("Peter").build();
-    assertEquals("Peter", user.getFirstName().get(), "unexpected firstname");
+    assertEquals("Peter", user.getFirstName().orElse(""), "unexpected firstname");
   }
 
   @Test
@@ -188,7 +177,7 @@ class UserTest {
   @Test
   void testSetLastname() {
     User user = this.createBuilderWithRequiredValues().lastName("Pan").build();
-    assertEquals("Pan", user.getLastName().get(), "unexpected lastname");
+    assertEquals("Pan", user.getLastName().orElse(""), "unexpected lastname");
   }
 
   @Test
@@ -224,7 +213,7 @@ class UserTest {
   @Test
   void testSetEmail() {
     User user = this.createBuilderWithRequiredValues().email("peter.pan@nimmer.land").build();
-    assertEquals("peter.pan@nimmer.land", user.getEmail().get(), "unexpected lastname");
+    assertEquals("peter.pan@nimmer.land", user.getEmail().orElse(""), "unexpected lastname");
   }
 
   @Test
@@ -242,71 +231,58 @@ class UserTest {
   @Test
   void testSetRolesAsList() {
     User user =
-        this.createBuilderWithRequiredValues().roles(Arrays.asList(Identifier.ofId("123"))).build();
-    assertEquals(Arrays.asList(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
+        this.createBuilderWithRequiredValues().roles(List.of(Identifier.ofId("123"))).build();
+    assertEquals(List.of(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
   }
 
   @Test
   void testSetOverwriteRolesAsList() {
     User user =
-        this.createBuilderWithRequiredValues().roles(Arrays.asList(Identifier.ofId("123"))).build();
-    User overwritter = user.toBuilder().roles(Arrays.asList(Identifier.ofId("345"))).build();
-    assertEquals(Arrays.asList(Identifier.ofId("345")), overwritter.getRoles(), "unexpected roles");
+        this.createBuilderWithRequiredValues().roles(List.of(Identifier.ofId("123"))).build();
+    User overwritter = user.toBuilder().roles(List.of(Identifier.ofId("345"))).build();
+    assertEquals(List.of(Identifier.ofId("345")), overwritter.getRoles(), "unexpected roles");
   }
 
   @Test
   void testSetNullRolesAsList() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().roles((List<Identifier>) null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().roles((List<Identifier>) null));
   }
 
   @Test
   void testSetNullRoleInList() {
     assertThrows(
         NullPointerException.class,
-        () -> {
-          User.builder().roles(Arrays.asList(Identifier.ofId("345"), null));
-        });
+        () -> User.builder().roles(Arrays.asList(Identifier.ofId("345"), null)));
   }
 
   @Test
   void testSetRolesAsVArgs() {
     User user = this.createBuilderWithRequiredValues().roles(Identifier.ofId("123")).build();
-    assertEquals(Arrays.asList(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
+    assertEquals(List.of(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
   }
 
   @Test
   void testSetOverwriteRolesAsVArgs() {
     User user = this.createBuilderWithRequiredValues().roles(Identifier.ofId("123")).build();
     User overwritter = user.toBuilder().roles(Identifier.ofId("345")).build();
-    assertEquals(Arrays.asList(Identifier.ofId("345")), overwritter.getRoles(), "unexpected roles");
+    assertEquals(List.of(Identifier.ofId("345")), overwritter.getRoles(), "unexpected roles");
   }
 
   @Test
   void testSetNullRolesAsVArgs() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().roles((Identifier[]) null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().roles((Identifier[]) null));
   }
 
   @Test
   void testSetNullRoleInVArgs() {
     assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().roles(Identifier.ofId("345"), null);
-        });
+        NullPointerException.class, () -> User.builder().roles(Identifier.ofId("345"), null));
   }
 
   @Test
   void testSetRole() {
     User user = this.createBuilderWithRequiredValues().role(Identifier.ofId("123")).build();
-    assertEquals(Arrays.asList(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
+    assertEquals(List.of(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
   }
 
   @Test
@@ -321,51 +297,40 @@ class UserTest {
 
   @Test
   void testSetNullRole() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().role(null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().role(null));
   }
 
   @Test
   void testSetIdentitiesAsList() {
-    User user =
-        this.createBuilderWithRequiredValues().identities(Arrays.asList(TEST_IDENTITY)).build();
-    assertEquals(Arrays.asList(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
+    User user = this.createBuilderWithRequiredValues().identities(List.of(TEST_IDENTITY)).build();
+    assertEquals(List.of(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
   }
 
   @Test
   void testSetOverwriteIdentitiesAsList() {
-    User user =
-        this.createBuilderWithRequiredValues().identities(Arrays.asList(TEST_IDENTITY)).build();
+    User user = this.createBuilderWithRequiredValues().identities(List.of(TEST_IDENTITY)).build();
     Identity newIdentity = LdapIdentity.builder().server(3).dn("userdn2").build();
-    User overwritter = user.toBuilder().identities(Arrays.asList(newIdentity)).build();
-    assertEquals(Arrays.asList(newIdentity), overwritter.getIdentities(), "unexpected identities");
+    User overwritter = user.toBuilder().identities(List.of(newIdentity)).build();
+    assertEquals(List.of(newIdentity), overwritter.getIdentities(), "unexpected identities");
   }
 
   @Test
   void testSetNullIdentitiesAsList() {
     assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().identities((List<Identity>) null);
-        });
+        NullPointerException.class, () -> User.builder().identities((List<Identity>) null));
   }
 
   @Test
   void testSetNullIdentityInList() {
     assertThrows(
         NullPointerException.class,
-        () -> {
-          User.builder().identities(Arrays.asList(TEST_IDENTITY, null));
-        });
+        () -> User.builder().identities(Arrays.asList(TEST_IDENTITY, null)));
   }
 
   @Test
   void testSetIdentitiesAsVArgs() {
     User user = this.createBuilderWithRequiredValues().identities(TEST_IDENTITY).build();
-    assertEquals(Arrays.asList(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
+    assertEquals(List.of(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
   }
 
   @Test
@@ -373,31 +338,23 @@ class UserTest {
     User user = this.createBuilderWithRequiredValues().identities(TEST_IDENTITY).build();
     Identity newIdentity = LdapIdentity.builder().server(3).dn("userdn2").build();
     User overwritter = user.toBuilder().identities(newIdentity).build();
-    assertEquals(Arrays.asList(newIdentity), overwritter.getIdentities(), "unexpected identities");
+    assertEquals(List.of(newIdentity), overwritter.getIdentities(), "unexpected identities");
   }
 
   @Test
   void testSetNullIdentitiesAsVArgs() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().identities((Identity[]) null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().identities((Identity[]) null));
   }
 
   @Test
   void testSetNullIdentityInVArgs() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().identities(TEST_IDENTITY, null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().identities(TEST_IDENTITY, null));
   }
 
   @Test
   void testSetIndentity() {
     User user = this.createBuilderWithRequiredValues().identity(TEST_IDENTITY).build();
-    assertEquals(Arrays.asList(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
+    assertEquals(List.of(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
   }
 
   @Test
@@ -415,11 +372,7 @@ class UserTest {
 
   @Test
   void testSetNullIdentity() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().identity(null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().identity(null));
   }
 
   @Test
@@ -431,7 +384,7 @@ class UserTest {
             .identity(TEST_IDENTITY)
             .build();
     Optional<LdapIdentity> identity = user.getIdentity(LdapIdentity.class);
-    assertEquals(TEST_IDENTITY, identity.get(), "unexpected identity");
+    assertEquals(TEST_IDENTITY, identity.orElse(null), "unexpected identity");
   }
 
   @Test
@@ -455,28 +408,25 @@ class UserTest {
 
   @Test
   void testSetGenderWithNull() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().gender(null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().gender(null));
   }
 
   @Test
   void testSetCreatedAt() {
     OffsetDateTime now = OffsetDateTime.now();
     User user = this.createBuilderWithRequiredValues().createdAt(now).build();
-    assertEquals(now, user.getCreatedAt().get(), "unexpected createdAt");
+    assertEquals(now, user.getCreatedAt().orElse(null), "unexpected createdAt");
   }
 
   @Test
   void testSetChangedAt() {
     OffsetDateTime now = OffsetDateTime.now();
     User user = this.createBuilderWithRequiredValues().changedAt(now).build();
-    assertEquals(now, user.getChangedAt().get(), "unexpected changedAt");
+    assertEquals(now, user.getChangedAt().orElse(null), "unexpected changedAt");
   }
 
   @Test
+  @SuppressWarnings("PMD.LawOfDemeter")
   void testSetValiditiy() {
 
     User user =
@@ -488,6 +438,7 @@ class UserTest {
   }
 
   @Test
+  @SuppressWarnings("PMD.LawOfDemeter")
   void testSetValiditiyBuilder() {
 
     User user =
@@ -500,20 +451,13 @@ class UserTest {
 
   @Test
   void testSetNullValiditiy() {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().validity((UserValidity) null);
-        });
+    assertThrows(NullPointerException.class, () -> User.builder().validity((UserValidity) null));
   }
 
   @Test
   void testSetNullValiditiyBuilder() {
     assertThrows(
-        NullPointerException.class,
-        () -> {
-          User.builder().validity((UserValidity.Builder) null);
-        });
+        NullPointerException.class, () -> User.builder().validity((UserValidity.Builder) null));
   }
 
   @Test

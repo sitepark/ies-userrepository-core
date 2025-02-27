@@ -6,12 +6,7 @@ import com.sitepark.ies.userrepository.core.domain.entity.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.domain.entity.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.domain.entity.query.sort.SortCriteria;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @JsonDeserialize(builder = Query.Builder.class)
 public final class Query {
@@ -22,6 +17,7 @@ public final class Query {
 
   private final Limit limit;
 
+  @SuppressWarnings("PMD.LawOfDemeter")
   private Query(Builder builder) {
     this.filter = builder.filter;
     this.sort = Collections.unmodifiableList(builder.sort);
@@ -77,6 +73,7 @@ public final class Query {
 
     protected Builder() {}
 
+    @SuppressWarnings("PMD.LawOfDemeter")
     protected Builder(Query query) {
       this.filter = query.filter;
       this.sort = new ArrayList<>(query.sort);
@@ -88,24 +85,19 @@ public final class Query {
       return this;
     }
 
-    public Builder sort(SortCriteria sortCriteria) {
+    public Builder sort(SortCriteria... sortCriteria) {
       Objects.requireNonNull(sortCriteria, "sortCriteria is null");
-      this.sort.add(sortCriteria);
-      return this;
-    }
-
-    public Builder sort(SortCriteria[] sortCriterias) {
-      Objects.requireNonNull(sortCriterias, "sortCriterias is null");
-      for (SortCriteria criteria : sortCriterias) {
-        this.sort(criteria);
+      this.sort.addAll(Arrays.asList(sortCriteria));
+      for (SortCriteria sortCriterion : sortCriteria) {
+        Objects.requireNonNull(sortCriterion, "sortCriterion contains null");
       }
       return this;
     }
 
-    public Builder sort(Collection<SortCriteria> sortCriterias) {
-      Objects.requireNonNull(sortCriterias, "sortCriterias is null");
-      for (SortCriteria criteria : sortCriterias) {
-        this.sort(criteria);
+    public Builder sort(Collection<SortCriteria> sortCriteria) {
+      Objects.requireNonNull(sortCriteria, "sortCriteria is null");
+      for (SortCriteria sortCriterion : sortCriteria) {
+        this.sort(sortCriterion);
       }
       return this;
     }

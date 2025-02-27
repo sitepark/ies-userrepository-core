@@ -29,11 +29,7 @@ class PurgeUserTest {
     var purgeEntity =
         new PurgeUser(
             null, identifierResolver, extensionsNotifier, accessControl, accessTokenRepository);
-    assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          purgeEntity.purgeUser(Identifier.ofId("10"));
-        });
+    assertThrows(AccessDeniedException.class, () -> purgeEntity.purgeUser(Identifier.ofId("10")));
   }
 
   @SuppressWarnings("PMD")

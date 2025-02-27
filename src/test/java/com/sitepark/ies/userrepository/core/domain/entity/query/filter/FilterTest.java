@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.entity.query.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class FilterTest {
 
   @Test
@@ -161,26 +159,16 @@ class FilterTest {
 
     Filter filter = objectMapper.readValue(json, Filter.class);
 
-    assertInstanceOf(Or.class, filter);
+    Filter expected =
+        Filter.or(
+            Filter.idList("6"),
+            Filter.anchor(
+                com.sitepark.ies.userrepository.core.domain.entity.Anchor.ofString("abc")),
+            Filter.and(
+                Filter.login("login"),
+                Filter.firstName("firstName"),
+                Filter.not(Filter.lastName("lastName"))));
 
-    Or or = (Or) filter;
-
-    assertInstanceOf(IdList.class, or.getOr().get(0));
-    assertInstanceOf(Anchor.class, or.getOr().get(1));
-    assertEquals("abc", ((Anchor) (or.getOr().get(1))).getAnchor().getName(), "wront root");
-    assertInstanceOf(And.class, or.getOr().get(2));
-
-    And and = (And) or.getOr().get(2);
-
-    assertInstanceOf(Login.class, and.getAnd().get(0));
-    assertEquals("login", ((Login) and.getAnd().get(0)).getLogin(), "wront login");
-    assertInstanceOf(FirstName.class, and.getAnd().get(1));
-    assertEquals("firstName", ((FirstName) and.getAnd().get(1)).getFirstName(), "wront first name");
-    assertInstanceOf(Not.class, and.getAnd().get(2));
-
-    Not not = (Not) and.getAnd().get(2);
-
-    assertInstanceOf(LastName.class, not.getNot());
-    assertEquals("lastName", ((LastName) not.getNot()).getLastName(), "wront last name (in not)");
+    assertEquals(expected, filter, "unexpected filter");
   }
 }

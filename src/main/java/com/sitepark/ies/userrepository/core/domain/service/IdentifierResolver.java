@@ -21,6 +21,8 @@ public class IdentifierResolver {
       return identifier.getId().get();
     }
 
+    assert identifier.getAnchor().isPresent();
+
     Optional<String> id = this.repository.resolveAnchor(identifier.getAnchor().get());
     if (id.isEmpty()) {
       throw new AnchorNotFoundException(identifier.getAnchor().get());

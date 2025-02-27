@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
 import java.util.List;
@@ -32,9 +31,7 @@ class RoleTest {
   void testWithoutName() {
     assertThrows(
         IllegalStateException.class,
-        () -> {
-          Role.builder().build();
-        },
+        () -> Role.builder().build(),
         "role without name should't be allowed");
   }
 
@@ -49,9 +46,7 @@ class RoleTest {
 
     assertThrows(
         IllegalArgumentException.class,
-        () -> {
-          Role.builder().name("testrole").id("a").build();
-        },
+        () -> Role.builder().name("testrole").id("a").build(),
         "id 0 should't be allowed");
   }
 

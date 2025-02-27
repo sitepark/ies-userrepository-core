@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Encapsulates user properties indicating whether a user
- * is blocked or has a limited validity period.
+ * Encapsulates user properties indicating whether a user is blocked or has a limited validity
+ * period.
  */
 @JsonDeserialize(builder = UserValidity.Builder.class)
 public class UserValidity {
@@ -22,6 +22,7 @@ public class UserValidity {
 
   public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
 
+  @SuppressWarnings("PMD.LawOfDemeter")
   protected UserValidity(Builder builder) {
     this.blocked = builder.blocked;
     this.validFrom = builder.validFrom;
@@ -50,11 +51,7 @@ public class UserValidity {
       return false;
     }
 
-    if ((this.validTo != null) && this.validTo.isBefore(base)) {
-      return false;
-    }
-
-    return true;
+    return (this.validTo == null) || !this.validTo.isBefore(base);
   }
 
   @JsonIgnore
@@ -79,22 +76,11 @@ public class UserValidity {
   }
 
   @Override
-  @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
   public final boolean equals(Object o) {
-
-    if (!(o instanceof UserValidity validity)) {
-      return false;
-    }
-
-    if (!Objects.equals(this.blocked, validity.blocked)) {
-      return false;
-    }
-    if (!Objects.equals(this.validFrom, validity.validFrom)
-        || !Objects.equals(this.validTo, validity.validTo)) {
-      return false;
-    }
-
-    return true;
+    return (o instanceof UserValidity validity)
+        && Objects.equals(this.blocked, validity.blocked)
+        && Objects.equals(this.validFrom, validity.validFrom)
+        && Objects.equals(this.validTo, validity.validTo);
   }
 
   @Override
@@ -108,7 +94,8 @@ public class UserValidity {
         + "]";
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
+  @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   public static final class Builder {
 
     private boolean blocked;
@@ -117,9 +104,10 @@ public class UserValidity {
 
     private OffsetDateTime validTo;
 
-    protected Builder() {}
+    private Builder() {}
 
-    protected Builder(UserValidity userValidity) {
+    @SuppressWarnings("PMD.LawOfDemeter")
+    private Builder(UserValidity userValidity) {
       this.blocked = userValidity.blocked;
       this.validFrom = userValidity.validFrom;
       this.validTo = userValidity.validTo;

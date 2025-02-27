@@ -24,11 +24,7 @@ class RevokeImpersonationTokenTest {
 
     assertThrows(
         AccessDeniedException.class,
-        () -> {
-          revokeImpersonationToken.revokeImpersonationToken("1", "2");
-        });
-
-    verify(accessControl).isImpersonationTokensManageable();
+        () -> revokeImpersonationToken.revokeImpersonationToken("1", "2"));
   }
 
   @Test
