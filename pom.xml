@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>jakarta.inject</groupId>
 			<artifactId>jakarta.inject-api</artifactId>
-			<version>2.0.1</version>
+			<version>2.0.1.MR</version>
 		</dependency>
 
 		<dependency>
@@ -88,7 +88,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jdk8</artifactId>
-			<version>2.17.2</version>
+			<version>2.18.2</version>
 		</dependency>
 
 		<!--	Java Time Module	-->
@@ -136,14 +136,14 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.12.0</version>
+			<version>5.15.2</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>nl.jqno.equalsverifier</groupId>
 			<artifactId>equalsverifier</artifactId>
-			<version>3.16.1</version>
+			<version>3.19.1</version>
 			<scope>test</scope>
 		</dependency>
 
