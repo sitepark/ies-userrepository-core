@@ -22,7 +22,6 @@ public class UserValidity {
 
   public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
 
-  @SuppressWarnings("PMD.LawOfDemeter")
   protected UserValidity(Builder builder) {
     this.blocked = builder.blocked;
     this.validFrom = builder.validFrom;
@@ -106,7 +105,6 @@ public class UserValidity {
 
     private Builder() {}
 
-    @SuppressWarnings("PMD.LawOfDemeter")
     private Builder(UserValidity userValidity) {
       this.blocked = userValidity.blocked;
       this.validFrom = userValidity.validFrom;

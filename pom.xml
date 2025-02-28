@@ -371,7 +371,7 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.8.5.0</version>
+				<version>4.9.1.0</version>
 				<configuration>
 					<effort>Max</effort>
 					<threshold>Low</threshold>
@@ -385,7 +385,7 @@
 					<dependency>
 						<groupId>com.github.spotbugs</groupId>
 						<artifactId>spotbugs</artifactId>
-						<version>4.8.5</version>
+						<version>4.9.1</version>
 					</dependency>
 				</dependencies>
 				<executions>

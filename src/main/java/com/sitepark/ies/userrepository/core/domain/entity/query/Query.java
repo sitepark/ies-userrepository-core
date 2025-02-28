@@ -17,10 +17,9 @@ public final class Query {
 
   private final Limit limit;
 
-  @SuppressWarnings("PMD.LawOfDemeter")
   private Query(Builder builder) {
     this.filter = builder.filter;
-    this.sort = Collections.unmodifiableList(builder.sort);
+    this.sort = List.copyOf(builder.sort);
     this.limit = builder.limit;
   }
 
@@ -73,7 +72,6 @@ public final class Query {
 
     protected Builder() {}
 
-    @SuppressWarnings("PMD.LawOfDemeter")
     protected Builder(Query query) {
       this.filter = query.filter;
       this.sort = new ArrayList<>(query.sort);

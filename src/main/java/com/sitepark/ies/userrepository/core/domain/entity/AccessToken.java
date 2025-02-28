@@ -38,7 +38,6 @@ public final class AccessToken {
 
   private final boolean revoked;
 
-  @SuppressWarnings("PMD.LawOfDemeter")
   private AccessToken(Builder builder) {
     this.id = builder.id;
     this.user = builder.user;
@@ -173,7 +172,6 @@ public final class AccessToken {
 
     private Builder() {}
 
-    @SuppressWarnings("PMD.LawOfDemeter")
     private Builder(AccessToken accessToken) {
       this.id = accessToken.id;
       this.user = accessToken.user;

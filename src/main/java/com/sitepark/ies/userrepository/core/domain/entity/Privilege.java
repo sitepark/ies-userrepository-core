@@ -17,7 +17,6 @@ public final class Privilege {
 
   private final String description;
 
-  @SuppressWarnings("PMD.LawOfDemeter")
   private Privilege(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
@@ -98,7 +97,6 @@ public final class Privilege {
 
     private Builder() {}
 
-    @SuppressWarnings("PMD.LawOfDemeter")
     private Builder(Privilege privilege) {
       this.id = privilege.id;
       this.anchor = privilege.anchor;

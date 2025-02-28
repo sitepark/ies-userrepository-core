@@ -44,7 +44,6 @@ public final class User {
 
   private final OffsetDateTime changedAt;
 
-  @SuppressWarnings("PMD.LawOfDemeter")
   private User(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
@@ -272,7 +271,6 @@ public final class User {
 
     private Builder() {}
 
-    @SuppressWarnings("PMD.LawOfDemeter")
     private Builder(User user) {
       this.id = user.id;
       this.anchor = user.anchor;
