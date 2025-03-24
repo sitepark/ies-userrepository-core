@@ -40,7 +40,6 @@
 		</properties>
 	</rule>
 
-
 	<!-- Best Practices -->
 	<rule ref="category/java/bestpractices.xml"/>
 
@@ -58,6 +57,5 @@
 
 	<!-- Multithreading -->
 	<rule ref="category/java/multithreading.xml"/>
-
 
 </ruleset>

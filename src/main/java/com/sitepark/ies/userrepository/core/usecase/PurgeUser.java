@@ -1,7 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
+import com.sitepark.ies.shared.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;

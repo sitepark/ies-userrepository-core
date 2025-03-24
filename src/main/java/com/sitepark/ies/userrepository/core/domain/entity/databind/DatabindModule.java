@@ -1,8 +1,8 @@
 package com.sitepark.ies.userrepository.core.domain.entity.databind;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.sitepark.ies.userrepository.core.domain.entity.query.filter.Filter;
-import com.sitepark.ies.userrepository.core.domain.entity.query.filter.FilterDeserializer;
+import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
+import com.sitepark.ies.userrepository.core.usecase.query.filter.FilterDeserializer;
 import java.io.Serial;
 
 public class DatabindModule extends SimpleModule {

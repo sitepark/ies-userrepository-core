@@ -6,11 +6,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sitepark.ies.shared.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.entity.query.Query;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import com.sitepark.ies.userrepository.core.usecase.query.Query;
+import com.sitepark.ies.userrepository.core.usecase.query.Result;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -35,14 +36,14 @@ class GetAllUsersTest {
     User user = User.builder().id("123").login("test").build();
 
     UserRepository userRepository = mock();
-    when(userRepository.getAll(any())).thenReturn(List.of(user));
+    when(userRepository.getAll(any())).thenReturn(new Result<>(List.of(user), 1, 0, 1));
     AccessControl accessControl = mock();
     when(accessControl.isUserReadable()).thenReturn(true);
 
     GetAllUsers getAllUsersUseCase = new GetAllUsers(userRepository, accessControl);
 
     assertEquals(
-        List.of(user),
+        new Result<>(List.of(user), 1, 0, 1),
         getAllUsersUseCase.getAllUsers(Query.builder().build()),
         "Unexpected result");
   }

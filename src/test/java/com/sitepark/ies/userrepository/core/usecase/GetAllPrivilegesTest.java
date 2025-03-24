@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sitepark.ies.shared.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import java.util.List;

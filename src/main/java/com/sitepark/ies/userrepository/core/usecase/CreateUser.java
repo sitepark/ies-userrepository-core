@@ -1,8 +1,8 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
+import com.sitepark.ies.shared.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Password;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;

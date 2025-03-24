@@ -1,8 +1,9 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Defines user privileges to manage permissions and access control based on the provided privilege
@@ -17,11 +18,17 @@ public final class Privilege {
 
   private final String description;
 
+  private final Set<String> roleIds;
+
+  private final Permission permission;
+
   private Privilege(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
     this.description = builder.description;
+    this.roleIds = Set.copyOf(builder.roleIds);
+    this.permission = builder.permission;
   }
 
   public String getId() {
@@ -40,6 +47,14 @@ public final class Privilege {
     return this.description;
   }
 
+  public Set<String> getRoleIds() {
+    return this.roleIds;
+  }
+
+  public Permission getPermission() {
+    return this.permission;
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -50,7 +65,8 @@ public final class Privilege {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.id, this.anchor, this.name, this.description);
+    return Objects.hash(
+        this.id, this.anchor, this.name, this.description, this.roleIds, this.permission);
   }
 
   @Override
@@ -63,7 +79,9 @@ public final class Privilege {
     return Objects.equals(this.id, that.id)
         && Objects.equals(this.anchor, that.anchor)
         && Objects.equals(this.name, that.name)
-        && Objects.equals(this.description, that.description);
+        && Objects.equals(this.description, that.description)
+        && Objects.equals(this.roleIds, that.roleIds)
+        && Objects.equals(this.permission, that.permission);
   }
 
   @Override
@@ -80,6 +98,11 @@ public final class Privilege {
         + ", description='"
         + description
         + '\''
+        + ", roleIds='"
+        + roleIds
+        + '\''
+        + ", permission='"
+        + permission
         + '}';
   }
 
@@ -95,6 +118,10 @@ public final class Privilege {
 
     private String description;
 
+    private final Set<String> roleIds = new HashSet<>();
+
+    private Permission permission;
+
     private Builder() {}
 
     private Builder(Privilege privilege) {
@@ -102,6 +129,8 @@ public final class Privilege {
       this.anchor = privilege.anchor;
       this.name = privilege.name;
       this.description = privilege.description;
+      this.roleIds.addAll(privilege.roleIds);
+      this.permission = privilege.permission;
     }
 
     public Builder id(String id) {
@@ -140,6 +169,36 @@ public final class Privilege {
 
     public Builder description(String description) {
       this.description = this.trimToNull(description);
+      return this;
+    }
+
+    @JsonSetter
+    public Builder roleIds(Collection<String> roleIds) {
+      Objects.requireNonNull(roleIds, "roleIds is null");
+      this.roleIds.clear();
+      for (String roleId : roleIds) {
+        this.roleId(roleId);
+      }
+      return this;
+    }
+
+    public Builder roleIds(String... roleIds) {
+      Objects.requireNonNull(roleIds, "roleIds is null");
+      this.roleIds.clear();
+      for (String roleId : roleIds) {
+        this.roleId(roleId);
+      }
+      return this;
+    }
+
+    public Builder roleId(String roleId) {
+      Objects.requireNonNull(roleId, "roleId is null");
+      this.roleIds.add(roleId);
+      return this;
+    }
+
+    public Builder permission(Permission permission) {
+      this.permission = permission;
       return this;
     }
 
