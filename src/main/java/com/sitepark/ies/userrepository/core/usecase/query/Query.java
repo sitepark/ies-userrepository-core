@@ -74,12 +74,12 @@ public final class Query {
 
     protected Builder(Query query) {
       this.filter = query.filter;
-      this.sort = new ArrayList<>(query.sort);
+      this.sort.addAll(query.sort);
       this.limit = query.limit;
     }
 
-    public Builder filter(Filter filterBy) {
-      this.filter = filterBy;
+    public Builder filter(Filter filter) {
+      this.filter = filter;
       return this;
     }
 
