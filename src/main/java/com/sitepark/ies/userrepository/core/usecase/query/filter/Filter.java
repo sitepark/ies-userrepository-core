@@ -11,12 +11,11 @@ public interface Filter {
     return new IdList(idList);
   }
 
-  static Anchor anchor(com.sitepark.ies.userrepository.core.domain.entity.Anchor anchor) {
+  static Anchor anchor(com.sitepark.ies.sharedkernel.anchor.domain.Anchor anchor) {
     return new Anchor(anchor);
   }
 
-  static AnchorList anchorList(
-      com.sitepark.ies.userrepository.core.domain.entity.Anchor... anchorList) {
+  static AnchorList anchorList(com.sitepark.ies.sharedkernel.anchor.domain.Anchor... anchorList) {
     return new AnchorList(anchorList);
   }
 

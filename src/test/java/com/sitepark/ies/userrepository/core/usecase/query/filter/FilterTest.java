@@ -25,16 +25,16 @@ class FilterTest {
 
   @Test
   void testAnchor() {
-    com.sitepark.ies.userrepository.core.domain.entity.Anchor anchor =
-        com.sitepark.ies.userrepository.core.domain.entity.Anchor.ofString("abc");
+    com.sitepark.ies.sharedkernel.anchor.domain.Anchor anchor =
+        com.sitepark.ies.sharedkernel.anchor.domain.Anchor.ofString("abc");
     Anchor filter = Filter.anchor(anchor);
     assertEquals(anchor, filter.getAnchor(), "unexpected anchorList");
   }
 
   @Test
   void testAnchorList() {
-    com.sitepark.ies.userrepository.core.domain.entity.Anchor anchor =
-        com.sitepark.ies.userrepository.core.domain.entity.Anchor.ofString("abc");
+    com.sitepark.ies.sharedkernel.anchor.domain.Anchor anchor =
+        com.sitepark.ies.sharedkernel.anchor.domain.Anchor.ofString("abc");
     AnchorList filter = Filter.anchorList(anchor);
     assertEquals(List.of(anchor), filter.getAnchorList(), "unexpected anchorList");
   }
@@ -116,8 +116,7 @@ class FilterTest {
     Filter filter =
         Filter.or(
             Filter.idList("6"),
-            Filter.anchor(
-                com.sitepark.ies.userrepository.core.domain.entity.Anchor.ofString("abc")),
+            Filter.anchor(com.sitepark.ies.sharedkernel.anchor.domain.Anchor.ofString("abc")),
             Filter.and(Filter.lastName("test"), Filter.login("test")));
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -162,8 +161,7 @@ class FilterTest {
     Filter expected =
         Filter.or(
             Filter.idList("6"),
-            Filter.anchor(
-                com.sitepark.ies.userrepository.core.domain.entity.Anchor.ofString("abc")),
+            Filter.anchor(com.sitepark.ies.sharedkernel.anchor.domain.Anchor.ofString("abc")),
             Filter.and(
                 Filter.login("login"),
                 Filter.firstName("firstName"),

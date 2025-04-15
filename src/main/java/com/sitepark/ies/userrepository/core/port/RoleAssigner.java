@@ -1,6 +1,6 @@
 package com.sitepark.ies.userrepository.core.port;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
+import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.List;
 
 public interface RoleAssigner {

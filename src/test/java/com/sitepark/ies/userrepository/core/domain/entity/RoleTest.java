@@ -3,6 +3,8 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
+import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;

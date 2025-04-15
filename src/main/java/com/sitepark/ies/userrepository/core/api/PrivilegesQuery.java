@@ -5,4 +5,6 @@ import java.util.List;
 
 public interface PrivilegesQuery {
   List<Privilege> getPrivilegesByUserId(String userId);
+
+  List<Privilege> getPrivilegesByDataField(String jsonPath, List<String> fieldValues);
 }
