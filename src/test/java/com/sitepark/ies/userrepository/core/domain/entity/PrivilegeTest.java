@@ -1,10 +1,13 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import java.util.List;
+import java.util.Set;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -98,6 +101,31 @@ class PrivilegeTest {
   void testNullDescription() {
     Privilege privilege = Privilege.builder().name("privilegerole").description(null).build();
     assertNull(privilege.getDescription(), "unexpected description");
+  }
+
+  @Test
+  void testRoleIdsCollection() {
+    Privilege privilege = Privilege.builder().name("privilegerole").roleIds(List.of("123")).build();
+    assertEquals(Set.of("123"), privilege.getRoleIds(), "unexpected roleIds");
+  }
+
+  @Test
+  void testRoleIdsArray() {
+    Privilege privilege = Privilege.builder().name("privilegerole").roleIds("123").build();
+    assertEquals(Set.of("123"), privilege.getRoleIds(), "unexpected roleIds");
+  }
+
+  @Test
+  void testRoleId() {
+    Privilege privilege = Privilege.builder().name("privilegerole").roleId("123").build();
+    assertEquals(Set.of("123"), privilege.getRoleIds(), "unexpected roleIds");
+  }
+
+  @Test
+  void testPermission() {
+    Permission permission = mock();
+    Privilege privilege = Privilege.builder().name("privilegerole").permission(permission).build();
+    assertSame(permission, privilege.getPermission(), "unexpected permission");
   }
 
   @Test
