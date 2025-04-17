@@ -25,14 +25,14 @@ public final class Role {
 
   private final String description;
 
-  private final List<Identifier> privileges;
+  private final List<Identifier> privilegeIds;
 
   private Role(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
     this.description = builder.description;
-    this.privileges = Collections.unmodifiableList(builder.privileges);
+    this.privilegeIds = Collections.unmodifiableList(builder.privilegeIds);
   }
 
   public String getId() {
@@ -52,8 +52,8 @@ public final class Role {
   }
 
   @SuppressFBWarnings("EI_EXPOSE_REP")
-  public List<Identifier> getPrivileges() {
-    return this.privileges;
+  public List<Identifier> getPrivilegeIds() {
+    return this.privilegeIds;
   }
 
   public static Builder builder() {
@@ -66,7 +66,7 @@ public final class Role {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.id, this.anchor, this.name, this.description, this.privileges);
+    return Objects.hash(this.id, this.anchor, this.name, this.description, this.privilegeIds);
   }
 
   @Override
@@ -80,7 +80,7 @@ public final class Role {
         && Objects.equals(this.anchor, that.anchor)
         && Objects.equals(this.name, that.name)
         && Objects.equals(this.description, that.description)
-        && Objects.equals(this.privileges, that.privileges);
+        && Objects.equals(this.privilegeIds, that.privilegeIds);
   }
 
   @Override
@@ -93,8 +93,8 @@ public final class Role {
         + name
         + ", description="
         + description
-        + ", privileges="
-        + privileges
+        + ", privilegeIds="
+        + privilegeIds
         + "]";
   }
 
@@ -110,7 +110,7 @@ public final class Role {
 
     private String description;
 
-    private final List<Identifier> privileges = new ArrayList<>();
+    private final List<Identifier> privilegeIds = new ArrayList<>();
 
     private Builder() {}
 
@@ -119,7 +119,7 @@ public final class Role {
       this.anchor = role.anchor;
       this.name = role.name;
       this.description = role.description;
-      this.privileges.addAll(role.privileges);
+      this.privilegeIds.addAll(role.privilegeIds);
     }
 
     public Builder id(String id) {
@@ -162,27 +162,27 @@ public final class Role {
     }
 
     @JsonSetter
-    public Builder privileges(Identifier... privileges) {
-      Objects.requireNonNull(privileges, "privileges is null");
-      this.privileges.clear();
-      for (Identifier privilege : privileges) {
-        this.privilege(privilege);
+    public Builder privilegeIds(Identifier... privilegeIds) {
+      Objects.requireNonNull(privilegeIds, "privilegeIds is null");
+      this.privilegeIds.clear();
+      for (Identifier privilege : privilegeIds) {
+        this.privilegeId(privilege);
       }
       return this;
     }
 
-    public Builder privileges(List<Identifier> privileges) {
-      Objects.requireNonNull(privileges, "privileges is null");
-      this.privileges.clear();
-      for (Identifier role : privileges) {
-        this.privilege(role);
+    public Builder privilegeIds(List<Identifier> privilegeIds) {
+      Objects.requireNonNull(privilegeIds, "privilegeIds is null");
+      this.privilegeIds.clear();
+      for (Identifier privilegeId : privilegeIds) {
+        this.privilegeId(privilegeId);
       }
       return this;
     }
 
-    public Builder privilege(Identifier privilege) {
-      Objects.requireNonNull(privilege, "privilege is null");
-      this.privileges.add(privilege);
+    public Builder privilegeId(Identifier privilegeId) {
+      Objects.requireNonNull(privilegeId, "privilegeId is null");
+      this.privilegeIds.add(privilegeId);
       return this;
     }
 

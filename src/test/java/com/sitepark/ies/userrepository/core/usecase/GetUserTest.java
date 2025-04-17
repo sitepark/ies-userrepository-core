@@ -52,7 +52,7 @@ class GetUserTest {
   void testGet() {
 
     UserRepository userRepository = mock();
-    User storedUser = User.builder().id("123").login("test").role(Identifier.ofId("345")).build();
+    User storedUser = User.builder().id("123").login("test").roleId("345").build();
     when(userRepository.get("123")).thenReturn(Optional.of(storedUser));
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
@@ -61,8 +61,7 @@ class GetUserTest {
 
     GetUser getUserUseCase = new GetUser(userRepository, identifierResolver, accessControl);
 
-    User expectedUser =
-        User.builder().id("123").login("test").roles(Identifier.ofId("345")).build();
+    User expectedUser = User.builder().id("123").login("test").roleIds("345").build();
 
     User user = getUserUseCase.getUser(Identifier.ofString("123"));
 

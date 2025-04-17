@@ -232,74 +232,70 @@ class UserTest {
 
   @Test
   void testSetRolesAsList() {
-    User user =
-        this.createBuilderWithRequiredValues().roles(List.of(Identifier.ofId("123"))).build();
-    assertEquals(List.of(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
+    User user = this.createBuilderWithRequiredValues().roleIds(List.of("123")).build();
+    assertEquals(List.of("123"), user.getRoleIds(), "unexpected roles");
   }
 
   @Test
   void testSetOverwriteRolesAsList() {
-    User user =
-        this.createBuilderWithRequiredValues().roles(List.of(Identifier.ofId("123"))).build();
-    User overwritter = user.toBuilder().roles(List.of(Identifier.ofId("345"))).build();
-    assertEquals(List.of(Identifier.ofId("345")), overwritter.getRoles(), "unexpected roles");
+    User user = this.createBuilderWithRequiredValues().roleIds(List.of("123")).build();
+    User overwritter = user.toBuilder().roleIds(List.of("345")).build();
+    assertEquals(List.of("345"), overwritter.getRoleIds(), "unexpected roles");
   }
 
   @Test
   void testSetNullRolesAsList() {
-    assertThrows(NullPointerException.class, () -> User.builder().roles((List<Identifier>) null));
+    assertThrows(NullPointerException.class, () -> User.builder().roleIds((List<String>) null));
   }
 
   @Test
   void testSetNullRoleInList() {
     assertThrows(
-        NullPointerException.class,
-        () -> User.builder().roles(Arrays.asList(Identifier.ofId("345"), null)));
+        NullPointerException.class, () -> User.builder().roleIds(Arrays.asList("345", null)));
   }
 
   @Test
   void testSetRolesAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().roles(Identifier.ofId("123")).build();
-    assertEquals(List.of(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
+    User user = this.createBuilderWithRequiredValues().roleIds("123").build();
+    assertEquals(List.of("123"), user.getRoleIds(), "unexpected roles");
   }
 
   @Test
   void testSetOverwriteRolesAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().roles(Identifier.ofId("123")).build();
-    User overwritter = user.toBuilder().roles(Identifier.ofId("345")).build();
-    assertEquals(List.of(Identifier.ofId("345")), overwritter.getRoles(), "unexpected roles");
+    User user = this.createBuilderWithRequiredValues().roleIds("123").build();
+    User overwritter = user.toBuilder().roleIds("345").build();
+    assertEquals(List.of("345"), overwritter.getRoleIds(), "unexpected roles");
   }
 
   @Test
   void testSetNullRolesAsVArgs() {
-    assertThrows(NullPointerException.class, () -> User.builder().roles((Identifier[]) null));
+    assertThrows(NullPointerException.class, () -> User.builder().roleIds((String[]) null));
   }
 
   @Test
   void testSetNullRoleInVArgs() {
-    assertThrows(
-        NullPointerException.class, () -> User.builder().roles(Identifier.ofId("345"), null));
+    assertThrows(NullPointerException.class, () -> User.builder().roleIds("345", null));
   }
 
   @Test
   void testSetRole() {
-    User user = this.createBuilderWithRequiredValues().role(Identifier.ofId("123")).build();
-    assertEquals(List.of(Identifier.ofId("123")), user.getRoles(), "unexpected roles");
+    User user = this.createBuilderWithRequiredValues().roleId("123").build();
+    assertEquals(List.of("123"), user.getRoleIds(), "unexpected roles");
   }
 
   @Test
   void testAddRole() {
-    User user = this.createBuilderWithRequiredValues().role(Identifier.ofId("123")).build();
-    User added = user.toBuilder().role(Identifier.ofId("456")).build();
+    User user = this.createBuilderWithRequiredValues().roleId("123").build();
+    User added = user.toBuilder().roleId("456").build();
 
-    List<Identifier> expected = Arrays.asList(Identifier.ofId("123"), Identifier.ofId("456"));
+    List<String> expected = Arrays.asList("123", "456");
 
-    assertEquals(expected, added.getRoles(), "unexpected roles");
+    assertEquals(expected, added.getRoleIds(), "unexpected roles");
   }
 
   @Test
   void testSetNullRole() {
-    assertThrows(NullPointerException.class, () -> User.builder().role(null));
+    assertThrows(NullPointerException.class, () -> User.builder().roleId(null));
   }
 
   @Test
@@ -473,13 +469,13 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roles(Identifier.ofAnchor("test.anchor"), Identifier.ofId("123"))
+            .roleIds("345", "123")
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();
     String expected =
         """
-		User [id=100560100000014842, anchor=user.peterpan, login=peterpan, password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE, note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null], identities=[LdapIdentity [server=2, dn=userdn]], roles=[test.anchor, 123], createdAt=null, changedAt=null]""";
+		User [id=100560100000014842, anchor=user.peterpan, login=peterpan, password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE, note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null], identities=[LdapIdentity [server=2, dn=userdn]], roles=[345, 123], createdAt=null, changedAt=null]""";
     assertEquals(expected, user.toString(), "unexpected string representation");
   }
 
@@ -499,7 +495,7 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roles(Identifier.ofAnchor("test.anchor"), Identifier.ofId("123"))
+            .roleIds("345", "123")
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();
@@ -518,7 +514,7 @@ class UserTest {
 				"description":"a note",\
 				"validity":{"blocked":false},\
 				"identities":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-				"roles":["test.anchor","123"]}\
+				"roleIds":["345","123"]}\
 				""";
 
     assertEquals(expected, json, "unexpected json");
@@ -544,7 +540,7 @@ class UserTest {
 			"gender":"MALE",\
 			"description":"a note",\
 			"identities":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-			"roles":["test.anchor","123"]\
+			"roleIds":["345","123"]\
 			}""";
 
     User user = mapper.readValue(json, User.class);
@@ -558,7 +554,7 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roles(Identifier.ofAnchor("test.anchor"), Identifier.ofId("123"))
+            .roleIds("345", "123")
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();

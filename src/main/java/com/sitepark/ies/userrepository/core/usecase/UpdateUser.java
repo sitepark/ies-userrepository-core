@@ -1,6 +1,5 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
@@ -66,7 +65,7 @@ public final class UpdateUser {
       LOGGER.info("update: {}", joinedUpdateUser);
     }
 
-    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoles(), List.of(id));
+    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoleIds(), List.of(id));
 
     this.repository.update(joinedUpdateUser);
 
@@ -97,8 +96,8 @@ public final class UpdateUser {
     User storedUser = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));
 
     assert storedUser.getId().isPresent();
-    List<Identifier> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
-    return storedUser.toBuilder().roles(roles).build();
+    List<String> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
+    return storedUser.toBuilder().roleIds(roles).build();
   }
 
   private void validateLogin(User user) {

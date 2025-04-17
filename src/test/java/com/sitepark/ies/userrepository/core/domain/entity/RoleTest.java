@@ -105,11 +105,11 @@ class RoleTest {
     Role role =
         Role.builder()
             .name("testrole")
-            .privileges(Identifier.ofId("123"), Identifier.ofId("234"))
+            .privilegeIds(Identifier.ofId("123"), Identifier.ofId("234"))
             .build();
     assertEquals(
         List.of(Identifier.ofId("123"), Identifier.ofId("234")),
-        role.getPrivileges(),
+        role.getPrivilegeIds(),
         "unexpected privileges");
   }
 
@@ -118,11 +118,11 @@ class RoleTest {
     Role role =
         Role.builder()
             .name("testrole")
-            .privileges(List.of(Identifier.ofId("123"), Identifier.ofId("234")))
+            .privilegeIds(List.of(Identifier.ofId("123"), Identifier.ofId("234")))
             .build();
     assertEquals(
         List.of(Identifier.ofId("123"), Identifier.ofId("234")),
-        role.getPrivileges(),
+        role.getPrivilegeIds(),
         "unexpected privileges");
   }
 
@@ -131,12 +131,12 @@ class RoleTest {
     Role role =
         Role.builder()
             .name("testrole")
-            .privilege(Identifier.ofId("123"))
-            .privilege(Identifier.ofId("234"))
+            .privilegeId(Identifier.ofId("123"))
+            .privilegeId(Identifier.ofId("234"))
             .build();
     assertEquals(
         List.of(Identifier.ofId("123"), Identifier.ofId("234")),
-        role.getPrivileges(),
+        role.getPrivilegeIds(),
         "unexpected privileges");
   }
 
@@ -147,8 +147,8 @@ class RoleTest {
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description")
-            .privilege(Identifier.ofId("123"))
-            .privilege(Identifier.ofId("234"))
+            .privilegeId(Identifier.ofId("123"))
+            .privilegeId(Identifier.ofId("234"))
             .build();
     Role copy = role.toBuilder().description("description2").build();
 
@@ -157,8 +157,8 @@ class RoleTest {
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description2")
-            .privilege(Identifier.ofId("123"))
-            .privilege(Identifier.ofId("234"))
+            .privilegeId(Identifier.ofId("123"))
+            .privilegeId(Identifier.ofId("234"))
             .build();
 
     assertEquals(expected, copy, "unexpected privileges");

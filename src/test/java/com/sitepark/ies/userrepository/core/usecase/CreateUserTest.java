@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.exception.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Password;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
@@ -88,7 +87,7 @@ class CreateUserTest {
     when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roles(Identifier.ofId("333")).build();
+    User user = User.builder().login("test").roleIds("333").build();
 
     var createUserUseCase =
         new CreateUser(
@@ -103,11 +102,10 @@ class CreateUserTest {
 
     assertEquals("123", id, "unexpected id");
 
-    User effectiveUser =
-        User.builder().id("123").login("test").roles(Identifier.ofId("333")).build();
+    User effectiveUser = User.builder().id("123").login("test").roleIds("333").build();
 
     verify(repository).create(eq(effectiveUser));
-    verify(roleAssigner).assignRoleToUser(List.of(Identifier.ofId("333")), List.of("123"));
+    verify(roleAssigner).assignRoleToUser(List.of("333"), List.of("123"));
   }
 
   @Test
@@ -192,7 +190,7 @@ class CreateUserTest {
     when(repository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roles(Identifier.ofId("333")).build();
+    User user = User.builder().login("test").roleIds("333").build();
 
     var createUserUseCase =
         new CreateUser(

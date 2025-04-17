@@ -40,7 +40,7 @@ public final class User {
 
   private final List<Identity> identities;
 
-  private final List<Identifier> roles;
+  private final List<String> roleIds;
 
   private final OffsetDateTime createdAt;
 
@@ -58,7 +58,7 @@ public final class User {
     this.description = builder.description;
     this.validity = builder.validity;
     this.identities = builder.identities;
-    this.roles = Collections.unmodifiableList(builder.roles);
+    this.roleIds = Collections.unmodifiableList(builder.roleIds);
     this.createdAt = builder.createdAt;
     this.changedAt = builder.changedAt;
   }
@@ -152,8 +152,8 @@ public final class User {
   }
 
   @SuppressFBWarnings("EI_EXPOSE_REP")
-  public List<Identifier> getRoles() {
-    return this.roles;
+  public List<String> getRoleIds() {
+    return this.roleIds;
   }
 
   public static Builder builder() {
@@ -178,7 +178,7 @@ public final class User {
         this.validity,
         this.identities,
         this.description,
-        this.roles,
+        this.roleIds,
         this.createdAt,
         this.changedAt);
   }
@@ -201,7 +201,7 @@ public final class User {
         && Objects.equals(this.description, entity.description)
         && Objects.equals(this.validity, entity.validity)
         && Objects.equals(this.identities, entity.identities)
-        && Objects.equals(this.roles, entity.roles)
+        && Objects.equals(this.roleIds, entity.roleIds)
         && Objects.equals(this.createdAt, entity.createdAt)
         && Objects.equals(this.changedAt, entity.changedAt);
   }
@@ -231,7 +231,7 @@ public final class User {
         + ", identities="
         + this.identities
         + ", roles="
-        + this.roles
+        + this.roleIds
         + ", createdAt="
         + this.createdAt
         + ", changedAt="
@@ -265,7 +265,7 @@ public final class User {
 
     private final List<Identity> identities = new ArrayList<>();
 
-    private final List<Identifier> roles = new ArrayList<>();
+    private final List<String> roleIds = new ArrayList<>();
 
     private OffsetDateTime createdAt;
 
@@ -285,7 +285,7 @@ public final class User {
       this.description = user.description;
       this.validity = user.validity;
       this.identities.addAll(user.identities);
-      this.roles.addAll(user.roles);
+      this.roleIds.addAll(user.roleIds);
       this.createdAt = user.createdAt;
       this.changedAt = user.changedAt;
     }
@@ -394,27 +394,27 @@ public final class User {
     }
 
     @JsonSetter
-    public Builder roles(Identifier... roles) {
-      Objects.requireNonNull(roles, "roles is null");
-      this.roles.clear();
-      for (Identifier role : roles) {
-        this.role(role);
+    public Builder roleIds(String... roleIds) {
+      Objects.requireNonNull(roleIds, "roleIds is null");
+      this.roleIds.clear();
+      for (String roleId : roleIds) {
+        this.roleId(roleId);
       }
       return this;
     }
 
-    public Builder roles(List<Identifier> roles) {
-      Objects.requireNonNull(roles, "roles is null");
-      this.roles.clear();
-      for (Identifier role : roles) {
-        this.role(role);
+    public Builder roleIds(List<String> roleIds) {
+      Objects.requireNonNull(roleIds, "roleIds is null");
+      this.roleIds.clear();
+      for (String roleId : roleIds) {
+        this.roleId(roleId);
       }
       return this;
     }
 
-    public Builder role(Identifier role) {
-      Objects.requireNonNull(role, "role is null");
-      this.roles.add(role);
+    public Builder roleId(String roleId) {
+      Objects.requireNonNull(roleId, "roleId is null");
+      this.roleIds.add(roleId);
       return this;
     }
 
