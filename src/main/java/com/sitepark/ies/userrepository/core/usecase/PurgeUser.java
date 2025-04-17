@@ -1,7 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
@@ -26,7 +26,7 @@ public final class PurgeUser {
   private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
-  protected PurgeUser(
+  PurgeUser(
       UserRepository repository,
       IdentifierResolver identifierResolver,
       ExtensionsNotifier extensionsNotifier,

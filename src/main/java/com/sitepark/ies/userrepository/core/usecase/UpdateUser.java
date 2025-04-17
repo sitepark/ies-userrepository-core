@@ -1,8 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
@@ -11,7 +10,6 @@ import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -32,7 +30,7 @@ public final class UpdateUser {
   private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
-  protected UpdateUser(
+  UpdateUser(
       UserRepository repository,
       IdentifierResolver identifierResolver,
       RoleAssigner roleAssigner,
@@ -48,8 +46,9 @@ public final class UpdateUser {
   public String updateUser(User user) {
 
     User updateUser = this.buildUserWithId(user);
+    assert updateUser.getId().isPresent();
     String id = updateUser.getId().get();
-    this.validateWritable(id);
+    this.validateWritable();
     User storedUser = this.loadStoredUser(id);
     this.validateLogin(updateUser);
 
@@ -66,7 +65,7 @@ public final class UpdateUser {
       LOGGER.info("update: {}", joinedUpdateUser);
     }
 
-    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoleList(), Arrays.asList(id));
+    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoleIds(), List.of(id));
 
     this.repository.update(joinedUpdateUser);
 
@@ -87,7 +86,7 @@ public final class UpdateUser {
     return user.toBuilder().id(id).build();
   }
 
-  private void validateWritable(String id) {
+  private void validateWritable() {
     if (!this.accessControl.isUserWritable()) {
       throw new AccessDeniedException("Not allowed to update user");
     }
@@ -96,8 +95,9 @@ public final class UpdateUser {
   private User loadStoredUser(String id) {
     User storedUser = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));
 
-    List<Role> roleList = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
-    return storedUser.toBuilder().roleList(roleList).build();
+    assert storedUser.getId().isPresent();
+    List<String> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
+    return storedUser.toBuilder().roleIds(roles).build();
   }
 
   private void validateLogin(User user) {

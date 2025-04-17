@@ -6,8 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
@@ -29,11 +29,7 @@ class PurgeUserTest {
     var purgeEntity =
         new PurgeUser(
             null, identifierResolver, extensionsNotifier, accessControl, accessTokenRepository);
-    assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          purgeEntity.purgeUser(Identifier.ofId("10"));
-        });
+    assertThrows(AccessDeniedException.class, () -> purgeEntity.purgeUser(Identifier.ofId("10")));
   }
 
   @SuppressWarnings("PMD")

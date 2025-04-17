@@ -1,10 +1,10 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.entity.query.Query;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import jakarta.inject.Inject;
 import java.util.List;
 
@@ -15,17 +15,17 @@ public final class GetAllUsers {
   private final AccessControl accessControl;
 
   @Inject
-  protected GetAllUsers(UserRepository repository, AccessControl accessControl) {
+  GetAllUsers(UserRepository repository, AccessControl accessControl) {
     this.repository = repository;
     this.accessControl = accessControl;
   }
 
-  public List<User> getAllUsers(Query query) {
+  public List<User> getAllUsers(Filter filter) {
 
     if (!this.accessControl.isUserReadable()) {
       throw new AccessDeniedException("Not allowed to read users");
     }
 
-    return this.repository.getAll(query);
+    return this.repository.getAll(filter);
   }
 }

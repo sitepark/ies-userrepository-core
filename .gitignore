@@ -7,6 +7,10 @@
 .ruleset
 .pmdruleset.xml
 
+# IntelliJ
+.idea/
+*.iml
+
 # ? validate
 reports/
 

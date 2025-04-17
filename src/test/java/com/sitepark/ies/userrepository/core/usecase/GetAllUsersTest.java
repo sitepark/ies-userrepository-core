@@ -6,11 +6,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.entity.query.Query;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -26,10 +26,7 @@ class GetAllUsersTest {
     GetAllUsers getAllUsersUseCase = new GetAllUsers(userRepository, accessControl);
 
     assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          getAllUsersUseCase.getAllUsers(Query.builder().build());
-        });
+        AccessDeniedException.class, () -> getAllUsersUseCase.getAllUsers(Filter.id("123")));
   }
 
   @Test
@@ -45,8 +42,6 @@ class GetAllUsersTest {
     GetAllUsers getAllUsersUseCase = new GetAllUsers(userRepository, accessControl);
 
     assertEquals(
-        List.of(user),
-        getAllUsersUseCase.getAllUsers(Query.builder().build()),
-        "Unexpected result");
+        List.of(user), getAllUsersUseCase.getAllUsers(Filter.id("123")), "Unexpected result");
   }
 }

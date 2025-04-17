@@ -3,11 +3,23 @@ package com.sitepark.ies.userrepository.core.port;
 public interface AccessControl {
   boolean isImpersonationTokensManageable();
 
-  boolean isUserCreateable();
+  boolean isUserCreatable();
 
   boolean isUserReadable();
 
   boolean isUserWritable();
 
   boolean isUserRemovable();
+
+  boolean isRoleReadable();
+
+  boolean isRoleWritable();
+
+  boolean isRoleRemovable();
+
+  boolean isPrivilegeReadable();
+
+  boolean isPrivilegeWritable();
+
+  boolean isPrivilegeRemovable();
 }

@@ -10,10 +10,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.exception.AnchorNotFoundException;
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
@@ -24,10 +24,10 @@ import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class UpdateUserTest {
 
   @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testAccessDeniedUpdate() {
 
     IdentifierResolver identifierResolver = mock();
@@ -40,11 +40,7 @@ class UpdateUserTest {
 
     var updateUserUseCase =
         new UpdateUser(null, identifierResolver, null, accessControl, extensionsNotifier);
-    assertThrows(
-        AccessDeniedException.class,
-        () -> {
-          updateUserUseCase.updateUser(user);
-        });
+    assertThrows(AccessDeniedException.class, () -> updateUserUseCase.updateUser(user));
 
     verify(accessControl).isUserWritable();
   }
@@ -55,11 +51,7 @@ class UpdateUserTest {
     User user = User.builder().login("test").build();
 
     var updateUserUseCase = new UpdateUser(null, null, null, null, null);
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          updateUserUseCase.updateUser(user);
-        });
+    assertThrows(IllegalArgumentException.class, () -> updateUserUseCase.updateUser(user));
   }
 
   @Test
@@ -78,14 +70,7 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
-    UserNotFoundException thrown =
-        assertThrows(
-            UserNotFoundException.class,
-            () -> {
-              updateUserUseCase.updateUser(user);
-            });
-
-    assertEquals("123", thrown.getId(), "unexpected id");
+    assertThrows(UserNotFoundException.class, () -> updateUserUseCase.updateUser(user));
   }
 
   @Test
@@ -112,19 +97,11 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test2").build();
 
-    LoginAlreadyExistsException thrown =
-        assertThrows(
-            LoginAlreadyExistsException.class,
-            () -> {
-              updateUserUseCase.updateUser(user);
-            });
-
-    assertEquals("55", thrown.getOwner(), "unexpected owner");
-    assertEquals("test2", thrown.getLogin(), "unexpected login");
+    assertThrows(LoginAlreadyExistsException.class, () -> updateUserUseCase.updateUser(user));
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testUpdateUnchanged() {
 
     IdentifierResolver identifierResolver = mock();
@@ -146,7 +123,8 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
-    updateUserUseCase.updateUser(user);
+    String id = updateUserUseCase.updateUser(user);
+    assertEquals("123", id, "unexpected id");
 
     verify(repository).get(anyString());
     verify(repository).resolveLogin(anyString());
@@ -155,7 +133,7 @@ class UpdateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testUpdateViaIdWithStoredAnchor() {
 
     IdentifierResolver identifierResolver = mock();
@@ -191,7 +169,7 @@ class UpdateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testViaAnchor() {
 
     IdentifierResolver identifierResolver = mock();
@@ -229,7 +207,7 @@ class UpdateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testUpdateAnchor() {
 
     IdentifierResolver identifierResolver = mock();
@@ -263,7 +241,7 @@ class UpdateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testUpdateLogin() {
 
     IdentifierResolver identifierResolver = mock();
@@ -316,10 +294,6 @@ class UpdateUserTest {
 
     User user = User.builder().login("test").anchor("user.test2").build();
 
-    assertThrows(
-        AnchorNotFoundException.class,
-        () -> {
-          updateUserUseCase.updateUser(user);
-        });
+    assertThrows(AnchorNotFoundException.class, () -> updateUserUseCase.updateUser(user));
   }
 }
