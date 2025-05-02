@@ -6,9 +6,8 @@ import com.sitepark.ies.userrepository.core.domain.entity.Identity;
 import java.util.Objects;
 
 /**
- * The <code>LdapIdentity</code> class represents an identity provider using
- * LDAP for user authentication. It facilitates user authentication and access
- * control using LDAP credentials.
+ * The <code>LdapIdentity</code> class represents an identity provider using LDAP for user
+ * authentication. It facilitates user authentication and access control using LDAP credentials.
  */
 @JsonDeserialize(builder = LdapIdentity.Builder.class)
 public final class LdapIdentity implements Identity {
@@ -52,18 +51,15 @@ public final class LdapIdentity implements Identity {
   @Override
   public boolean equals(Object o) {
 
-    if (!(o instanceof LdapIdentity entity)) {
+    if (!(o instanceof LdapIdentity that)) {
       return false;
     }
 
-    if ((this.server != entity.server) || !Objects.equals(this.dn, entity.dn)) {
-      return false;
-    }
-
-    return true;
+    return Objects.equals(this.server, that.server) && Objects.equals(this.dn, that.dn);
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
+  @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   public static final class Builder {
 
     private int server;

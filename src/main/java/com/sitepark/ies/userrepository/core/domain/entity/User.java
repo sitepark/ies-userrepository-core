@@ -4,16 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.base.Identifier;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Represents user
- */
+/** Represents user */
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
@@ -23,41 +24,47 @@ public final class User {
 
   private final String login;
 
-  private final String firstname;
+  private final Password password;
 
-  private final String lastname;
+  private final String firstName;
+
+  private final String lastName;
 
   private final String email;
 
   private final GenderType gender;
 
-  private final String note;
+  private final String description;
 
   private final UserValidity validity;
 
-  private final List<Identity> identityList;
+  private final List<Identity> identities;
 
-  private final List<Role> roleList;
+  private final List<String> roleIds;
 
-  protected User(Builder builder) {
+  private final OffsetDateTime createdAt;
+
+  private final OffsetDateTime changedAt;
+
+  private User(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.login = builder.login;
-    this.firstname = builder.firstname;
-    this.lastname = builder.lastname;
+    this.password = builder.password;
+    this.firstName = builder.firstName;
+    this.lastName = builder.lastName;
     this.email = builder.email;
     this.gender = builder.gender;
-    this.note = builder.note;
+    this.description = builder.description;
     this.validity = builder.validity;
-    this.identityList = builder.identityList;
-    this.roleList = Collections.unmodifiableList(builder.roleList);
+    this.identities = builder.identities;
+    this.roleIds = Collections.unmodifiableList(builder.roleIds);
+    this.createdAt = builder.createdAt;
+    this.changedAt = builder.changedAt;
   }
 
   public Optional<String> getId() {
-    if (this.id == null) {
-      return Optional.empty();
-    }
-    return Optional.of(this.id);
+    return Optional.ofNullable(this.id);
   }
 
   @JsonIgnore
@@ -79,27 +86,39 @@ public final class User {
     return this.login;
   }
 
+  public Optional<Password> getPassword() {
+    return Optional.ofNullable(this.password);
+  }
+
+  public Optional<OffsetDateTime> getCreatedAt() {
+    return Optional.ofNullable(this.createdAt);
+  }
+
+  public Optional<OffsetDateTime> getChangedAt() {
+    return Optional.ofNullable(this.changedAt);
+  }
+
   @JsonIgnore
   public String getName() {
     StringBuilder name = new StringBuilder();
-    if (this.lastname != null) {
-      name.append(this.lastname);
+    if (this.lastName != null) {
+      name.append(this.lastName);
     }
-    if (this.firstname != null) {
-      if (name.length() > 0) {
+    if (this.firstName != null) {
+      if (!name.isEmpty()) {
         name.append(", ");
       }
-      name.append(this.firstname);
+      name.append(this.firstName);
     }
     return name.toString();
   }
 
-  public Optional<String> getFirstname() {
-    return Optional.ofNullable(this.firstname);
+  public Optional<String> getFirstName() {
+    return Optional.ofNullable(this.firstName);
   }
 
-  public Optional<String> getLastname() {
-    return Optional.ofNullable(this.lastname);
+  public Optional<String> getLastName() {
+    return Optional.ofNullable(this.lastName);
   }
 
   public Optional<String> getEmail() {
@@ -110,8 +129,8 @@ public final class User {
     return this.gender;
   }
 
-  public Optional<String> getNote() {
-    return Optional.ofNullable(this.note);
+  public Optional<String> getDescription() {
+    return Optional.ofNullable(this.description);
   }
 
   public UserValidity getValidity() {
@@ -119,12 +138,12 @@ public final class User {
   }
 
   @SuppressFBWarnings("EI_EXPOSE_REP")
-  public List<Identity> getIdentityList() {
-    return this.identityList;
+  public List<Identity> getIdentities() {
+    return this.identities;
   }
 
   public <T extends Identity> Optional<T> getIdentity(Class<T> type) {
-    for (Identity identity : this.identityList) {
+    for (Identity identity : this.identities) {
       if (type.isInstance(identity)) {
         return Optional.of(type.cast(identity));
       }
@@ -133,8 +152,8 @@ public final class User {
   }
 
   @SuppressFBWarnings("EI_EXPOSE_REP")
-  public List<Role> getRoleList() {
-    return this.roleList;
+  public List<String> getRoleIds() {
+    return this.roleIds;
   }
 
   public static Builder builder() {
@@ -151,14 +170,17 @@ public final class User {
         this.id,
         this.anchor,
         this.login,
-        this.firstname,
-        this.lastname,
+        this.password,
+        this.firstName,
+        this.lastName,
         this.email,
         this.gender,
         this.validity,
-        this.identityList,
-        this.note,
-        this.roleList);
+        this.identities,
+        this.description,
+        this.roleIds,
+        this.createdAt,
+        this.changedAt);
   }
 
   @Override
@@ -171,14 +193,17 @@ public final class User {
     return Objects.equals(this.id, entity.id)
         && Objects.equals(this.anchor, entity.anchor)
         && Objects.equals(this.login, entity.login)
-        && Objects.equals(this.firstname, entity.firstname)
-        && Objects.equals(this.lastname, entity.lastname)
+        && Objects.equals(this.password, entity.password)
+        && Objects.equals(this.firstName, entity.firstName)
+        && Objects.equals(this.lastName, entity.lastName)
         && Objects.equals(this.email, entity.email)
         && Objects.equals(this.gender, entity.gender)
-        && Objects.equals(this.note, entity.note)
+        && Objects.equals(this.description, entity.description)
         && Objects.equals(this.validity, entity.validity)
-        && Objects.equals(this.identityList, entity.identityList)
-        && Objects.equals(this.roleList, entity.roleList);
+        && Objects.equals(this.identities, entity.identities)
+        && Objects.equals(this.roleIds, entity.roleIds)
+        && Objects.equals(this.createdAt, entity.createdAt)
+        && Objects.equals(this.changedAt, entity.changedAt);
   }
 
   @Override
@@ -189,27 +214,33 @@ public final class User {
         + this.anchor
         + ", login="
         + this.login
+        + ", password="
+        + this.password
         + ", firstname="
-        + this.firstname
+        + this.firstName
         + ", lastname="
-        + this.lastname
+        + this.lastName
         + ", email="
         + this.email
         + ", gender="
         + this.gender
         + ", note="
-        + this.note
+        + this.description
         + ", validity="
         + this.validity
-        + ", identityList="
-        + this.identityList
-        + ", roleList="
-        + this.roleList
+        + ", identities="
+        + this.identities
+        + ", roles="
+        + this.roleIds
+        + ", createdAt="
+        + this.createdAt
+        + ", changedAt="
+        + this.changedAt
         + "]";
   }
 
   @SuppressWarnings("PMD.TooManyMethods")
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
+  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private String id;
@@ -218,36 +249,45 @@ public final class User {
 
     private String login;
 
-    private String firstname;
+    private Password password;
 
-    private String lastname;
+    private String firstName;
+
+    private String lastName;
 
     private String email;
 
     private GenderType gender = GenderType.UNKNOWN;
 
-    private String note;
+    private String description;
 
     private UserValidity validity = UserValidity.ALWAYS_VALID;
 
-    private final List<Identity> identityList = new ArrayList<>();
+    private final List<Identity> identities = new ArrayList<>();
 
-    private final List<Role> roleList = new ArrayList<>();
+    private final List<String> roleIds = new ArrayList<>();
 
-    protected Builder() {}
+    private OffsetDateTime createdAt;
 
-    protected Builder(User user) {
+    private OffsetDateTime changedAt;
+
+    private Builder() {}
+
+    private Builder(User user) {
       this.id = user.id;
       this.anchor = user.anchor;
       this.login = user.login;
-      this.firstname = user.firstname;
-      this.lastname = user.lastname;
+      this.password = user.password;
+      this.firstName = user.firstName;
+      this.lastName = user.lastName;
       this.email = user.email;
       this.gender = user.gender;
-      this.note = user.note;
+      this.description = user.description;
       this.validity = user.validity;
-      this.identityList.addAll(user.identityList);
-      this.roleList.addAll(user.roleList);
+      this.identities.addAll(user.identities);
+      this.roleIds.addAll(user.roleIds);
+      this.createdAt = user.createdAt;
+      this.changedAt = user.changedAt;
     }
 
     public Builder id(String id) {
@@ -260,11 +300,12 @@ public final class User {
     }
 
     public Builder identifier(Identifier identifier) {
-      if (identifier.getId().isPresent()) {
-        this.id = identifier.getId().get();
+      assert identifier.getId().isPresent() || identifier.getAnchor().isPresent();
+      if (identifier.getAnchor().isPresent()) {
+        this.anchor = identifier.getAnchor().get();
         return this;
       }
-      this.anchor = identifier.getAnchor().get();
+      this.id = identifier.getId().get();
       return this;
     }
 
@@ -283,13 +324,18 @@ public final class User {
       return this;
     }
 
-    public Builder firstname(String firstname) {
-      this.firstname = this.trimToNull(firstname);
+    public Builder password(Password password) {
+      this.password = password;
       return this;
     }
 
-    public Builder lastname(String lastname) {
-      this.lastname = this.trimToNull(lastname);
+    public Builder firstName(String firstname) {
+      this.firstName = this.trimToNull(firstname);
+      return this;
+    }
+
+    public Builder lastName(String lastname) {
+      this.lastName = this.trimToNull(lastname);
       return this;
     }
 
@@ -304,8 +350,8 @@ public final class User {
       return this;
     }
 
-    public Builder note(String note) {
-      this.note = this.trimToNull(note);
+    public Builder description(String note) {
+      this.description = this.trimToNull(note);
       return this;
     }
 
@@ -323,19 +369,19 @@ public final class User {
     }
 
     @JsonSetter
-    public Builder identityList(List<Identity> identityList) {
-      Objects.requireNonNull(identityList, "identityList is null");
-      this.identityList.clear();
-      for (Identity identity : identityList) {
+    public Builder identities(List<Identity> identities) {
+      Objects.requireNonNull(identities, "identities is null");
+      this.identities.clear();
+      for (Identity identity : identities) {
         this.identity(identity);
       }
       return this;
     }
 
-    public Builder identityList(Identity... identityList) {
-      Objects.requireNonNull(identityList, "identityList is null");
-      this.identityList.clear();
-      for (Identity identity : identityList) {
+    public Builder identities(Identity... identities) {
+      Objects.requireNonNull(identities, "identities is null");
+      this.identities.clear();
+      for (Identity identity : identities) {
         this.identity(identity);
       }
       return this;
@@ -343,32 +389,44 @@ public final class User {
 
     public Builder identity(Identity identity) {
       Objects.requireNonNull(identity, "identity is null");
-      this.identityList.add(identity);
+      this.identities.add(identity);
       return this;
     }
 
     @JsonSetter
-    public Builder roleList(Role... roleList) {
-      Objects.requireNonNull(roleList, "roleList is null");
-      this.roleList.clear();
-      for (Role role : roleList) {
-        this.role(role);
+    public Builder roleIds(String... roleIds) {
+      Objects.requireNonNull(roleIds, "roleIds is null");
+      this.roleIds.clear();
+      for (String roleId : roleIds) {
+        this.roleId(roleId);
       }
       return this;
     }
 
-    public Builder roleList(List<Role> roleList) {
-      Objects.requireNonNull(roleList, "roleList is null");
-      this.roleList.clear();
-      for (Role role : roleList) {
-        this.role(role);
+    public Builder roleIds(List<String> roleIds) {
+      Objects.requireNonNull(roleIds, "roleIds is null");
+      this.roleIds.clear();
+      for (String roleId : roleIds) {
+        this.roleId(roleId);
       }
       return this;
     }
 
-    public Builder role(Role role) {
-      Objects.requireNonNull(role, "role is null");
-      this.roleList.add(role);
+    public Builder roleId(String roleId) {
+      Objects.requireNonNull(roleId, "roleId is null");
+      this.roleIds.add(roleId);
+      return this;
+    }
+
+    public Builder createdAt(OffsetDateTime createdAt) {
+      Objects.requireNonNull(createdAt, "createdAt is null");
+      this.createdAt = createdAt;
+      return this;
+    }
+
+    public Builder changedAt(OffsetDateTime changedAt) {
+      Objects.requireNonNull(changedAt, "changedAt is null");
+      this.changedAt = changedAt;
       return this;
     }
 

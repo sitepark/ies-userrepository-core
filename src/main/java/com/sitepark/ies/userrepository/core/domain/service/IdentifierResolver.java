@@ -1,7 +1,7 @@
 package com.sitepark.ies.userrepository.core.domain.service;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
+import com.sitepark.ies.sharedkernel.anchor.exception.AnchorNotFoundException;
+import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
 import java.util.Optional;
@@ -20,6 +20,8 @@ public class IdentifierResolver {
     if (identifier.getId().isPresent()) {
       return identifier.getId().get();
     }
+
+    assert identifier.getAnchor().isPresent();
 
     Optional<String> id = this.repository.resolveAnchor(identifier.getAnchor().get());
     if (id.isEmpty()) {

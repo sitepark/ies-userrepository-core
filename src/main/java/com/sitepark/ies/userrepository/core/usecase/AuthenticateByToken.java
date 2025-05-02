@@ -27,19 +27,8 @@ public class AuthenticateByToken {
 
   public User authenticateByToken(String token) {
 
-    Optional<AccessToken> accessTokenOptinal = this.accessTokenRepository.getByToken(token);
-    if (accessTokenOptinal.isEmpty()) {
-      throw new InvalidAccessTokenException("Token not found");
-    }
-
-    AccessToken accessToken = accessTokenOptinal.get();
-    if (!accessToken.isActive()) {
-      throw new AccessTokenNotActiveException();
-    }
-    if (accessToken.isRevoked()) {
-      throw new AccessTokenRevokedException();
-    }
-    this.checkExpirationDate(accessToken.getExpiresAt());
+    AccessToken accessToken = getValidAccessToken(token);
+    validateAccessToken(accessToken);
 
     Optional<User> user = this.userRepository.get(accessToken.getUser());
     if (user.isEmpty()) {
@@ -49,15 +38,31 @@ public class AuthenticateByToken {
     return user.get();
   }
 
-  public void checkExpirationDate(Optional<OffsetDateTime> expiredAt) {
-
-    if (expiredAt.isEmpty()) {
-      return;
+  private AccessToken getValidAccessToken(String token) {
+    Optional<AccessToken> accessTokenOptional = this.accessTokenRepository.getByToken(token);
+    if (accessTokenOptional.isEmpty()) {
+      throw new InvalidAccessTokenException("Token not found");
     }
+    return accessTokenOptional.get();
+  }
+
+  private void validateAccessToken(AccessToken accessToken) {
+    if (!accessToken.isActive()) {
+      throw new AccessTokenNotActiveException();
+    }
+    if (accessToken.isRevoked()) {
+      throw new AccessTokenRevokedException();
+    }
+    if (accessToken.getExpiresAt().isPresent()) {
+      this.checkExpirationDate(accessToken.getExpiresAt().get());
+    }
+  }
+
+  public void checkExpirationDate(OffsetDateTime expiredAt) {
 
     OffsetDateTime now = OffsetDateTime.now();
-    if (expiredAt.get().isBefore(now)) {
-      throw new AccessTokenExpiredException(expiredAt.get());
+    if (expiredAt.isBefore(now)) {
+      throw new AccessTokenExpiredException(expiredAt);
     }
   }
 }

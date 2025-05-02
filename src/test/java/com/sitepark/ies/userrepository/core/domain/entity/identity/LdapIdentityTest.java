@@ -12,7 +12,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.TooManyMethods")
 @SuppressFBWarnings({
   "PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
   "NP_NULL_PARAM_DEREF_NONVIRTUAL",
@@ -29,72 +28,53 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSetServer() throws JsonProcessingException {
+  void testSetServer() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();
     assertEquals(2, ldapIdentity.getServer(), "unexpected server");
   }
 
   @Test
-  void testSetInvalidServer() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          LdapIdentity.builder().server(0);
-        });
+  void testSetInvalidServer() {
+    assertThrows(IllegalArgumentException.class, () -> LdapIdentity.builder().server(0));
   }
 
   @Test
-  void testSetNullDn() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          LdapIdentity.builder().dn(null);
-        });
+  void testSetNullDn() {
+    assertThrows(NullPointerException.class, () -> LdapIdentity.builder().dn(null));
   }
 
   @Test
-  void testSetBlankdDn() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          LdapIdentity.builder().dn(" ");
-        });
+  void testSetBlankDn() {
+    assertThrows(IllegalArgumentException.class, () -> LdapIdentity.builder().dn(" "));
   }
 
   @Test
-  void testMissingServer() throws JsonProcessingException {
-    assertThrows(
-        IllegalStateException.class,
-        () -> {
-          LdapIdentity.builder().dn(USER_DN).build();
-        });
+  void testMissingServer() {
+    assertThrows(IllegalStateException.class, () -> LdapIdentity.builder().dn(USER_DN).build());
   }
 
   @Test
-  void testMissingDn() throws JsonProcessingException {
-    assertThrows(
-        IllegalStateException.class,
-        () -> {
-          LdapIdentity.builder().server(1).build();
-        });
+  void testMissingDn() {
+    assertThrows(IllegalStateException.class, () -> LdapIdentity.builder().server(1).build());
   }
 
   @Test
-  void testSetDn() throws JsonProcessingException {
+  void testSetDn() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();
     assertEquals(USER_DN, ldapIdentity.getDn(), "unexpected server");
   }
 
   @Test
   @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
-  void testToBuilder() throws JsonProcessingException {
+  void testToBuilder() {
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();
 
-    LdapIdentity changedLdapIdentity = ldapIdentity.toBuilder().build();
+    LdapIdentity copy = ldapIdentity.toBuilder().server(3).build();
 
-    assertEquals(2, changedLdapIdentity.getServer(), "unexpected server");
-    assertEquals(USER_DN, changedLdapIdentity.getDn(), "dn");
+    LdapIdentity expected = LdapIdentity.builder().server(3).dn(USER_DN).build();
+
+    assertEquals(expected, copy, "unexpected ldapIdentity");
   }
 
   @Test

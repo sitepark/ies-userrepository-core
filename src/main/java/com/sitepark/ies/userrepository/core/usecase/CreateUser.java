@@ -1,16 +1,18 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
+import com.sitepark.ies.sharedkernel.anchor.exception.AnchorAlreadyExistsException;
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
+import com.sitepark.ies.userrepository.core.domain.entity.Password;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.IdGenerator;
+import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,20 +29,24 @@ public final class CreateUser {
 
   private final ExtensionsNotifier extensionsNotifier;
 
-  private static Logger LOGGER = LogManager.getLogger();
+  private final PasswordHasher passwordHasher;
+
+  private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
-  protected CreateUser(
+  CreateUser(
       UserRepository repository,
       RoleAssigner roleAssigner,
       AccessControl accessControl,
       IdGenerator idGenerator,
-      ExtensionsNotifier extensionsNotifier) {
+      ExtensionsNotifier extensionsNotifier,
+      PasswordHasher passwordHasher) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
     this.accessControl = accessControl;
     this.idGenerator = idGenerator;
     this.extensionsNotifier = extensionsNotifier;
+    this.passwordHasher = passwordHasher;
   }
 
   public String createUser(User newUser) {
@@ -49,29 +55,36 @@ public final class CreateUser {
       throw new IllegalArgumentException("The ID of the user must not be set when creating.");
     }
 
+    if (!this.accessControl.isUserCreatable()) {
+      throw new AccessDeniedException("Not allowed to create user " + newUser);
+    }
+
     this.validateAnchor(newUser);
 
     this.validateLogin(newUser);
 
-    if (!this.accessControl.isUserCreateable()) {
-      throw new AccessDeniedException("Not allowed to create user " + newUser);
+    Password hashedPassword = null;
+    if (newUser.getPassword().isPresent()) {
+      hashedPassword = this.passwordHasher.hash(newUser.getPassword().get().getClearText());
     }
 
     String generatedId = this.idGenerator.generate();
 
-    User userWithId = newUser.toBuilder().id(generatedId).build();
+    User userWithIdAndHashPassword =
+        newUser.toBuilder().id(generatedId).password(hashedPassword).build();
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("create user: {}", userWithId);
+      LOGGER.info("create user: {}", userWithIdAndHashPassword);
     }
 
-    this.repository.create(userWithId);
+    this.repository.create(userWithIdAndHashPassword);
 
-    this.roleAssigner.assignRoleToUser(userWithId.getRoleList(), Arrays.asList(generatedId));
+    this.roleAssigner.assignRoleToUser(
+        userWithIdAndHashPassword.getRoleIds(), Collections.singletonList(generatedId));
 
-    this.extensionsNotifier.notifyCreated(userWithId);
+    this.extensionsNotifier.notifyCreated(userWithIdAndHashPassword);
 
-    return userWithId.getId().get();
+    return userWithIdAndHashPassword.getId().orElse("");
   }
 
   private void validateAnchor(User newUser) {
