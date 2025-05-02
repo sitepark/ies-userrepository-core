@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +56,7 @@ public final class User {
     this.gender = builder.gender;
     this.description = builder.description;
     this.validity = builder.validity;
-    this.identities = builder.identities;
+    this.identities = List.copyOf(builder.identities);
     this.roleIds = Collections.unmodifiableList(builder.roleIds);
     this.createdAt = builder.createdAt;
     this.changedAt = builder.changedAt;
@@ -137,7 +136,6 @@ public final class User {
     return this.validity;
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<Identity> getIdentities() {
     return this.identities;
   }
@@ -151,7 +149,6 @@ public final class User {
     return Optional.empty();
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<String> getRoleIds() {
     return this.roleIds;
   }

@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,7 +15,6 @@ public final class And implements Filter {
     this.and = List.of(and);
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<Filter> getAnd() {
     return this.and;
   }
