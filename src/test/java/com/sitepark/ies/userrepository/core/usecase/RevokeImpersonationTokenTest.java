@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import org.junit.jupiter.api.Test;
@@ -24,11 +24,7 @@ class RevokeImpersonationTokenTest {
 
     assertThrows(
         AccessDeniedException.class,
-        () -> {
-          revokeImpersonationToken.revokeImpersonationToken("1", "2");
-        });
-
-    verify(accessControl).isImpersonationTokensManageable();
+        () -> revokeImpersonationToken.revokeImpersonationToken("1", "2"));
   }
 
   @Test

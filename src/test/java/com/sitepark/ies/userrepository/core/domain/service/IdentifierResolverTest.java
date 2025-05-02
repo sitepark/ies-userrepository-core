@@ -6,14 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Anchor;
-import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
-import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
+import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.exception.AnchorNotFoundException;
+import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class IdentifierResolverTest {
 
   @Test
@@ -51,10 +50,6 @@ class IdentifierResolverTest {
     when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
     IdentifierResolver resolver = new IdentifierResolver(repository);
 
-    assertThrows(
-        AnchorNotFoundException.class,
-        () -> {
-          resolver.resolveIdentifier(identifier);
-        });
+    assertThrows(AnchorNotFoundException.class, () -> resolver.resolveIdentifier(identifier));
   }
 }

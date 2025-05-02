@@ -1,6 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
-import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
+import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import jakarta.inject.Inject;
@@ -13,7 +13,7 @@ public class RevokeImpersonationToken {
 
   private final AccessControl accessControl;
 
-  private static Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOGGER = LogManager.getLogger();
 
   @Inject
   protected RevokeImpersonationToken(
