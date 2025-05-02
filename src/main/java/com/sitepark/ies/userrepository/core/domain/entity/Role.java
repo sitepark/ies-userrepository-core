@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +50,6 @@ public final class Role {
     return this.description;
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<Identifier> getPrivilegeIds() {
     return this.privilegeIds;
   }

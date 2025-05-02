@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,7 +83,6 @@ public final class AccessToken {
     return Optional.ofNullable(this.lastUsed);
   }
 
-  @SuppressFBWarnings("EI_EXPOSE_REP")
   public List<String> getScopeList() {
     return this.scopeList;
   }
