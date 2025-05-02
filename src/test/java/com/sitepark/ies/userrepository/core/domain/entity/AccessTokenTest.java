@@ -21,7 +21,6 @@ import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals"})
 @SuppressFBWarnings({
   "PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
   "NP_NULL_PARAM_DEREF_NONVIRTUAL",
@@ -34,212 +33,150 @@ class AccessTokenTest {
   private static final String TOKEN_NAME = "Test Token";
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEquals() {
     EqualsVerifier.forClass(AccessToken.class).verify();
   }
 
   @Test
-  void testSetUser() throws JsonProcessingException {
+  void testSetUser() {
     AccessToken accessToken = AccessToken.builder().user("345").name(TOKEN_NAME).build();
     assertEquals("345", accessToken.getUser(), "wrong user");
   }
 
   @Test
-  void testSetUserWithNull() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().user(null);
-        });
+  void testSetUserWithNull() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().user(null));
   }
 
   @Test
-  void testSetUserWithZero() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().user("0");
-        });
+  void testSetUserWithZero() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().user("0"));
   }
 
   @Test
-  void testSetUserWithInvalidValue() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().user("1x");
-        });
+  void testSetUserWithInvalidValue() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().user("1x"));
   }
 
   @Test
-  void testSetName() throws JsonProcessingException {
+  void testSetName() {
     AccessToken accessToken = AccessToken.builder().user("345").name(TOKEN_NAME).build();
     assertEquals(TOKEN_NAME, accessToken.getName(), "wrong name");
   }
 
   @Test
-  void testSetNullName() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().name(null);
-        });
+  void testSetNullName() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().name(null));
   }
 
   @Test
-  void testSetBlankName() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().name(" ");
-        });
+  void testSetBlankName() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().name(" "));
   }
 
   @Test
-  void testBuildUserNotSet() throws JsonProcessingException {
-    assertThrows(
-        IllegalStateException.class,
-        () -> {
-          AccessToken.builder().name(TOKEN_NAME).build();
-        });
+  void testBuildUserNotSet() {
+    assertThrows(IllegalStateException.class, () -> AccessToken.builder().name(TOKEN_NAME).build());
   }
 
   @Test
-  void testBuildNameNotSet() throws JsonProcessingException {
-    assertThrows(
-        IllegalStateException.class,
-        () -> {
-          AccessToken.builder().user("123").build();
-        });
+  void testBuildNameNotSet() {
+    assertThrows(IllegalStateException.class, () -> AccessToken.builder().user("123").build());
   }
 
   @Test
-  void testSetId() throws JsonProcessingException {
+  void testSetId() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().id("123").build();
-    assertEquals("123", accessToken.getId().get(), "wrong id");
+    assertEquals("123", accessToken.getId().orElse(""), "wrong id");
   }
 
   @Test
-  void testGetEmptyId() throws JsonProcessingException {
+  void testGetEmptyId() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().build();
     assertTrue(accessToken.getId().isEmpty(), "id should be empty");
   }
 
   @Test
-  void testSetIdWithNull() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().id(null);
-        });
+  void testSetIdWithNull() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().id(null));
   }
 
   @Test
-  void testSetIdWithZero() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().id("0");
-        });
+  void testSetIdWithZero() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().id("0"));
   }
 
   @Test
-  void testSetIdWithInvalidValue() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().id("1x");
-        });
+  void testSetIdWithInvalidValue() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().id("1x"));
   }
 
   @Test
-  void testSetToken() throws JsonProcessingException {
+  void testSetToken() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().token("abc").build();
-    assertEquals("abc", accessToken.getToken().get(), "wrong token");
+    assertEquals("abc", accessToken.getToken().orElse(""), "wrong token");
   }
 
   @Test
-  void testSetNullToken() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().token(null);
-        });
+  void testSetNullToken() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().token(null));
   }
 
   @Test
-  void testSetBlankToken() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().token(" ");
-        });
+  void testSetBlankToken() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().token(" "));
   }
 
   @Test
-  void testSetCreatedAt() throws JsonProcessingException {
+  void testSetCreatedAt() {
 
     OffsetDateTime createdAt =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
     AccessToken accessToken = this.createBuilderWithRequiredValues().createdAt(createdAt).build();
 
-    assertEquals(createdAt, accessToken.getCreatedAt().get(), "unexpected createAt");
+    assertEquals(createdAt, accessToken.getCreatedAt().orElse(null), "unexpected createAt");
   }
 
   @Test
-  void testSetNullCreatedAt() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().createdAt(null);
-        });
+  void testSetNullCreatedAt() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().createdAt(null));
   }
 
   @Test
-  void testSetExpiresAt() throws JsonProcessingException {
+  void testSetExpiresAt() {
 
     OffsetDateTime expiresAt =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
     AccessToken accessToken = this.createBuilderWithRequiredValues().expiresAt(expiresAt).build();
 
-    assertEquals(expiresAt, accessToken.getExpiresAt().get(), "unexpected expiresAt");
+    assertEquals(expiresAt, accessToken.getExpiresAt().orElse(null), "unexpected expiresAt");
   }
 
   @Test
-  void testSetNullExpiresAt() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().expiresAt(null);
-        });
+  void testSetNullExpiresAt() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().expiresAt(null));
   }
 
   @Test
-  void testSetLastUsed() throws JsonProcessingException {
+  void testSetLastUsed() {
 
     OffsetDateTime lastUsed =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
 
     AccessToken accessToken = this.createBuilderWithRequiredValues().lastUsed(lastUsed).build();
 
-    assertEquals(lastUsed, accessToken.getLastUsed().get(), "unexpected lastUsed");
+    assertEquals(lastUsed, accessToken.getLastUsed().orElse(null), "unexpected lastUsed");
   }
 
   @Test
-  void testSetNullLastUsed() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().lastUsed(null);
-        });
+  void testSetNullLastUsed() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().lastUsed(null));
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-  void testSetScopeListViaList() throws JsonProcessingException {
+  void testSetScopeListViaList() {
     AccessToken accessToken =
         this.createBuilderWithRequiredValues().scopeList(Arrays.asList("a", "b")).build();
 
@@ -247,35 +184,27 @@ class AccessTokenTest {
   }
 
   @Test
-  void testSetNullScopeListViaList() throws JsonProcessingException {
+  void testSetNullScopeListViaList() {
     assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().scopeList((List<String>) null);
-        });
+        NullPointerException.class, () -> AccessToken.builder().scopeList((List<String>) null));
   }
 
   @Test
-  void testSetNullScopeViaList() throws JsonProcessingException {
+  void testSetNullScopeViaList() {
     assertThrows(
         NullPointerException.class,
-        () -> {
-          AccessToken.builder().scopeList(Arrays.asList("a", null));
-        });
+        () -> AccessToken.builder().scopeList(Arrays.asList("a", null)));
   }
 
   @Test
-  void testSetBlankScopeListViaList() throws JsonProcessingException {
+  void testSetBlankScopeListViaList() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().scopeList(Arrays.asList("a", " "));
-        });
+        () -> AccessToken.builder().scopeList(Arrays.asList("a", " ")));
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-  void testOverwriteScopeListViaList() throws JsonProcessingException {
+  void testOverwriteScopeListViaList() {
     AccessToken accessToken =
         this.createBuilderWithRequiredValues().scopeList(Arrays.asList("a", "b")).build();
 
@@ -285,16 +214,14 @@ class AccessTokenTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-  void testSetScopeListViaVArgs() throws JsonProcessingException {
+  void testSetScopeListViaVArgs() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().scopeList("a", "b").build();
 
     assertEquals(Arrays.asList("a", "b"), accessToken.getScopeList(), "unexpected scopeList");
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-  void testOverwriteScopeListViaVArgs() throws JsonProcessingException {
+  void testOverwriteScopeListViaVArgs() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().scopeList("a", "b").build();
     AccessToken overwritten = accessToken.toBuilder().scopeList("c", "d").build();
 
@@ -302,35 +229,23 @@ class AccessTokenTest {
   }
 
   @Test
-  void testSetNullScopeListViaVArgs() throws JsonProcessingException {
+  void testSetNullScopeListViaVArgs() {
     assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().scopeList((String[]) null);
-        });
+        NullPointerException.class, () -> AccessToken.builder().scopeList((String[]) null));
   }
 
   @Test
-  void testSetNullScopeViaVArgs() throws JsonProcessingException {
-    assertThrows(
-        NullPointerException.class,
-        () -> {
-          AccessToken.builder().scopeList("a", null);
-        });
+  void testSetNullScopeViaVArgs() {
+    assertThrows(NullPointerException.class, () -> AccessToken.builder().scopeList("a", null));
   }
 
   @Test
-  void testSetBlankScopeViaVArgs() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().scopeList("a", " ");
-        });
+  void testSetBlankScopeViaVArgs() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().scopeList("a", " "));
   }
 
   @Test
-  @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-  void testAddScope() throws JsonProcessingException {
+  void testAddScope() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().scopeList("a", "b").build();
 
     AccessToken addition = accessToken.toBuilder().scope("c").build();
@@ -339,55 +254,48 @@ class AccessTokenTest {
   }
 
   @Test
-  void testAddNullScope() throws JsonProcessingException {
+  void testAddNullScope() {
     assertThrows(
-        NullPointerException.class,
-        () -> {
-          this.createBuilderWithRequiredValues().scope(null);
-        });
+        NullPointerException.class, () -> this.createBuilderWithRequiredValues().scope(null));
   }
 
   @Test
-  void testAddBlankScope() throws JsonProcessingException {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          AccessToken.builder().scope(" ");
-        });
+  void testAddBlankScope() {
+    assertThrows(IllegalArgumentException.class, () -> AccessToken.builder().scope(" "));
   }
 
   @Test
-  void testSetImpersonationTrue() throws JsonProcessingException {
+  void testSetImpersonationTrue() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().impersonation(true).build();
     assertTrue(accessToken.isImpersonation(), "unexpected impersonation");
   }
 
   @Test
-  void testSetImpersonationFalse() throws JsonProcessingException {
+  void testSetImpersonationFalse() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().impersonation(false).build();
     assertFalse(accessToken.isImpersonation(), "unexpected impersonation");
   }
 
   @Test
-  void testSetActiveTrue() throws JsonProcessingException {
+  void testSetActiveTrue() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().active(true).build();
     assertTrue(accessToken.isActive(), "unexpected active");
   }
 
   @Test
-  void testSetActiveFalse() throws JsonProcessingException {
+  void testSetActiveFalse() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().active(false).build();
     assertFalse(accessToken.isActive(), "unexpected active");
   }
 
   @Test
-  void testSetRevokedTrue() throws JsonProcessingException {
+  void testSetRevokedTrue() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().revoked(true).build();
     assertTrue(accessToken.isRevoked(), "unexpected revoked");
   }
 
   @Test
-  void testSetRevokedFalse() throws JsonProcessingException {
+  void testSetRevokedFalse() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().revoked(false).build();
     assertFalse(accessToken.isRevoked(), "unexpected revoked");
   }
@@ -423,17 +331,17 @@ class AccessTokenTest {
 
     String expected =
         """
-    	{\
-    	"id":"123",\
-    	"user":"345",\
-    	"name":"Test Token",\
-    	"createdAt":"2023-08-21T00:00:00+02:00",\
-    	"expiresAt":"2023-12-12T00:00:00+01:00",\
-    	"lastUsed":"2023-08-25T00:00:00+02:00",\
-    	"impersonation":true,\
-    	"active":true,\
-    	"revoked":false\
-    	}""";
+		{\
+		"id":"123",\
+		"user":"345",\
+		"name":"Test Token",\
+		"createdAt":"2023-08-21T00:00:00+02:00",\
+		"expiresAt":"2023-12-12T00:00:00+01:00",\
+		"lastUsed":"2023-08-25T00:00:00+02:00",\
+		"impersonation":true,\
+		"active":true,\
+		"revoked":false\
+		}""";
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -448,17 +356,17 @@ class AccessTokenTest {
 
     String json =
         """
-    	{\
-    	"id":123,\
-    	"user":345,\
-    	"name":"Test Token",\
-    	"createdAt":"2023-08-21T00:00:00+02:00",\
-    	"expiresAt":"2023-12-12T00:00:00+01:00",\
-    	"lastUsed":"2023-08-25T00:00:00+02:00",\
-    	"impersonation":true,\
-    	"active":true,\
-    	"revoked":false\
-    	}""";
+        {\
+        "id":123,\
+        "user":345,\
+        "name":"Test Token",\
+        "createdAt":"2023-08-21T00:00:00+02:00",\
+        "expiresAt":"2023-12-12T00:00:00+01:00",\
+        "lastUsed":"2023-08-25T00:00:00+02:00",\
+        "impersonation":true,\
+        "active":true,\
+        "revoked":false\
+        }""";
 
     AccessToken accessToken = mapper.readValue(json, AccessToken.class);
 
