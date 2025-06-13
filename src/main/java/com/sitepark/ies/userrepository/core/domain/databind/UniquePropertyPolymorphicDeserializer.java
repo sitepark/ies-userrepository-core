@@ -1,4 +1,4 @@
-package com.sitepark.ies.userrepository.core.domain.entity.databind;
+package com.sitepark.ies.userrepository.core.domain.databind;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.io.Serial;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -45,10 +44,8 @@ public class UniquePropertyPolymorphicDeserializer<T> extends StdDeserializer<T>
 
     ObjectMapper mapper = (ObjectMapper) jp.getCodec();
     ObjectNode obj = mapper.readTree(jp);
-    Iterator<Entry<String, JsonNode>> elementsIterator = obj.fields();
 
-    while (elementsIterator.hasNext()) {
-      Entry<String, JsonNode> element = elementsIterator.next();
+    for (Entry<String, JsonNode> element : obj.properties()) {
       String name = element.getKey();
       if (registry.containsKey(name)) {
         clazz = registry.get(name);

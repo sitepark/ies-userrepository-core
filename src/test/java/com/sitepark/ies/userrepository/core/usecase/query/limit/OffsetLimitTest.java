@@ -1,10 +1,9 @@
 package com.sitepark.ies.userrepository.core.usecase.query.limit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
-import java.util.Optional;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -23,15 +22,23 @@ class OffsetLimitTest {
   }
 
   @Test
-  void testNullOffset() {
-    OffsetLimit offsetLimit = new OffsetLimit(null, null);
-    assertEquals(0, offsetLimit.getOffset(), "Offset should be 0");
+  void testInvalidOffset() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          new OffsetLimit(-1, 0);
+        },
+        "Offset must be >= 0, but was: -1");
   }
 
   @Test
-  void testNullLimit() {
-    OffsetLimit offsetLimit = new OffsetLimit(null, null);
-    assertTrue(offsetLimit.getLimit().isEmpty(), "Limit should be empty");
+  void testInvalidLimit() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          new OffsetLimit(0, -1);
+        },
+        "Limit must be >= 0, but was: -1");
   }
 
   @Test
@@ -43,6 +50,6 @@ class OffsetLimitTest {
   @Test
   void testLimit() {
     OffsetLimit offsetLimit = new OffsetLimit(1, 2);
-    assertEquals(Optional.of(2), offsetLimit.getLimit(), "Limit should be 2");
+    assertEquals(2, offsetLimit.getLimit(), "Limit should be 2");
   }
 }

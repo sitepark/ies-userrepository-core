@@ -3,7 +3,7 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +34,10 @@ public final class Role {
     this.privilegeIds = Collections.unmodifiableList(builder.privilegeIds);
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public String getId() {
     return this.id;
   }
@@ -52,10 +56,6 @@ public final class Role {
 
   public List<Identifier> getPrivilegeIds() {
     return this.privilegeIds;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {
@@ -100,15 +100,11 @@ public final class Role {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private String id;
-
-    private Anchor anchor;
-
-    private String name;
-
-    private String description;
-
     private final List<Identifier> privilegeIds = new ArrayList<>();
+    private String id;
+    private Anchor anchor;
+    private String name;
+    private String description;
 
     private Builder() {}
 
@@ -130,12 +126,12 @@ public final class Role {
     }
 
     public Builder identifier(Identifier identifier) {
-      assert identifier.getId().isPresent() || identifier.getAnchor().isPresent();
-      if (identifier.getAnchor().isPresent()) {
-        this.anchor = identifier.getAnchor().get();
+      assert identifier.getId() != null || identifier.getAnchor() != null;
+      if (identifier.getAnchor() != null) {
+        this.anchor = identifier.getAnchor();
         return this;
       }
-      this.id = identifier.getId().get();
+      this.id = identifier.getId();
       return this;
     }
 

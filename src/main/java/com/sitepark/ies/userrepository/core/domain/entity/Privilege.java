@@ -3,8 +3,9 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import java.util.*;
 
 /**
@@ -33,6 +34,10 @@ public final class Privilege {
     this.permission = builder.permission;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public String getId() {
     return this.id;
   }
@@ -55,10 +60,6 @@ public final class Privilege {
 
   public Permission getPermission() {
     return this.permission;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {
@@ -112,16 +113,11 @@ public final class Privilege {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private String id;
-
-    private Anchor anchor;
-
-    private String name;
-
-    private String description;
-
     private final Set<String> roleIds = new HashSet<>();
-
+    private String id;
+    private Anchor anchor;
+    private String name;
+    private String description;
     private Permission permission;
 
     private Builder() {}
@@ -145,12 +141,12 @@ public final class Privilege {
     }
 
     public Builder identifier(Identifier identifier) {
-      assert identifier.getId().isPresent() || identifier.getAnchor().isPresent();
-      if (identifier.getAnchor().isPresent()) {
-        this.anchor = identifier.getAnchor().get();
+      assert identifier.getId() != null || identifier.getAnchor() != null;
+      if (identifier.getAnchor() != null) {
+        this.anchor = identifier.getAnchor();
         return this;
       }
-      this.id = identifier.getId().get();
+      this.id = identifier.getId();
       return this;
     }
 

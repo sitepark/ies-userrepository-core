@@ -1,4 +1,4 @@
-package com.sitepark.ies.userrepository.core.domain.entity.databind;
+package com.sitepark.ies.userrepository.core.domain.databind;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class UniquePropertyPolymorphicDeserializerTest {
@@ -35,12 +35,11 @@ class UniquePropertyPolymorphicDeserializerTest {
 
     Entry<String, JsonNode> element = mock();
 
-    Iterator<Entry<String, JsonNode>> elementsIterator =
-        Collections.singletonList(element).iterator();
+    Set<Entry<String, JsonNode>> properties = Collections.singleton(element);
 
     when(mapper.readTree(any(JsonParser.class))).thenReturn(obj);
     when(jp.getCodec()).thenReturn(mapper);
-    when(obj.fields()).thenReturn(elementsIterator);
+    when(obj.properties()).thenReturn(properties);
     when(element.getKey()).thenReturn("c");
 
     deserializer.deserialize(jp, context);
@@ -65,12 +64,11 @@ class UniquePropertyPolymorphicDeserializerTest {
 
     Entry<String, JsonNode> element = mock();
 
-    Iterator<Entry<String, JsonNode>> elementsIterator =
-        Collections.singletonList(element).iterator();
+    Set<Entry<String, JsonNode>> properties = Collections.singleton(element);
 
     when(mapper.readTree(any(JsonParser.class))).thenReturn(obj);
     when(jp.getCodec()).thenReturn(mapper);
-    when(obj.fields()).thenReturn(elementsIterator);
+    when(obj.properties()).thenReturn(properties);
     when(element.getKey()).thenReturn("d");
 
     deserializer.deserialize(jp, context);

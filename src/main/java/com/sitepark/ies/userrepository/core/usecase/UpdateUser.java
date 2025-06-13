@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
-import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
+import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
@@ -17,17 +18,12 @@ import org.apache.logging.log4j.Logger;
 
 public final class UpdateUser {
 
-  private final UserRepository repository;
-
-  private final IdentifierResolver identifierResolver;
-
-  private final RoleAssigner roleAssigner;
-
-  private final AccessControl accessControl;
-
-  private final ExtensionsNotifier extensionsNotifier;
-
   private static final Logger LOGGER = LogManager.getLogger();
+  private final UserRepository repository;
+  private final IdentifierResolver identifierResolver;
+  private final RoleAssigner roleAssigner;
+  private final AccessControl accessControl;
+  private final ExtensionsNotifier extensionsNotifier;
 
   @Inject
   UpdateUser(
@@ -46,8 +42,10 @@ public final class UpdateUser {
   public String updateUser(User user) {
 
     User updateUser = this.buildUserWithId(user);
-    assert updateUser.getId().isPresent();
-    String id = updateUser.getId().get();
+    if (updateUser.getId() == null) {
+      throw new IllegalArgumentException("The ID of the user must be set when updating.");
+    }
+    String id = updateUser.getId();
     this.validateWritable();
     User storedUser = this.loadStoredUser(id);
     this.validateLogin(updateUser);
@@ -65,7 +63,7 @@ public final class UpdateUser {
       LOGGER.info("update: {}", joinedUpdateUser);
     }
 
-    this.roleAssigner.reassignRoleToUser(joinedUpdateUser.getRoleIds(), List.of(id));
+    this.roleAssigner.reassignUsersToRoles(joinedUpdateUser.getRoleIds(), List.of(id));
 
     this.repository.update(joinedUpdateUser);
 
@@ -76,12 +74,13 @@ public final class UpdateUser {
 
   private User buildUserWithId(User user) {
 
-    if (user.getIdentifier().isEmpty()) {
+    Identifier identifier = user.getIdentifier();
+    if (identifier == null) {
       throw new IllegalArgumentException(
           "For users to be updated neither an id nor an anchor is set");
     }
 
-    String id = this.identifierResolver.resolveIdentifier(user.getIdentifier().get());
+    String id = this.identifierResolver.resolveIdentifier(identifier);
 
     return user.toBuilder().id(id).build();
   }
@@ -95,22 +94,22 @@ public final class UpdateUser {
   private User loadStoredUser(String id) {
     User storedUser = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));
 
-    assert storedUser.getId().isPresent();
-    List<String> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
+    assert storedUser.getId() != null;
+    List<String> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId());
     return storedUser.toBuilder().roleIds(roles).build();
   }
 
   private void validateLogin(User user) {
     Optional<String> resolveLogin = this.repository.resolveLogin(user.getLogin());
-    if (resolveLogin.isPresent() && !resolveLogin.equals(user.getId())) {
+    if (resolveLogin.isPresent() && !resolveLogin.get().equals(user.getId())) {
       throw new LoginAlreadyExistsException(user.getLogin(), resolveLogin.get());
     }
   }
 
   private User joinForUpdate(User storedUser, User updateUser) {
 
-    if (updateUser.getAnchor().isEmpty() && storedUser.getAnchor().isPresent()) {
-      return updateUser.toBuilder().anchor(storedUser.getAnchor().get()).build();
+    if (updateUser.getAnchor() == null && storedUser.getAnchor() != null) {
+      return updateUser.toBuilder().anchor(storedUser.getAnchor()).build();
     }
 
     return updateUser;

@@ -2,25 +2,30 @@ package com.sitepark.ies.userrepository.core.usecase.query.limit;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
-import java.util.Optional;
 
 public final class OffsetLimit implements Limit {
 
-  private final Integer offset;
+  private final int offset;
 
-  private final Integer limit;
+  private final int limit;
 
-  OffsetLimit(@JsonProperty("offset") Integer offset, @JsonProperty("limit") Integer limit) {
-    this.offset = (offset == null) ? Integer.valueOf(0) : offset;
+  OffsetLimit(@JsonProperty("offset") int offset, @JsonProperty("limit") int limit) {
+    if (offset < 0) {
+      throw new IllegalArgumentException("Offset must be >= 0, but was: " + offset);
+    }
+    if (limit < 0) {
+      throw new IllegalArgumentException("Limit must be >= 0, but was: " + limit);
+    }
+    this.offset = offset;
     this.limit = limit;
   }
 
-  public Integer getOffset() {
+  public int getOffset() {
     return this.offset;
   }
 
-  public Optional<Integer> getLimit() {
-    return Optional.ofNullable(this.limit);
+  public int getLimit() {
+    return this.limit;
   }
 
   @Override

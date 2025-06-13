@@ -1,8 +1,8 @@
-package com.sitepark.ies.userrepository.core.domain.entity.identity;
+package com.sitepark.ies.userrepository.core.domain.value.identity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.sitepark.ies.userrepository.core.domain.entity.Identity;
+import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import java.util.Objects;
 
 /**

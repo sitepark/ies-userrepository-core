@@ -1,6 +1,6 @@
 package com.sitepark.ies.userrepository.core.port;
 
-import com.sitepark.ies.userrepository.core.domain.entity.Password;
+import com.sitepark.ies.userrepository.core.domain.value.Password;
 
 public interface PasswordHasher {
   Password hash(String password);

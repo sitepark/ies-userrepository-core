@@ -128,7 +128,7 @@ class AuthenticateByTokenTest {
     var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
     User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
-    assertEquals(user.getId().orElse(""), authenticatedUser.getId().orElse(""), "unexpected user");
+    assertEquals(user.getId(), authenticatedUser.getId(), "unexpected user");
   }
 
   @Test
@@ -151,6 +151,6 @@ class AuthenticateByTokenTest {
     var authenticateByToken = new AuthenticateByToken(accessTokenRepository, userRepository);
 
     User authenticatedUser = authenticateByToken.authenticateByToken(TOKEN_STRING);
-    assertEquals(user.getId().orElse(""), authenticatedUser.getId().orElse(""), "unexpected user");
+    assertEquals(user.getId(), authenticatedUser.getId(), "unexpected user");
   }
 }

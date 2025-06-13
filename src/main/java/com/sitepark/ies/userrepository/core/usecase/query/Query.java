@@ -6,6 +6,7 @@ import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.usecase.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.usecase.query.sort.SortCriteria;
 import java.util.*;
+import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = Query.Builder.class)
 public final class Query {
@@ -22,16 +23,22 @@ public final class Query {
     this.limit = builder.limit;
   }
 
-  public Optional<Filter> getFilter() {
-    return Optional.ofNullable(this.filter);
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  @Nullable
+  public Filter getFilter() {
+    return this.filter;
   }
 
   public List<SortCriteria> getSort() {
     return this.sort;
   }
 
-  public Optional<Limit> getLimit() {
-    return Optional.ofNullable(this.limit);
+  @Nullable
+  public Limit getLimit() {
+    return this.limit;
   }
 
   @Override
@@ -49,10 +56,6 @@ public final class Query {
     return Objects.equals(this.filter, that.filter)
         && Objects.equals(this.sort, that.sort)
         && Objects.equals(this.limit, that.limit);
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {

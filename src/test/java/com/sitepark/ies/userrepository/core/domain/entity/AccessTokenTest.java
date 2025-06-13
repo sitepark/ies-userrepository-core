@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -87,13 +88,13 @@ class AccessTokenTest {
   @Test
   void testSetId() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().id("123").build();
-    assertEquals("123", accessToken.getId().orElse(""), "wrong id");
+    assertEquals("123", accessToken.getId(), "wrong id");
   }
 
   @Test
   void testGetEmptyId() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().build();
-    assertTrue(accessToken.getId().isEmpty(), "id should be empty");
+    assertNull(accessToken.getId(), "id should be null");
   }
 
   @Test
@@ -114,7 +115,7 @@ class AccessTokenTest {
   @Test
   void testSetToken() {
     AccessToken accessToken = this.createBuilderWithRequiredValues().token("abc").build();
-    assertEquals("abc", accessToken.getToken().orElse(""), "wrong token");
+    assertEquals("abc", accessToken.getToken(), "wrong token");
   }
 
   @Test
@@ -135,7 +136,7 @@ class AccessTokenTest {
 
     AccessToken accessToken = this.createBuilderWithRequiredValues().createdAt(createdAt).build();
 
-    assertEquals(createdAt, accessToken.getCreatedAt().orElse(null), "unexpected createAt");
+    assertEquals(createdAt, accessToken.getCreatedAt(), "unexpected createAt");
   }
 
   @Test
@@ -151,7 +152,7 @@ class AccessTokenTest {
 
     AccessToken accessToken = this.createBuilderWithRequiredValues().expiresAt(expiresAt).build();
 
-    assertEquals(expiresAt, accessToken.getExpiresAt().orElse(null), "unexpected expiresAt");
+    assertEquals(expiresAt, accessToken.getExpiresAt(), "unexpected expiresAt");
   }
 
   @Test
@@ -167,7 +168,7 @@ class AccessTokenTest {
 
     AccessToken accessToken = this.createBuilderWithRequiredValues().lastUsed(lastUsed).build();
 
-    assertEquals(lastUsed, accessToken.getLastUsed().orElse(null), "unexpected lastUsed");
+    assertEquals(lastUsed, accessToken.getLastUsed(), "unexpected lastUsed");
   }
 
   @Test
@@ -331,17 +332,18 @@ class AccessTokenTest {
 
     String expected =
         """
-		{\
-		"id":"123",\
-		"user":"345",\
-		"name":"Test Token",\
-		"createdAt":"2023-08-21T00:00:00+02:00",\
-		"expiresAt":"2023-12-12T00:00:00+01:00",\
-		"lastUsed":"2023-08-25T00:00:00+02:00",\
-		"impersonation":true,\
-		"active":true,\
-		"revoked":false\
-		}""";
+        {\
+        "id":"123",\
+        "user":"345",\
+        "name":"Test Token",\
+        "createdAt":"2023-08-21T00:00:00+02:00",\
+        "expiresAt":"2023-12-12T00:00:00+01:00",\
+        "lastUsed":"2023-08-25T00:00:00+02:00",\
+        "impersonation":true,\
+        "active":true,\
+        "revoked":false\
+        }\
+        """;
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -366,7 +368,8 @@ class AccessTokenTest {
         "impersonation":true,\
         "active":true,\
         "revoked":false\
-        }""";
+        }\
+        """;
 
     AccessToken accessToken = mapper.readValue(json, AccessToken.class);
 

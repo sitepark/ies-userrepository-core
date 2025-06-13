@@ -1,4 +1,4 @@
-package com.sitepark.ies.userrepository.core.domain.entity.databind;
+package com.sitepark.ies.userrepository.core.domain.databind;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;

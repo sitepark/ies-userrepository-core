@@ -10,12 +10,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
-import com.sitepark.ies.sharedkernel.anchor.exception.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.security.exceptions.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.entity.Password;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
+import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
+import com.sitepark.ies.userrepository.core.domain.value.Password;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.IdGenerator;
@@ -105,7 +105,7 @@ class CreateUserTest {
     User effectiveUser = User.builder().id("123").login("test").roleIds("333").build();
 
     verify(repository).create(eq(effectiveUser));
-    verify(roleAssigner).assignRoleToUser(List.of("333"), List.of("123"));
+    verify(roleAssigner).assignUsersToRoles(List.of("333"), List.of("123"));
   }
 
   @Test

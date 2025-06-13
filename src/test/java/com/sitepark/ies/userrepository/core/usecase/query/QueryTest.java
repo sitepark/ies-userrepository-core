@@ -24,14 +24,14 @@ class QueryTest {
   void testSetFilter() {
     Filter filter = mock();
     Query query = Query.builder().filter(filter).build();
-    assertEquals(filter, query.getFilter().orElse(null), "Unexpected filter");
+    assertEquals(filter, query.getFilter(), "Unexpected filter");
   }
 
   @Test
   void testSetLimit() {
     Limit limit = mock();
     Query query = Query.builder().limit(limit).build();
-    assertEquals(limit, query.getLimit().orElse(null), "Unexpected limit");
+    assertEquals(limit, query.getLimit(), "Unexpected limit");
   }
 
   @Test

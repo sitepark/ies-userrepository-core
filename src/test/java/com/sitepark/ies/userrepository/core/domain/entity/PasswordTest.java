@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.sitepark.ies.userrepository.core.domain.value.Password;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,6 @@
 package com.sitepark.ies.userrepository.core.port;
 
-import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.usecase.query.Query;
 import com.sitepark.ies.userrepository.core.usecase.query.Result;

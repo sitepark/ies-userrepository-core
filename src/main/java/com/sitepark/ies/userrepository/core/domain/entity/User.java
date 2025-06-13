@@ -4,14 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.userrepository.core.domain.value.GenderType;
+import com.sitepark.ies.userrepository.core.domain.value.Identity;
+import com.sitepark.ies.userrepository.core.domain.value.Password;
+import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 /** Represents user */
 @JsonDeserialize(builder = User.Builder.class)
@@ -57,44 +60,53 @@ public final class User {
     this.description = builder.description;
     this.validity = builder.validity;
     this.identities = List.copyOf(builder.identities);
-    this.roleIds = Collections.unmodifiableList(builder.roleIds);
+    this.roleIds = List.copyOf(builder.roleIds);
     this.createdAt = builder.createdAt;
     this.changedAt = builder.changedAt;
   }
 
-  public Optional<String> getId() {
-    return Optional.ofNullable(this.id);
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public String getId() {
+    return this.id;
   }
 
   @JsonIgnore
-  public Optional<Identifier> getIdentifier() {
+  @Nullable
+  public Identifier getIdentifier() {
     if (this.id != null) {
-      return Optional.of(Identifier.ofId(this.id));
+      return Identifier.ofId(this.id);
     }
     if (this.anchor != null) {
-      return Optional.of(Identifier.ofAnchor(this.anchor));
+      return Identifier.ofAnchor(this.anchor);
     }
-    return Optional.empty();
+    return null;
   }
 
-  public Optional<Anchor> getAnchor() {
-    return Optional.ofNullable(this.anchor);
+  @Nullable
+  public Anchor getAnchor() {
+    return this.anchor;
   }
 
   public String getLogin() {
     return this.login;
   }
 
-  public Optional<Password> getPassword() {
-    return Optional.ofNullable(this.password);
+  @Nullable
+  public Password getPassword() {
+    return this.password;
   }
 
-  public Optional<OffsetDateTime> getCreatedAt() {
-    return Optional.ofNullable(this.createdAt);
+  @Nullable
+  public OffsetDateTime getCreatedAt() {
+    return this.createdAt;
   }
 
-  public Optional<OffsetDateTime> getChangedAt() {
-    return Optional.ofNullable(this.changedAt);
+  @Nullable
+  public OffsetDateTime getChangedAt() {
+    return this.changedAt;
   }
 
   @JsonIgnore
@@ -112,24 +124,28 @@ public final class User {
     return name.toString();
   }
 
-  public Optional<String> getFirstName() {
-    return Optional.ofNullable(this.firstName);
+  @Nullable
+  public String getFirstName() {
+    return this.firstName;
   }
 
-  public Optional<String> getLastName() {
-    return Optional.ofNullable(this.lastName);
+  @Nullable
+  public String getLastName() {
+    return this.lastName;
   }
 
-  public Optional<String> getEmail() {
-    return Optional.ofNullable(this.email);
+  @Nullable
+  public String getEmail() {
+    return this.email;
   }
 
   public GenderType getGender() {
     return this.gender;
   }
 
-  public Optional<String> getDescription() {
-    return Optional.ofNullable(this.description);
+  @Nullable
+  public String getDescription() {
+    return this.description;
   }
 
   public UserValidity getValidity() {
@@ -140,21 +156,18 @@ public final class User {
     return this.identities;
   }
 
-  public <T extends Identity> Optional<T> getIdentity(Class<T> type) {
+  @Nullable
+  public <T extends Identity> T getIdentity(Class<T> type) {
     for (Identity identity : this.identities) {
       if (type.isInstance(identity)) {
-        return Optional.of(type.cast(identity));
+        return type.cast(identity);
       }
     }
-    return Optional.empty();
+    return null;
   }
 
   public List<String> getRoleIds() {
     return this.roleIds;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {
@@ -240,30 +253,18 @@ public final class User {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private String id;
-
-    private Anchor anchor;
-
-    private String login;
-
-    private Password password;
-
-    private String firstName;
-
-    private String lastName;
-
-    private String email;
-
-    private GenderType gender = GenderType.UNKNOWN;
-
-    private String description;
-
-    private UserValidity validity = UserValidity.ALWAYS_VALID;
-
     private final List<Identity> identities = new ArrayList<>();
-
     private final List<String> roleIds = new ArrayList<>();
-
+    private String id;
+    private Anchor anchor;
+    private String login;
+    private Password password;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private GenderType gender = GenderType.UNKNOWN;
+    private String description;
+    private UserValidity validity = UserValidity.ALWAYS_VALID;
     private OffsetDateTime createdAt;
 
     private OffsetDateTime changedAt;
@@ -297,12 +298,12 @@ public final class User {
     }
 
     public Builder identifier(Identifier identifier) {
-      assert identifier.getId().isPresent() || identifier.getAnchor().isPresent();
-      if (identifier.getAnchor().isPresent()) {
-        this.anchor = identifier.getAnchor().get();
+      assert identifier.getId() != null || identifier.getAnchor() != null;
+      if (identifier.getAnchor() != null) {
+        this.anchor = identifier.getAnchor();
         return this;
       }
-      this.id = identifier.getId().get();
+      this.id = identifier.getId();
       return this;
     }
 

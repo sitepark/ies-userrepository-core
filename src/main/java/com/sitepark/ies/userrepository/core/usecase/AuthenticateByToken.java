@@ -53,8 +53,8 @@ public class AuthenticateByToken {
     if (accessToken.isRevoked()) {
       throw new AccessTokenRevokedException();
     }
-    if (accessToken.getExpiresAt().isPresent()) {
-      this.checkExpirationDate(accessToken.getExpiresAt().get());
+    if (accessToken.getExpiresAt() != null) {
+      this.checkExpirationDate(accessToken.getExpiresAt());
     }
   }
 

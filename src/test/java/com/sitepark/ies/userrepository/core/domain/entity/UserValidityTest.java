@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -173,7 +174,7 @@ class UserValidityTest {
 
     UserValidity userValidity = UserValidity.builder().validFrom(validFrom).build();
 
-    assertEquals(validFrom, userValidity.getValidFrom().orElse(null), "unexpected validFrom");
+    assertEquals(validFrom, userValidity.getValidFrom(), "unexpected validFrom");
   }
 
   @Test
@@ -189,7 +190,7 @@ class UserValidityTest {
 
     UserValidity userValidity = UserValidity.builder().validTo(validTo).build();
 
-    assertEquals(validTo, userValidity.getValidTo().orElse(null), "unexpected validTo");
+    assertEquals(validTo, userValidity.getValidTo(), "unexpected validTo");
   }
 
   @Test
@@ -217,10 +218,11 @@ class UserValidityTest {
 
     String expected =
         """
-		{\
-		"blocked":false,\
-		"validFrom":"2023-08-21T00:00:00+02:00",\
-		"validTo":"2023-10-01T00:00:00+02:00"}""";
+        {\
+        "blocked":false,\
+        "validFrom":"2023-08-21T00:00:00+02:00",\
+        "validTo":"2023-10-01T00:00:00+02:00"}\
+        """;
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -235,10 +237,11 @@ class UserValidityTest {
 
     String json =
         """
-		{\
-		"blocked":false,\
-		"validFrom":"2023-08-21T00:00:00+02:00",\
-		"validTo":"2023-10-01T00:00:00+02:00"}""";
+        {\
+        "blocked":false,\
+        "validFrom":"2023-08-21T00:00:00+02:00",\
+        "validTo":"2023-10-01T00:00:00+02:00"}\
+        """;
 
     UserValidity userValidity = mapper.readValue(json, UserValidity.class);
 

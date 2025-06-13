@@ -4,8 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
-import com.sitepark.ies.sharedkernel.anchor.domain.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import java.util.List;
 import java.util.Set;
 import nl.jqno.equalsverifier.EqualsVerifier;

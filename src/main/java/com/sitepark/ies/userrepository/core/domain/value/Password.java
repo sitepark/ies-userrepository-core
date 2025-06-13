@@ -1,4 +1,4 @@
-package com.sitepark.ies.userrepository.core.domain.entity;
+package com.sitepark.ies.userrepository.core.domain.value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 /** An access token enables authentication as a user without specifying a username and password. */
 @JsonDeserialize(builder = AccessToken.Builder.class)
@@ -52,11 +52,12 @@ public final class AccessToken {
     this.revoked = builder.revoked;
   }
 
-  public Optional<String> getId() {
-    if (this.id == null) {
-      return Optional.empty();
-    }
-    return Optional.of(this.id);
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public String getId() {
+    return this.id;
   }
 
   public String getUser() {
@@ -67,20 +68,23 @@ public final class AccessToken {
     return this.name;
   }
 
-  public Optional<String> getToken() {
-    return Optional.ofNullable(this.token);
+  public String getToken() {
+    return this.token;
   }
 
-  public Optional<OffsetDateTime> getCreatedAt() {
-    return Optional.ofNullable(this.createdAt);
+  @Nullable
+  public OffsetDateTime getCreatedAt() {
+    return this.createdAt;
   }
 
-  public Optional<OffsetDateTime> getExpiresAt() {
-    return Optional.ofNullable(this.expiresAt);
+  @Nullable
+  public OffsetDateTime getExpiresAt() {
+    return this.expiresAt;
   }
 
-  public Optional<OffsetDateTime> getLastUsed() {
-    return Optional.ofNullable(this.lastUsed);
+  @Nullable
+  public OffsetDateTime getLastUsed() {
+    return this.lastUsed;
   }
 
   public List<String> getScopeList() {
@@ -97,10 +101,6 @@ public final class AccessToken {
 
   public boolean isRevoked() {
     return this.revoked;
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {
@@ -147,22 +147,14 @@ public final class AccessToken {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private String id;
-
-    private String user;
-
-    private String name;
-
-    private String token;
-
-    private OffsetDateTime createdAt;
-
-    private OffsetDateTime expiresAt;
-
-    private OffsetDateTime lastUsed;
-
     private final List<String> scopeList = new ArrayList<>();
-
+    private String id;
+    private String user;
+    private String name;
+    private String token;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime expiresAt;
+    private OffsetDateTime lastUsed;
     private boolean impersonation;
 
     private boolean active = true;

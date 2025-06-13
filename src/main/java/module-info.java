@@ -3,7 +3,8 @@
  */
 module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.domain.entity;
-  exports com.sitepark.ies.userrepository.core.domain.entity.identity;
+  exports com.sitepark.ies.userrepository.core.domain.value.identity;
+  exports com.sitepark.ies.userrepository.core.domain.value;
   exports com.sitepark.ies.userrepository.core.usecase.query;
   exports com.sitepark.ies.userrepository.core.usecase.query.sort;
   exports com.sitepark.ies.userrepository.core.usecase.query.filter;
@@ -18,12 +19,17 @@ module com.sitepark.ies.userrepository.core {
   requires com.fasterxml.jackson.datatype.jsr310;
   requires com.sitepark.ies.sharedkernel;
   requires org.apache.logging.log4j;
-  requires com.github.spotbugs.annotations;
+  requires static com.github.spotbugs.annotations;
+  requires com.fasterxml.jackson.annotation;
+  requires static org.jetbrains.annotations;
+  requires com.fasterxml.jackson.databind;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
   opens com.sitepark.ies.userrepository.core.usecase.query;
   opens com.sitepark.ies.userrepository.core.usecase.query.sort;
   opens com.sitepark.ies.userrepository.core.usecase.query.filter;
   opens com.sitepark.ies.userrepository.core.usecase.query.limit;
-  opens com.sitepark.ies.userrepository.core.domain.entity.identity;
+  opens com.sitepark.ies.userrepository.core.domain.value.identity;
+  opens com.sitepark.ies.userrepository.core.domain.value;
+  opens com.sitepark.ies.userrepository.core.usecase;
 }

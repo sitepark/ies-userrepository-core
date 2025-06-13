@@ -1,11 +1,11 @@
-package com.sitepark.ies.userrepository.core.domain.entity;
+package com.sitepark.ies.userrepository.core.domain.value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import java.util.Optional;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Encapsulates user properties indicating whether a user is blocked or has a limited validity
@@ -14,13 +14,10 @@ import java.util.Optional;
 @JsonDeserialize(builder = UserValidity.Builder.class)
 public class UserValidity {
 
-  private final boolean blocked;
-
-  private final OffsetDateTime validFrom;
-
-  private final OffsetDateTime validTo;
-
   public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
+  private final boolean blocked;
+  private final OffsetDateTime validFrom;
+  private final OffsetDateTime validTo;
 
   protected UserValidity(Builder builder) {
     this.blocked = builder.blocked;
@@ -28,16 +25,22 @@ public class UserValidity {
     this.validTo = builder.validTo;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public boolean isBlocked() {
     return this.blocked;
   }
 
-  public Optional<OffsetDateTime> getValidFrom() {
-    return Optional.ofNullable(this.validFrom);
+  @Nullable
+  public OffsetDateTime getValidFrom() {
+    return this.validFrom;
   }
 
-  public Optional<OffsetDateTime> getValidTo() {
-    return Optional.ofNullable(this.validTo);
+  @Nullable
+  public OffsetDateTime getValidTo() {
+    return this.validTo;
   }
 
   @JsonIgnore
@@ -56,10 +59,6 @@ public class UserValidity {
   @JsonIgnore
   public boolean isNowValid() {
     return this.isValid(OffsetDateTime.now());
-  }
-
-  public static Builder builder() {
-    return new Builder();
   }
 
   public Builder toBuilder() {

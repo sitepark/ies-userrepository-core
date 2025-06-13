@@ -1,6 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.query.filter;
 
-import com.sitepark.ies.userrepository.core.domain.entity.databind.UniquePropertyPolymorphicDeserializer;
+import com.sitepark.ies.userrepository.core.domain.databind.UniquePropertyPolymorphicDeserializer;
 import java.io.Serial;
 
 public class FilterDeserializer extends UniquePropertyPolymorphicDeserializer<Filter> {
