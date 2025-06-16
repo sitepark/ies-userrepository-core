@@ -30,31 +30,12 @@ public final class CreatePrivilege {
     this.accessControl = accessControl;
   }
 
+  @SuppressWarnings("PMD.UseVarargs")
   public String createPrivilege(@NotNull Privilege privilege, @Nullable String[] roleIds) {
 
-    if (privilege.getId() != null) {
-      throw new IllegalArgumentException("The ID of the privilege must not be set when creating.");
-    }
-    if (privilege.getName() == null || privilege.getName().isBlank()) {
-      throw new IllegalArgumentException("The name of the privilege must not be null or empty.");
-    }
-    if (privilege.getPermission() == null) {
-      throw new IllegalArgumentException("The permission of the privilege must not be null.");
-    }
+    this.validatePrivilege(privilege);
 
-    if (!this.accessControl.isPrivilegeCreatable()) {
-      throw new AccessDeniedException("Not allowed to create privilege " + privilege);
-    }
-
-    if (roleIds != null && roleIds.length > 0) {
-      if (!this.accessControl.isRoleWritable()) {
-        throw new AccessDeniedException(
-            "Not allowed to update role to add privilege "
-                + privilege
-                + " -> "
-                + Arrays.toString(roleIds));
-      }
-    }
+    this.checkAccessControl(privilege, roleIds);
 
     this.validateAnchor(privilege);
 
@@ -70,6 +51,33 @@ public final class CreatePrivilege {
     }
 
     return id;
+  }
+
+  private void validatePrivilege(Privilege privilege) {
+    if (privilege.getId() != null) {
+      throw new IllegalArgumentException("The ID of the privilege must not be set when creating.");
+    }
+    if (privilege.getName() == null || privilege.getName().isBlank()) {
+      throw new IllegalArgumentException("The name of the privilege must not be null or empty.");
+    }
+    if (privilege.getPermission() == null) {
+      throw new IllegalArgumentException("The permission of the privilege must not be null.");
+    }
+  }
+
+  @SuppressWarnings("PMD.UseVarargs")
+  private void checkAccessControl(Privilege privilege, @Nullable String[] roleIds) {
+    if (!this.accessControl.isPrivilegeCreatable()) {
+      throw new AccessDeniedException("Not allowed to create privilege " + privilege);
+    }
+
+    if (roleIds != null && roleIds.length > 0 && !this.accessControl.isRoleWritable()) {
+      throw new AccessDeniedException(
+          "Not allowed to update role to add privilege "
+              + privilege
+              + " -> "
+              + Arrays.toString(roleIds));
+    }
   }
 
   private void validateAnchor(Privilege privilege) {

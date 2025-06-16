@@ -8,8 +8,8 @@ import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
-import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import jakarta.inject.Inject;
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,16 +23,18 @@ public final class RemovePrivileges {
   private final PrivilegeRepository repository;
   private final AccessControl accessControl;
   private final AuditLogService auditLogService;
+  private final Clock clock;
 
   @Inject
   RemovePrivileges(
       PrivilegeRepository repository,
-      RoleAssigner roleAssigner,
       AccessControl accessControl,
-      AuditLogService auditLogService) {
+      AuditLogService auditLogService,
+      Clock clock) {
     this.repository = repository;
     this.accessControl = accessControl;
     this.auditLogService = auditLogService;
+    this.clock = clock;
   }
 
   public void removePrivileges(@NotNull List<Identifier> identifier) {
@@ -54,7 +56,7 @@ public final class RemovePrivileges {
 
     this.repository.remove(privileges.stream().map(Privilege::getId).collect(Collectors.toList()));
 
-    OffsetDateTime now = OffsetDateTime.now();
+    OffsetDateTime now = OffsetDateTime.now(this.clock);
     privileges.forEach(
         privilege ->
             this.auditLogService.createAuditLog(

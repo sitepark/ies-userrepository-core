@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
+import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
@@ -30,28 +31,12 @@ public final class UpdatePrivilege {
     this.accessControl = accessControl;
   }
 
+  @SuppressWarnings("PMD.UseVarargs")
   public String updatePrivilege(@NotNull Privilege privilege, @Nullable String[] roleIds) {
 
-    if (privilege.getName() == null || privilege.getName().isBlank()) {
-      throw new IllegalArgumentException("The name of the privilege must not be null or empty.");
-    }
-    if (privilege.getPermission() == null) {
-      throw new IllegalArgumentException("The permission of the privilege must not be null.");
-    }
+    this.validatePrivilege(privilege);
 
-    if (!this.accessControl.isPrivilegeWritable()) {
-      throw new AccessDeniedException("Not allowed to update privilege " + privilege);
-    }
-
-    if (roleIds != null && roleIds.length > 0) {
-      if (!this.accessControl.isRoleWritable()) {
-        throw new AccessDeniedException(
-            "Not allowed to update role to add privilege "
-                + privilege
-                + " -> "
-                + Arrays.toString(roleIds));
-      }
-    }
+    this.checkAccessControl(privilege, roleIds);
 
     Privilege privilegeWithId = this.toPrivilegeWithId(privilege);
 
@@ -72,18 +57,37 @@ public final class UpdatePrivilege {
     return privilegeWithId.getId();
   }
 
+  private void validatePrivilege(Privilege privilege) {
+    if (privilege.getName() == null || privilege.getName().isBlank()) {
+      throw new IllegalArgumentException("The name of the privilege must not be null or empty.");
+    }
+    if (privilege.getPermission() == null) {
+      throw new IllegalArgumentException("The permission of the privilege must not be null.");
+    }
+  }
+
+  @SuppressWarnings("PMD.UseVarargs")
+  private void checkAccessControl(Privilege privilege, @Nullable String[] roleIds) {
+    if (!this.accessControl.isPrivilegeWritable()) {
+      throw new AccessDeniedException("Not allowed to update privilege " + privilege);
+    }
+
+    if (roleIds != null && roleIds.length > 0 && !this.accessControl.isRoleWritable()) {
+      throw new AccessDeniedException(
+          "Not allowed to update role to add privilege "
+              + privilege
+              + " -> "
+              + Arrays.toString(roleIds));
+    }
+  }
+
   private Privilege toPrivilegeWithId(Privilege privilege) {
     if (privilege.getId() == null) {
       if (privilege.getAnchor() != null) {
         String id =
             this.repository
                 .resolveAnchor(privilege.getAnchor())
-                .orElseThrow(
-                    () ->
-                        new IllegalArgumentException(
-                            "The privilege cannot be updated because the anchor '"
-                                + privilege.getAnchor()
-                                + "' cannot be resolved to an ID."));
+                .orElseThrow(() -> new AnchorNotFoundException(privilege.getAnchor()));
         return privilege.toBuilder().id(id).build();
       }
       throw new IllegalArgumentException(

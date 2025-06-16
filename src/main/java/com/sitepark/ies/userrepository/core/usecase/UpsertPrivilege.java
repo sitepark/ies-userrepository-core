@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
+import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
@@ -28,23 +29,19 @@ public final class UpsertPrivilege {
     this.accessControl = accessControl;
   }
 
+  @SuppressWarnings("PMD.UseVarargs")
   public String upsertPrivilege(@NotNull Privilege privilege, @Nullable String[] roleIds) {
 
-    if (privilege.getName() == null || privilege.getName().isBlank()) {
-      throw new IllegalArgumentException("The name of the privilege must not be null or empty.");
-    }
     if (privilege.getPermission() == null) {
       throw new IllegalArgumentException("The permission of the privilege must not be null.");
     }
 
-    if (roleIds != null && roleIds.length > 0) {
-      if (!this.accessControl.isRoleWritable()) {
-        throw new AccessDeniedException(
-            "Not allowed to update role to add privilege "
-                + privilege
-                + " -> "
-                + Arrays.toString(roleIds));
-      }
+    if (roleIds != null && roleIds.length > 0 && !this.accessControl.isRoleWritable()) {
+      throw new AccessDeniedException(
+          "Not allowed to update role to add privilege "
+              + privilege
+              + " -> "
+              + Arrays.toString(roleIds));
     }
 
     Privilege privilegeResolved = this.toPrivilegeWithId(privilege);
@@ -55,6 +52,7 @@ public final class UpsertPrivilege {
     }
   }
 
+  @SuppressWarnings("PMD.UseVarargs")
   private String create(Privilege privilege, String[] roleIds) {
     if (!this.accessControl.isPrivilegeCreatable()) {
       throw new AccessDeniedException("Not allowed to create privilege " + privilege);
@@ -69,6 +67,7 @@ public final class UpsertPrivilege {
     return id;
   }
 
+  @SuppressWarnings("PMD.UseVarargs")
   private String update(Privilege privilege, String[] roleIds) {
     if (!this.accessControl.isPrivilegeWritable()) {
       throw new AccessDeniedException("Not allowed to create privilege " + privilege);
@@ -90,6 +89,15 @@ public final class UpsertPrivilege {
           .resolveAnchor(privilege.getAnchor())
           .map(s -> privilege.toBuilder().id(s).build())
           .orElse(privilege);
+    } else if (privilege.getId() != null && privilege.getAnchor() != null) {
+      this.repository
+          .resolveAnchor(privilege.getAnchor())
+          .ifPresent(
+              owner -> {
+                if (!owner.equals(privilege.getId())) {
+                  throw new AnchorAlreadyExistsException(privilege.getAnchor(), owner);
+                }
+              });
     }
     return privilege;
   }

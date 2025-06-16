@@ -9,6 +9,7 @@ import java.util.*;
 import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = Query.Builder.class)
+@SuppressWarnings("PMD.LawOfDemeter")
 public final class Query {
 
   private final Filter filter;

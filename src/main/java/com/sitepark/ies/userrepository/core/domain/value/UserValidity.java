@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
  * period.
  */
 @JsonDeserialize(builder = UserValidity.Builder.class)
+@SuppressWarnings("PMD.LawOfDemeter")
 public class UserValidity {
 
   public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();

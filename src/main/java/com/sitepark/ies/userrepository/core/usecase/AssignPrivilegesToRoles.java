@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
+import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
@@ -47,12 +48,7 @@ public final class AssignPrivilegesToRoles {
                         (anchor) ->
                             this.roleRepository
                                 .resolveAnchor(role.getAnchor())
-                                .orElseThrow(
-                                    () ->
-                                        new IllegalArgumentException(
-                                            "Role with anchor "
-                                                + role.getAnchor()
-                                                + " not found."))))
+                                .orElseThrow(() -> new AnchorNotFoundException(anchor))))
             .toList();
 
     List<String> privilegeIds =
@@ -63,12 +59,7 @@ public final class AssignPrivilegesToRoles {
                         (anchor) ->
                             this.privilegeRepository
                                 .resolveAnchor(privilege.getAnchor())
-                                .orElseThrow(
-                                    () ->
-                                        new IllegalArgumentException(
-                                            "Privilege with anchor "
-                                                + privilege.getAnchor()
-                                                + " not found."))))
+                                .orElseThrow(() -> new AnchorNotFoundException(anchor))))
             .toList();
 
     if (!this.accessControl.isRoleWritable()) {
