@@ -20,9 +20,6 @@ import java.time.ZoneOffset;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({
-  "PMD.JUnitTestContainsTooManyAsserts",
-})
 @SuppressFBWarnings({
   "PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
   "NP_NULL_PARAM_DEREF_NONVIRTUAL",
@@ -33,7 +30,6 @@ class UserValidityTest {
   private static final ZoneId ZONE_ID = ZoneId.of("Europe/Berlin");
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEquals() {
     EqualsVerifier.forClass(UserValidity.class).verify();
   }
