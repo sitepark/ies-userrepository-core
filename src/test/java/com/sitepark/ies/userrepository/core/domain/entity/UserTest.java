@@ -33,7 +33,6 @@ class UserTest {
       LdapIdentity.builder().server(2).dn("userdn").build();
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEquals() {
     EqualsVerifier.forClass(User.class).verify();
   }

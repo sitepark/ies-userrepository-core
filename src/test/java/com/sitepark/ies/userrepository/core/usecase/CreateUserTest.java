@@ -54,7 +54,6 @@ class CreateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testAnchorAlreadyExists() {
 
     UserRepository repository = mock();
@@ -109,7 +108,6 @@ class CreateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testCreateWithAnchor() {
 
     AccessControl accessControl = mock();
@@ -143,7 +141,6 @@ class CreateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testCreateWithPassword() {
 
     AccessControl accessControl = mock();

@@ -23,7 +23,6 @@ class LdapIdentityTest {
   private static final String USER_DN = "userdn";
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEquals() {
     EqualsVerifier.forClass(LdapIdentity.class).verify();
   }
@@ -66,7 +65,6 @@ class LdapIdentityTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testToBuilder() {
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();

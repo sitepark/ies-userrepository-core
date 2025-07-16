@@ -131,7 +131,6 @@ class FilterTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testDeserialize() throws Exception {
 
     ObjectMapper objectMapper = new ObjectMapper();

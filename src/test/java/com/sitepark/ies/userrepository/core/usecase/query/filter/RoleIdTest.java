@@ -6,13 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class RoleIdTest {
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEquals() {
     EqualsVerifier.forClass(RoleId.class).verify();
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testToString() {
     ToStringVerifier.forClass(RoleId.class).verify();
   }

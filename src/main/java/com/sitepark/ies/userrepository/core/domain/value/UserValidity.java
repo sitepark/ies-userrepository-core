@@ -45,7 +45,6 @@ public class UserValidity {
   }
 
   @JsonIgnore
-  @SuppressWarnings("PMD.SimplifyBooleanReturns")
   public boolean isValid(OffsetDateTime base) {
 
     Objects.requireNonNull(base, "base is null");

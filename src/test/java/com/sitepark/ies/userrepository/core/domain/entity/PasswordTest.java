@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 class PasswordTest {
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEquals() {
     EqualsVerifier.forClass(Password.class).verify();
   }
