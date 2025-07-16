@@ -6,13 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class PrivilegeIdListTest {
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testEquals() {
     EqualsVerifier.forClass(PrivilegeIdList.class).verify();
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
   void testToString() {
     ToStringVerifier.forClass(PrivilegeIdList.class).verify();
   }

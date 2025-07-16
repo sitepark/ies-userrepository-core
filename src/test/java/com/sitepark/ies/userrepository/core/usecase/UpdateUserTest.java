@@ -74,7 +74,6 @@ class UpdateUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testChangeLoginToAlreadyExistsLogin() {
 
     IdentifierResolver identifierResolver = mock();

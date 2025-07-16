@@ -69,7 +69,6 @@ class GetUserTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   void testGetUserNotFound() {
 
     UserRepository userRepository = mock();

@@ -6,8 +6,6 @@ import java.util.Objects;
 
 public final class PrivilegeIdList implements Filter {
 
-  @SuppressWarnings(
-      "PMD.AvoidFieldNameMatchingTypeName") // so that when deserializing it has the desired format
   private final List<String> privilegedList;
 
   PrivilegeIdList(@JsonProperty("privilegedList") String... privilegedList) {

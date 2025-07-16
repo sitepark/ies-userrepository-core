@@ -72,7 +72,6 @@ class AuthenticateByTokenTest {
         AccessTokenRevokedException.class, () -> authenticateByToken.authenticateByToken("abc"));
   }
 
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
   @Test
   void testTokenExpired() {
 
