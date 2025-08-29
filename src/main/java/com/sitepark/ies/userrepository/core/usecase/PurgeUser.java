@@ -4,7 +4,6 @@ import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
-import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
@@ -17,8 +16,6 @@ public final class PurgeUser {
 
   private final IdentifierResolver identifierResolver;
 
-  private final AccessTokenRepository accessTokenRepository;
-
   private final ExtensionsNotifier extensionsNotifier;
 
   private final AccessControl accessControl;
@@ -30,14 +27,12 @@ public final class PurgeUser {
       UserRepository repository,
       IdentifierResolver identifierResolver,
       ExtensionsNotifier extensionsNotifier,
-      AccessControl accessControl,
-      AccessTokenRepository accessTokenRepository) {
+      AccessControl accessControl) {
 
     this.repository = repository;
     this.extensionsNotifier = extensionsNotifier;
     this.identifierResolver = identifierResolver;
     this.accessControl = accessControl;
-    this.accessTokenRepository = accessTokenRepository;
   }
 
   public void purgeUser(Identifier identifier) {
@@ -53,8 +48,6 @@ public final class PurgeUser {
     }
 
     this.repository.remove(id);
-
-    this.accessTokenRepository.purgeByUser(id);
 
     this.extensionsNotifier.notifyPurge(id);
   }

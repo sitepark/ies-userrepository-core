@@ -13,6 +13,7 @@ import java.util.Objects;
  */
 @JsonDeserialize(using = RoleDeserializer.class)
 public class Role {
+public class Role {
 
   @JsonValue private final String name;
 

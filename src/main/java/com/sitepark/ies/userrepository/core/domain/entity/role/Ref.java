@@ -50,6 +50,14 @@ public final class Ref extends Role {
     this.anchor = anchor;
   }
 
+  private Ref(Anchor anchor, String id) {
+    super(anchor.toString());
+    Objects.requireNonNull(anchor, "anchor is null");
+    Objects.requireNonNull(id, "id is null");
+    this.id = id;
+    this.anchor = anchor;
+  }
+
   public static Ref ofId(String id) {
     return new Ref(id);
   }
@@ -61,6 +69,11 @@ public final class Ref extends Role {
   public static Ref ofAnchor(String anchor) {
     Objects.requireNonNull(anchor, "anchor is null");
     return new Ref(Anchor.ofString(anchor));
+  }
+
+  public static Ref ofAnchor(String anchor, String id) {
+    Objects.requireNonNull(anchor, "anchor is null");
+    return new Ref(Anchor.ofString(anchor), id);
   }
 
   public Optional<String> getId() {

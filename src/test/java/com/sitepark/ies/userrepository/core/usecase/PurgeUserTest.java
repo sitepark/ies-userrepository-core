@@ -10,7 +10,6 @@ import com.sitepark.ies.userrepository.core.domain.entity.Identifier;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
-import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -22,13 +21,10 @@ class PurgeUserTest {
 
     AccessControl accessControl = mock(AccessControl.class);
     IdentifierResolver identifierResolver = mock();
-    AccessTokenRepository accessTokenRepository = mock(AccessTokenRepository.class);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     when(accessControl.isUserRemovable()).thenReturn(false);
 
-    var purgeEntity =
-        new PurgeUser(
-            null, identifierResolver, extensionsNotifier, accessControl, accessTokenRepository);
+    var purgeEntity = new PurgeUser(null, identifierResolver, extensionsNotifier, accessControl);
     assertThrows(
         AccessDeniedException.class,
         () -> {
@@ -43,23 +39,16 @@ class PurgeUserTest {
     IdentifierResolver identifierResolver = mock();
     when(identifierResolver.resolveIdentifier(any())).thenReturn("10");
     AccessControl accessControl = mock(AccessControl.class);
-    AccessTokenRepository accessTokenRepository = mock(AccessTokenRepository.class);
     when(accessControl.isUserRemovable()).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
 
     UserRepository repository = mock(UserRepository.class);
 
     PurgeUser purgeEntity =
-        new PurgeUser(
-            repository,
-            identifierResolver,
-            extensionsNotifier,
-            accessControl,
-            accessTokenRepository);
+        new PurgeUser(repository, identifierResolver, extensionsNotifier, accessControl);
     purgeEntity.purgeUser(Identifier.ofId("10"));
 
     verify(repository).remove("10");
     verify(extensionsNotifier).notifyPurge("10");
-    verify(accessTokenRepository).purgeByUser("10");
   }
 }
