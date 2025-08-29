@@ -4,7 +4,7 @@
 
 	<groupId>com.sitepark.ies</groupId>
 	<artifactId>ies-userrepository-core</artifactId>
-	<version>1.4.1-SNAPSHOT</version>
+	<version>1.4.0-SNAPSHOT</version>
 	<name>IES User Repository Core</name>
 	<description>IES User repository domain und use-case implementations</description>
 	<url>https://github.com/sitepark/ies-userrepository-core</url>
