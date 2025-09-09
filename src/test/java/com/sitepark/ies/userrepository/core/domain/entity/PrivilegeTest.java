@@ -27,7 +27,7 @@ class PrivilegeTest {
   @Test
   void testName() {
     Privilege privilege = Privilege.builder().name("privilegerole").build();
-    assertEquals("privilegerole", privilege.getName(), "unexpected name");
+    assertEquals("privilegerole", privilege.name(), "unexpected name");
   }
 
   @Test
@@ -41,7 +41,7 @@ class PrivilegeTest {
   @Test
   void testId() {
     Privilege privilege = Privilege.builder().name("privilegerole").id("123").build();
-    assertEquals("123", privilege.getId(), "unexpected id");
+    assertEquals("123", privilege.id(), "unexpected id");
   }
 
   @Test
@@ -57,7 +57,7 @@ class PrivilegeTest {
   void testIdentifierWithId() {
     Privilege privilege =
         Privilege.builder().name("privilegerole").identifier(Identifier.ofId("123")).build();
-    assertEquals("123", privilege.getId(), "unexpected id");
+    assertEquals("123", privilege.id(), "unexpected id");
   }
 
   @Test
@@ -67,64 +67,64 @@ class PrivilegeTest {
             .name("privilegerole")
             .identifier(Identifier.ofAnchor("myanchor"))
             .build();
-    assertEquals(Anchor.ofString("myanchor"), privilege.getAnchor(), "unexpected anchor");
+    assertEquals(Anchor.ofString("myanchor"), privilege.anchor(), "unexpected anchor");
   }
 
   @Test
   void testAnchorString() {
     Privilege privilege =
         Privilege.builder().name("privilegerole").anchor(Anchor.ofString("myanchor")).build();
-    assertEquals(Anchor.ofString("myanchor"), privilege.getAnchor(), "unexpected anchor");
+    assertEquals(Anchor.ofString("myanchor"), privilege.anchor(), "unexpected anchor");
   }
 
   @Test
   void testAnchor() {
     Privilege privilege = Privilege.builder().name("privilegerole").anchor("myanchor").build();
-    assertEquals(Anchor.ofString("myanchor"), privilege.getAnchor(), "unexpected anchor");
+    assertEquals(Anchor.ofString("myanchor"), privilege.anchor(), "unexpected anchor");
   }
 
   @Test
   void testDescription() {
     Privilege privilege =
         Privilege.builder().name("privilegerole").description("description").build();
-    assertEquals("description", privilege.getDescription(), "unexpected description");
+    assertEquals("description", privilege.description(), "unexpected description");
   }
 
   @Test
   void testEmptyDescription() {
     Privilege privilege = Privilege.builder().name("privilegerole").description("").build();
-    assertNull(privilege.getDescription(), "unexpected description");
+    assertNull(privilege.description(), "unexpected description");
   }
 
   @Test
   void testNullDescription() {
     Privilege privilege = Privilege.builder().name("privilegerole").description(null).build();
-    assertNull(privilege.getDescription(), "unexpected description");
+    assertNull(privilege.description(), "unexpected description");
   }
 
   @Test
   void testRoleIdsCollection() {
     Privilege privilege = Privilege.builder().name("privilegerole").roleIds(List.of("123")).build();
-    assertEquals(Set.of("123"), privilege.getRoleIds(), "unexpected roleIds");
+    assertEquals(Set.of("123"), privilege.roleIds(), "unexpected roleIds");
   }
 
   @Test
   void testRoleIdsArray() {
     Privilege privilege = Privilege.builder().name("privilegerole").roleIds("123").build();
-    assertEquals(Set.of("123"), privilege.getRoleIds(), "unexpected roleIds");
+    assertEquals(Set.of("123"), privilege.roleIds(), "unexpected roleIds");
   }
 
   @Test
   void testRoleId() {
     Privilege privilege = Privilege.builder().name("privilegerole").roleId("123").build();
-    assertEquals(Set.of("123"), privilege.getRoleIds(), "unexpected roleIds");
+    assertEquals(Set.of("123"), privilege.roleIds(), "unexpected roleIds");
   }
 
   @Test
   void testPermission() {
     Permission permission = mock();
     Privilege privilege = Privilege.builder().name("privilegerole").permission(permission).build();
-    assertSame(permission, privilege.getPermission(), "unexpected permission");
+    assertSame(permission, privilege.permission(), "unexpected permission");
   }
 
   @Test

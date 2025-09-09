@@ -17,6 +17,7 @@ import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -118,7 +119,7 @@ class RemovePrivilegesTest {
                 "remove",
                 "{}",
                 "{}",
-                OffsetDateTime.now(this.fixedClock),
+                Instant.now(this.fixedClock),
                 null));
   }
 }

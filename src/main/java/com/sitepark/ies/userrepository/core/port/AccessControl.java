@@ -11,6 +11,8 @@ public interface AccessControl {
 
   boolean isUserRemovable();
 
+  boolean isRoleCreatable();
+
   boolean isRoleReadable();
 
   boolean isRoleWritable();

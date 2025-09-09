@@ -21,6 +21,7 @@ import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +41,7 @@ class UpdateUserTest {
 
     var updateUserUseCase =
         new UpdateUser(null, identifierResolver, null, accessControl, extensionsNotifier);
-    assertThrows(AccessDeniedException.class, () -> updateUserUseCase.updateUser(user));
+    assertThrows(AccessDeniedException.class, () -> updateUserUseCase.updateUser(user, null));
 
     verify(accessControl).isUserWritable();
   }
@@ -51,7 +52,7 @@ class UpdateUserTest {
     User user = User.builder().login("test").build();
 
     var updateUserUseCase = new UpdateUser(null, null, null, null, null);
-    assertThrows(IllegalArgumentException.class, () -> updateUserUseCase.updateUser(user));
+    assertThrows(IllegalArgumentException.class, () -> updateUserUseCase.updateUser(user, null));
   }
 
   @Test
@@ -70,7 +71,7 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
-    assertThrows(UserNotFoundException.class, () -> updateUserUseCase.updateUser(user));
+    assertThrows(UserNotFoundException.class, () -> updateUserUseCase.updateUser(user, null));
   }
 
   @Test
@@ -96,7 +97,7 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test2").build();
 
-    assertThrows(LoginAlreadyExistsException.class, () -> updateUserUseCase.updateUser(user));
+    assertThrows(LoginAlreadyExistsException.class, () -> updateUserUseCase.updateUser(user, null));
   }
 
   @Test
@@ -122,11 +123,44 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
-    String id = updateUserUseCase.updateUser(user);
+    String id = updateUserUseCase.updateUser(user, null);
     assertEquals("123", id, "unexpected id");
 
     verify(repository).get(anyString());
     verify(repository).resolveLogin(anyString());
+
+    verifyNoMoreInteractions(repository);
+  }
+
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testUpdateRoles() {
+
+    IdentifierResolver identifierResolver = mock();
+    when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
+    AccessControl accessControl = mock(AccessControl.class);
+    when(accessControl.isUserWritable()).thenReturn(true);
+    ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
+    RoleAssigner roleAssigner = mock();
+
+    UserRepository repository = mock(UserRepository.class);
+    when(repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+
+    User storedUser = User.builder().id("123").anchor("user.test").login("test").build();
+    when(repository.get(anyString())).thenReturn(Optional.of(storedUser));
+
+    var updateUserUseCase =
+        new UpdateUser(
+            repository, identifierResolver, roleAssigner, accessControl, extensionsNotifier);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    String id = updateUserUseCase.updateUser(user, new String[] {"333"});
+    assertEquals("123", id, "unexpected id");
+
+    verify(repository).get(anyString());
+    verify(repository).resolveLogin(anyString());
+    verify(roleAssigner).reassignUsersToRoles(List.of("333"), List.of("123"));
 
     verifyNoMoreInteractions(repository);
   }
@@ -155,7 +189,7 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").login("test").lastName("B").build();
 
-    updateUserUseCase.updateUser(user);
+    updateUserUseCase.updateUser(user, null);
 
     User effectiveUser =
         User.builder().id("123").login("test").anchor("user.test").lastName("B").build();
@@ -192,7 +226,7 @@ class UpdateUserTest {
 
     User user = User.builder().login("test").anchor("user.test").lastName("B").build();
 
-    updateUserUseCase.updateUser(user);
+    updateUserUseCase.updateUser(user, null);
 
     User effectiveUser =
         User.builder().id("123").login("test").anchor("user.test").lastName("B").build();
@@ -228,7 +262,7 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").login("test").anchor("user.test2").build();
 
-    updateUserUseCase.updateUser(user);
+    updateUserUseCase.updateUser(user, null);
 
     User effectiveUser = User.builder().id("123").login("test").anchor("user.test2").build();
 
@@ -263,7 +297,7 @@ class UpdateUserTest {
 
     User user = User.builder().id("123").login("test2").build();
 
-    updateUserUseCase.updateUser(user);
+    updateUserUseCase.updateUser(user, null);
 
     User effectiveUser = User.builder().id("123").login("test2").build();
 
@@ -293,6 +327,6 @@ class UpdateUserTest {
 
     User user = User.builder().login("test").anchor("user.test2").build();
 
-    assertThrows(AnchorNotFoundException.class, () -> updateUserUseCase.updateUser(user));
+    assertThrows(AnchorNotFoundException.class, () -> updateUserUseCase.updateUser(user, null));
   }
 }

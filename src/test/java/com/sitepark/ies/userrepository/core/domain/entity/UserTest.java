@@ -10,12 +10,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.userrepository.core.domain.value.Address;
+import com.sitepark.ies.userrepository.core.domain.value.Contact;
 import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
+import com.sitepark.ies.userrepository.core.domain.value.Organisation;
 import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import com.sitepark.ies.userrepository.core.domain.value.identity.LdapIdentity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -30,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class UserTest {
 
   private static final Identity TEST_IDENTITY =
-      LdapIdentity.builder().server(2).dn("userdn").build();
+      LdapIdentity.builder().serverId("2").dn("userdn").build();
 
   @Test
   void testEquals() {
@@ -45,52 +48,52 @@ class UserTest {
   @Test
   void testSetLogin() {
     User user = User.builder().login("peterpan").build();
-    assertEquals("peterpan", user.getLogin(), "unexpected login");
+    assertEquals("peterpan", user.login(), "unexpected login");
   }
 
   @Test
   void testSetIdentifierWithId() {
     Identifier id = Identifier.ofId("123");
     User user = this.createBuilderWithRequiredValues().identifier(id).build();
-    assertEquals("123", user.getId(), "unexpected id");
+    assertEquals("123", user.id(), "unexpected id");
   }
 
   @Test
   void testSetIdentifierWithAnchor() {
     Identifier anchor = Identifier.ofAnchor(Anchor.ofString("abc"));
     User user = this.createBuilderWithRequiredValues().identifier(anchor).build();
-    assertEquals("abc", user.getAnchor().getName(), "unexpected anchor");
+    assertEquals("abc", user.anchor().getName(), "unexpected anchor");
   }
 
   @Test
   void testSetId() {
     User user = this.createBuilderWithRequiredValues().id("123").build();
-    assertEquals("123", user.getId(), "unexpected id");
+    assertEquals("123", user.id(), "unexpected id");
   }
 
   @Test
   void testGetEmptyId() {
     User user = this.createBuilderWithRequiredValues().build();
-    assertNull(user.getId(), "id should be null");
+    assertNull(user.id(), "id should be null");
   }
 
   @Test
   void testGetIdentifierWithId() {
     User user = this.createBuilderWithRequiredValues().id("123").build();
-    assertEquals(Identifier.ofId("123"), user.getIdentifier(), "unexpected identifier");
+    assertEquals(Identifier.ofId("123"), user.toIdentifier(), "unexpected identifier");
   }
 
   @Test
   void testGetIdentifierWithAnchor() {
     User user = this.createBuilderWithRequiredValues().anchor("abc").build();
     assertEquals(
-        Identifier.ofAnchor(Anchor.ofString("abc")), user.getIdentifier(), "unexpected identifier");
+        Identifier.ofAnchor(Anchor.ofString("abc")), user.toIdentifier(), "unexpected identifier");
   }
 
   @Test
   void testGetEmptyIdentifier() {
     User user = this.createBuilderWithRequiredValues().build();
-    assertNull(user.getIdentifier(), "identifier should be null");
+    assertNull(user.toIdentifier(), "identifier should be null");
   }
 
   @Test
@@ -117,13 +120,13 @@ class UserTest {
   void testSetAnchor() {
     Anchor anchor = Anchor.ofString("user.pan.peter");
     User user = this.createBuilderWithRequiredValues().anchor(anchor).build();
-    assertEquals("user.pan.peter", user.getAnchor().getName(), "unexpected anchor");
+    assertEquals("user.pan.peter", user.anchor().getName(), "unexpected anchor");
   }
 
   @Test
   void testSetAnchorString() {
     User user = this.createBuilderWithRequiredValues().anchor("user.pan.peter").build();
-    assertEquals("user.pan.peter", user.getAnchor().getName(), "unexpected anchor");
+    assertEquals("user.pan.peter", user.anchor().getName(), "unexpected anchor");
   }
 
   @Test
@@ -141,97 +144,103 @@ class UserTest {
 
     User changedUser = user.toBuilder().build();
 
-    assertEquals("100560100000014842", changedUser.getId(), "unexpected id");
-    assertEquals(Anchor.ofString("user.peterpan"), changedUser.getAnchor(), "unexpected anchor");
-    assertEquals("Peter", changedUser.getFirstName(), "unexpected firstname");
-    assertEquals("Pan", changedUser.getLastName(), "unexpected lastname");
-    assertEquals("peterpan", changedUser.getLogin(), "unexpected login");
-    assertEquals("Test", changedUser.getDescription(), "unexpected note");
+    assertEquals("100560100000014842", changedUser.id(), "unexpected id");
+    assertEquals(Anchor.ofString("user.peterpan"), changedUser.anchor(), "unexpected anchor");
+    assertEquals("Peter", changedUser.firstName(), "unexpected firstname");
+    assertEquals("Pan", changedUser.lastName(), "unexpected lastname");
+    assertEquals("peterpan", changedUser.login(), "unexpected login");
+    assertEquals("Test", changedUser.description(), "unexpected note");
+  }
+
+  @Test
+  void testSetTitle() {
+    User user = this.createBuilderWithRequiredValues().title("Dr.").build();
+    assertEquals("Dr.", user.title(), "unexpected title");
   }
 
   @Test
   void testSetFirstname() {
     User user = this.createBuilderWithRequiredValues().firstName("Peter").build();
-    assertEquals("Peter", user.getFirstName(), "unexpected firstname");
+    assertEquals("Peter", user.firstName(), "unexpected firstname");
   }
 
   @Test
   void testSetFirstnameWithNull() {
     User user = this.createBuilderWithRequiredValues().firstName(null).build();
-    assertNull(user.getFirstName(), "firstname should be null");
+    assertNull(user.firstName(), "firstname should be null");
   }
 
   @Test
   void testSetFirstnameWithBlank() {
     User user = this.createBuilderWithRequiredValues().firstName("  ").build();
-    assertNull(user.getFirstName(), "firstname should be null");
+    assertNull(user.firstName(), "firstname should be null");
   }
 
   @Test
   void testSetLastname() {
     User user = this.createBuilderWithRequiredValues().lastName("Pan").build();
-    assertEquals("Pan", user.getLastName(), "unexpected lastname");
+    assertEquals("Pan", user.lastName(), "unexpected lastname");
   }
 
   @Test
   void testSetLastnameWithNull() {
     User user = this.createBuilderWithRequiredValues().lastName(null).build();
-    assertNull(user.getLastName(), "lastname should be null");
+    assertNull(user.lastName(), "lastname should be null");
   }
 
   @Test
   void testSetLastnameWithBlank() {
     User user = this.createBuilderWithRequiredValues().lastName("  ").build();
-    assertNull(user.getLastName(), "lastname should be null");
+    assertNull(user.lastName(), "lastname should be null");
   }
 
   @Test
   void testGetNameOnlyLastname() {
     User user = this.createBuilderWithRequiredValues().lastName("Pan").build();
-    assertEquals("Pan", user.getName(), "unexpected name");
+    assertEquals("Pan", user.toDisplayName(), "unexpected name");
   }
 
   @Test
   void testGetNameOnlyFirstname() {
     User user = this.createBuilderWithRequiredValues().firstName("Peter").build();
-    assertEquals("Peter", user.getName(), "unexpected name");
+    assertEquals("Peter", user.toDisplayName(), "unexpected name");
   }
 
   @Test
   void testGetNameFirstnameAndLastName() {
     User user = this.createBuilderWithRequiredValues().lastName("Pan").firstName("Peter").build();
-    assertEquals("Pan, Peter", user.getName(), "unexpected name");
+    assertEquals("Pan, Peter", user.toDisplayName(), "unexpected name");
   }
 
   @Test
   void testSetEmail() {
     User user = this.createBuilderWithRequiredValues().email("peter.pan@nimmer.land").build();
-    assertEquals("peter.pan@nimmer.land", user.getEmail(), "unexpected lastname");
+    assertEquals("peter.pan@nimmer.land", user.email(), "unexpected lastname");
   }
 
   @Test
   void testSetEmailWithNull() {
     User user = this.createBuilderWithRequiredValues().email(null).build();
-    assertNull(user.getEmail(), "email should be null");
+    assertNull(user.email(), "email should be null");
   }
 
   @Test
   void testSetEmailWithBlank() {
     User user = User.builder().login("test").email("  ").build();
-    assertNull(user.getEmail(), "email should be null");
+    assertNull(user.email(), "email should be null");
   }
 
   @Test
   void testSetRolesAsList() {
     User user = this.createBuilderWithRequiredValues().roleIds(List.of("123")).build();
-    assertEquals(List.of("123"), user.getRoleIds(), "unexpected roles");
+    assertEquals(List.of("123"), user.roleIds(), "unexpected roles");
   }
 
   @Test
   void testSetOverwriteRolesAsList() {
     User user = this.createBuilderWithRequiredValues().roleIds(List.of("123")).build();
     User overwritter = user.toBuilder().roleIds(List.of("345")).build();
-    assertEquals(List.of("345"), overwritter.getRoleIds(), "unexpected roles");
+    assertEquals(List.of("345"), overwritter.roleIds(), "unexpected roles");
   }
 
   @Test
@@ -248,14 +257,14 @@ class UserTest {
   @Test
   void testSetRolesAsVArgs() {
     User user = this.createBuilderWithRequiredValues().roleIds("123").build();
-    assertEquals(List.of("123"), user.getRoleIds(), "unexpected roles");
+    assertEquals(List.of("123"), user.roleIds(), "unexpected roles");
   }
 
   @Test
   void testSetOverwriteRolesAsVArgs() {
     User user = this.createBuilderWithRequiredValues().roleIds("123").build();
     User overwritter = user.toBuilder().roleIds("345").build();
-    assertEquals(List.of("345"), overwritter.getRoleIds(), "unexpected roles");
+    assertEquals(List.of("345"), overwritter.roleIds(), "unexpected roles");
   }
 
   @Test
@@ -271,7 +280,7 @@ class UserTest {
   @Test
   void testSetRole() {
     User user = this.createBuilderWithRequiredValues().roleId("123").build();
-    assertEquals(List.of("123"), user.getRoleIds(), "unexpected roles");
+    assertEquals(List.of("123"), user.roleIds(), "unexpected roles");
   }
 
   @Test
@@ -281,7 +290,7 @@ class UserTest {
 
     List<String> expected = Arrays.asList("123", "456");
 
-    assertEquals(expected, added.getRoleIds(), "unexpected roles");
+    assertEquals(expected, added.roleIds(), "unexpected roles");
   }
 
   @Test
@@ -292,15 +301,15 @@ class UserTest {
   @Test
   void testSetIdentitiesAsList() {
     User user = this.createBuilderWithRequiredValues().identities(List.of(TEST_IDENTITY)).build();
-    assertEquals(List.of(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
+    assertEquals(List.of(TEST_IDENTITY), user.identities(), "unexpected identities");
   }
 
   @Test
   void testSetOverwriteIdentitiesAsList() {
     User user = this.createBuilderWithRequiredValues().identities(List.of(TEST_IDENTITY)).build();
-    Identity newIdentity = LdapIdentity.builder().server(3).dn("userdn2").build();
+    Identity newIdentity = LdapIdentity.builder().serverId("3").dn("userdn2").build();
     User overwritter = user.toBuilder().identities(List.of(newIdentity)).build();
-    assertEquals(List.of(newIdentity), overwritter.getIdentities(), "unexpected identities");
+    assertEquals(List.of(newIdentity), overwritter.identities(), "unexpected identities");
   }
 
   @Test
@@ -319,15 +328,15 @@ class UserTest {
   @Test
   void testSetIdentitiesAsVArgs() {
     User user = this.createBuilderWithRequiredValues().identities(TEST_IDENTITY).build();
-    assertEquals(List.of(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
+    assertEquals(List.of(TEST_IDENTITY), user.identities(), "unexpected identities");
   }
 
   @Test
   void testSetOverwriteIdentitiesAsVArgs() {
     User user = this.createBuilderWithRequiredValues().identities(TEST_IDENTITY).build();
-    Identity newIdentity = LdapIdentity.builder().server(3).dn("userdn2").build();
+    Identity newIdentity = LdapIdentity.builder().serverId("3").dn("userdn2").build();
     User overwritter = user.toBuilder().identities(newIdentity).build();
-    assertEquals(List.of(newIdentity), overwritter.getIdentities(), "unexpected identities");
+    assertEquals(List.of(newIdentity), overwritter.identities(), "unexpected identities");
   }
 
   @Test
@@ -343,20 +352,20 @@ class UserTest {
   @Test
   void testSetIndentity() {
     User user = this.createBuilderWithRequiredValues().identity(TEST_IDENTITY).build();
-    assertEquals(List.of(TEST_IDENTITY), user.getIdentities(), "unexpected identities");
+    assertEquals(List.of(TEST_IDENTITY), user.identities(), "unexpected identities");
   }
 
   @Test
   void testAddIdentity() {
     User user = this.createBuilderWithRequiredValues().identity(TEST_IDENTITY).build();
 
-    Identity newIdentity = LdapIdentity.builder().server(3).dn("userdn2").build();
+    Identity newIdentity = LdapIdentity.builder().serverId("3").dn("userdn2").build();
 
     User added = user.toBuilder().identity(newIdentity).build();
 
     List<Identity> expected = Arrays.asList(TEST_IDENTITY, newIdentity);
 
-    assertEquals(expected, added.getIdentities(), "unexpected roles");
+    assertEquals(expected, added.identities(), "unexpected roles");
   }
 
   @Test
@@ -386,13 +395,13 @@ class UserTest {
   @Test
   void testDefaultGender() {
     User user = this.createBuilderWithRequiredValues().build();
-    assertEquals(GenderType.UNKNOWN, user.getGender(), "unexpected gender");
+    assertEquals(GenderType.UNKNOWN, user.gender(), "unexpected gender");
   }
 
   @Test
   void testSetGender() {
     User user = this.createBuilderWithRequiredValues().gender(GenderType.MALE).build();
-    assertEquals(GenderType.MALE, user.getGender(), "unexpected gender");
+    assertEquals(GenderType.MALE, user.gender(), "unexpected gender");
   }
 
   @Test
@@ -402,20 +411,19 @@ class UserTest {
 
   @Test
   void testSetCreatedAt() {
-    OffsetDateTime now = OffsetDateTime.now();
+    Instant now = Instant.now();
     User user = this.createBuilderWithRequiredValues().createdAt(now).build();
-    assertEquals(now, user.getCreatedAt(), "unexpected createdAt");
+    assertEquals(now, user.createdAt(), "unexpected createdAt");
   }
 
   @Test
   void testSetChangedAt() {
-    OffsetDateTime now = OffsetDateTime.now();
+    Instant now = Instant.now();
     User user = this.createBuilderWithRequiredValues().changedAt(now).build();
-    assertEquals(now, user.getChangedAt(), "unexpected changedAt");
+    assertEquals(now, user.changedAt(), "unexpected changedAt");
   }
 
   @Test
-  @SuppressWarnings("PMD.LawOfDemeter")
   void testSetValiditiy() {
 
     User user =
@@ -423,11 +431,10 @@ class UserTest {
             .validity(UserValidity.builder().blocked(true).build())
             .build();
 
-    assertTrue(user.getValidity().isBlocked(), "user should be blocked");
+    assertTrue(user.validity().isBlocked(), "user should be blocked");
   }
 
   @Test
-  @SuppressWarnings("PMD.LawOfDemeter")
   void testSetValiditiyBuilder() {
 
     User user =
@@ -435,7 +442,7 @@ class UserTest {
             .validity(UserValidity.builder().blocked(true))
             .build();
 
-    assertTrue(user.getValidity().isBlocked(), "user should be blocked");
+    assertTrue(user.validity().isBlocked(), "user should be blocked");
   }
 
   @Test
@@ -450,10 +457,50 @@ class UserTest {
   }
 
   @Test
+  void testSetAddress() {
+    Address address = Address.builder().street("Musterstraße").city("Berlin").build();
+    User user = this.createBuilderWithRequiredValues().address(address).build();
+    assertEquals(address, user.address(), "unexpected address");
+  }
+
+  @Test
+  void testSetAddressWithNull() {
+    User user = this.createBuilderWithRequiredValues().address(null).build();
+    assertNull(user.address(), "address should be null");
+  }
+
+  @Test
+  void testSetContact() {
+    Contact contact =
+        Contact.builder().phonePrivate("0123456789").phoneOffice("0987654321").build();
+    User user = this.createBuilderWithRequiredValues().contact(contact).build();
+    assertEquals(contact, user.contact(), "unexpected contact");
+  }
+
+  @Test
+  void testSetContactWithNull() {
+    User user = this.createBuilderWithRequiredValues().contact(null).build();
+    assertNull(user.contact(), "contact should be null");
+  }
+
+  @Test
+  void testSetOrganisation() {
+    Organisation organisation = Organisation.builder().name("ACME Corp").build();
+    User user = this.createBuilderWithRequiredValues().organisation(organisation).build();
+    assertEquals(organisation, user.organisation(), "unexpected organisation");
+  }
+
+  @Test
+  void testSetOrganisationWithNull() {
+    User user = this.createBuilderWithRequiredValues().organisation(null).build();
+    assertNull(user.organisation(), "organisation should be null");
+  }
+
+  @Test
   void testToString() {
     User user =
         User.builder()
-            .id("100560100000014842")
+            .id("14842")
             .anchor("user.peterpan")
             .firstName("Peter")
             .lastName("Pan")
@@ -466,7 +513,7 @@ class UserTest {
             .build();
     String expected =
         """
-        User [id=100560100000014842, anchor=user.peterpan, login=peterpan, password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE, note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null], identities=[LdapIdentity [server=2, dn=userdn]], roles=[345, 123], createdAt=null, changedAt=null]\
+        User{id='14842', anchor=user.peterpan, title='null', firstName='Peter', lastName='Pan', email='peter.pan@nimmer.land', gender=MALE, description='a note', createdAt=null, changedAt=null, login='peterpan', password=null, identities=[LdapIdentity [serverId=2, dn=userdn]], validity=UserValidity{blocked=false, validFrom=null, validTo=null}, address=null, contact=null, organisation=null, roleIds=[345, 123]}\
         """;
     assertEquals(expected, user.toString(), "unexpected string representation");
   }
@@ -496,17 +543,7 @@ class UserTest {
 
     String expected =
         """
-        {"id":"100560100000014842",\
-        "anchor":"user.peterpan",\
-        "login":"peterpan",\
-        "firstName":"Peter",\
-        "lastName":"Pan",\
-        "email":"peter.pan@nimmer.land",\
-        "gender":"MALE",\
-        "description":"a note",\
-        "validity":{"blocked":false},\
-        "identities":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-        "roleIds":["345","123"]}\
+        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"@type":"ldap","serverId":"2","dn":"userdn"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
         """;
 
     assertEquals(expected, json, "unexpected json");
@@ -522,18 +559,7 @@ class UserTest {
 
     String json =
         """
-        {\
-        "id":100560100000014842,\
-        "anchor":"user.peterpan",\
-        "login":"peterpan",\
-        "firstName":"Peter",\
-        "lastName":"Pan",\
-        "email":"peter.pan@nimmer.land",\
-        "gender":"MALE",\
-        "description":"a note",\
-        "identities":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-        "roleIds":["345","123"]\
-        }\
+        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"@type":"ldap","serverId":"2","dn":"userdn"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
         """;
 
     User user = mapper.readValue(json, User.class);

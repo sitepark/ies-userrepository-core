@@ -16,7 +16,7 @@ public final class IdList implements Filter {
   }
 
   public List<String> getIdList() {
-    return this.idList;
+    return List.copyOf(this.idList);
   }
 
   @Override

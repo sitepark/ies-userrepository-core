@@ -1,61 +1,69 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Defines user roles to manage permissions and access control based on the provided role name,
  * allowing for custom role definitions in the application logic.
  */
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class Role {
 
-  private final String id;
+  @Nullable private final String id;
 
-  private final Anchor anchor;
+  @Nullable private final Anchor anchor;
 
-  private final String name;
+  @Nullable private final String name;
 
-  private final String description;
+  @Nullable private final String description;
 
-  private final List<Identifier> privilegeIds;
+  private final Set<String> privilegeIds;
 
   private Role(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
     this.description = builder.description;
-    this.privilegeIds = Collections.unmodifiableList(builder.privilegeIds);
+    this.privilegeIds = Set.copyOf(builder.privilegeIds);
   }
 
   public static Builder builder() {
     return new Builder();
   }
 
-  public String getId() {
+  @JsonProperty
+  public String id() {
     return this.id;
   }
 
-  public Anchor getAnchor() {
+  @JsonProperty
+  public Anchor anchor() {
     return this.anchor;
   }
 
-  public String getName() {
+  @JsonProperty
+  public String name() {
     return this.name;
   }
 
-  public String getDescription() {
+  @JsonProperty
+  public String description() {
     return this.description;
   }
 
-  public List<Identifier> getPrivilegeIds() {
-    return this.privilegeIds;
+  @JsonProperty
+  public Set<String> privilegeIds() {
+    return Set.copyOf(this.privilegeIds);
   }
 
   public Builder toBuilder() {
@@ -83,24 +91,28 @@ public final class Role {
 
   @Override
   public String toString() {
-    return "Role [id="
+    return "Role{"
+        + "id='"
         + id
+        + '\''
         + ", anchor="
         + anchor
-        + ", name="
+        + ", name='"
         + name
-        + ", description="
+        + '\''
+        + ", description='"
         + description
+        + '\''
         + ", privilegeIds="
         + privilegeIds
-        + "]";
+        + '}';
   }
 
   @SuppressWarnings("PMD.TooManyMethods")
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final List<Identifier> privilegeIds = new ArrayList<>();
+    private final Set<String> privilegeIds = new HashSet<>();
     private String id;
     private Anchor anchor;
     private String name;
@@ -156,25 +168,25 @@ public final class Role {
     }
 
     @JsonSetter
-    public Builder privilegeIds(Identifier... privilegeIds) {
+    public Builder privilegeIds(String... privilegeIds) {
       Objects.requireNonNull(privilegeIds, "privilegeIds is null");
       this.privilegeIds.clear();
-      for (Identifier privilege : privilegeIds) {
+      for (String privilege : privilegeIds) {
         this.privilegeId(privilege);
       }
       return this;
     }
 
-    public Builder privilegeIds(List<Identifier> privilegeIds) {
+    public Builder privilegeIds(Collection<String> privilegeIds) {
       Objects.requireNonNull(privilegeIds, "privilegeIds is null");
       this.privilegeIds.clear();
-      for (Identifier privilegeId : privilegeIds) {
+      for (String privilegeId : privilegeIds) {
         this.privilegeId(privilegeId);
       }
       return this;
     }
 
-    public Builder privilegeId(Identifier privilegeId) {
+    public Builder privilegeId(String privilegeId) {
       Objects.requireNonNull(privilegeId, "privilegeId is null");
       this.privilegeIds.add(privilegeId);
       return this;

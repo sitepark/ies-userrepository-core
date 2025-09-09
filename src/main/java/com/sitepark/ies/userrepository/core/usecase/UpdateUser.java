@@ -11,10 +11,12 @@ import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 public final class UpdateUser {
 
@@ -39,13 +41,14 @@ public final class UpdateUser {
     this.extensionsNotifier = extensionsNotifier;
   }
 
-  public String updateUser(User user) {
+  @SuppressWarnings("PMD.UseVarargs")
+  public String updateUser(User user, @Nullable String[] roleIds) {
 
     User updateUser = this.buildUserWithId(user);
-    if (updateUser.getId() == null) {
+    if (updateUser.id() == null) {
       throw new IllegalArgumentException("The ID of the user must be set when updating.");
     }
-    String id = updateUser.getId();
+    String id = updateUser.id();
     this.validateWritable();
     User storedUser = this.loadStoredUser(id);
     this.validateLogin(updateUser);
@@ -56,25 +59,27 @@ public final class UpdateUser {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("update(unchanged): {}", joinedUpdateUser);
       }
-      return id;
+    } else {
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("update: {}", joinedUpdateUser);
+      }
+      this.repository.update(joinedUpdateUser);
+      this.extensionsNotifier.notifyUpdated(joinedUpdateUser);
     }
 
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("update: {}", joinedUpdateUser);
+    if (roleIds != null && roleIds.length > 0) {
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("reassign user to roles: {} -> {}", List.of(id), Arrays.asList(roleIds));
+      }
+      this.roleAssigner.reassignUsersToRoles(Arrays.asList(roleIds), List.of(id));
     }
-
-    this.roleAssigner.reassignUsersToRoles(joinedUpdateUser.getRoleIds(), List.of(id));
-
-    this.repository.update(joinedUpdateUser);
-
-    this.extensionsNotifier.notifyUpdated(joinedUpdateUser);
 
     return id;
   }
 
   private User buildUserWithId(User user) {
 
-    Identifier identifier = user.getIdentifier();
+    Identifier identifier = user.toIdentifier();
     if (identifier == null) {
       throw new IllegalArgumentException(
           "For users to be updated neither an id nor an anchor is set");
@@ -94,22 +99,22 @@ public final class UpdateUser {
   private User loadStoredUser(String id) {
     User storedUser = this.repository.get(id).orElseThrow(() -> new UserNotFoundException(id));
 
-    assert storedUser.getId() != null;
-    List<String> roles = this.roleAssigner.getRolesAssignByUser(storedUser.getId());
+    assert storedUser.id() != null;
+    List<String> roles = this.roleAssigner.getRolesAssignByUser(storedUser.id());
     return storedUser.toBuilder().roleIds(roles).build();
   }
 
   private void validateLogin(User user) {
-    Optional<String> resolveLogin = this.repository.resolveLogin(user.getLogin());
-    if (resolveLogin.isPresent() && !resolveLogin.get().equals(user.getId())) {
-      throw new LoginAlreadyExistsException(user.getLogin(), resolveLogin.get());
+    Optional<String> resolveLogin = this.repository.resolveLogin(user.login());
+    if (resolveLogin.isPresent() && !resolveLogin.get().equals(user.id())) {
+      throw new LoginAlreadyExistsException(user.login(), resolveLogin.get());
     }
   }
 
   private User joinForUpdate(User storedUser, User updateUser) {
 
-    if (updateUser.getAnchor() == null && storedUser.getAnchor() != null) {
-      return updateUser.toBuilder().anchor(storedUser.getAnchor()).build();
+    if (updateUser.anchor() == null && storedUser.anchor() != null) {
+      return updateUser.toBuilder().anchor(storedUser.anchor()).build();
     }
 
     return updateUser;

@@ -41,7 +41,7 @@ public final class UpdatePrivilege {
     Privilege privilegeWithId = this.toPrivilegeWithId(privilege);
 
     this.validateAnchor(privilegeWithId);
-    this.repository.validatePermission(privilegeWithId.getPermission());
+    this.repository.validatePermission(privilegeWithId.permission());
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("update privilege: {}", privilege);
@@ -51,17 +51,17 @@ public final class UpdatePrivilege {
 
     if (roleIds != null && roleIds.length > 0) {
       this.roleAssigner.assignPrivilegesToRoles(
-          Arrays.asList(roleIds), List.of(privilegeWithId.getId()));
+          Arrays.asList(roleIds), List.of(privilegeWithId.id()));
     }
 
-    return privilegeWithId.getId();
+    return privilegeWithId.id();
   }
 
   private void validatePrivilege(Privilege privilege) {
-    if (privilege.getName() == null || privilege.getName().isBlank()) {
+    if (privilege.name() == null || privilege.name().isBlank()) {
       throw new IllegalArgumentException("The name of the privilege must not be null or empty.");
     }
-    if (privilege.getPermission() == null) {
+    if (privilege.permission() == null) {
       throw new IllegalArgumentException("The permission of the privilege must not be null.");
     }
   }
@@ -82,12 +82,12 @@ public final class UpdatePrivilege {
   }
 
   private Privilege toPrivilegeWithId(Privilege privilege) {
-    if (privilege.getId() == null) {
-      if (privilege.getAnchor() != null) {
+    if (privilege.id() == null) {
+      if (privilege.anchor() != null) {
         String id =
             this.repository
-                .resolveAnchor(privilege.getAnchor())
-                .orElseThrow(() -> new AnchorNotFoundException(privilege.getAnchor()));
+                .resolveAnchor(privilege.anchor())
+                .orElseThrow(() -> new AnchorNotFoundException(privilege.anchor()));
         return privilege.toBuilder().id(id).build();
       }
       throw new IllegalArgumentException(
@@ -97,12 +97,12 @@ public final class UpdatePrivilege {
   }
 
   private void validateAnchor(Privilege privilege) {
-    if (privilege.getAnchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(privilege.getAnchor());
+    if (privilege.anchor() != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(privilege.anchor());
       anchorOwner.ifPresent(
           owner -> {
-            if (!owner.equals(privilege.getId())) {
-              throw new AnchorAlreadyExistsException(privilege.getAnchor(), owner);
+            if (!owner.equals(privilege.id())) {
+              throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
             }
           });
     }

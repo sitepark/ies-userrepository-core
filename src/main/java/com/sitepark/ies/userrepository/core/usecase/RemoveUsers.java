@@ -5,9 +5,9 @@ import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogCommand;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
-import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
+import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
@@ -17,61 +17,56 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-public final class RemovePrivileges {
+public final class RemoveUsers {
 
-  private static final Logger LOGGER = LogManager.getLogger();
-  private final PrivilegeRepository repository;
+  private final UserRepository repository;
   private final AccessControl accessControl;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
+  private static final Logger LOGGER = LogManager.getLogger();
+
   @Inject
-  RemovePrivileges(
-      PrivilegeRepository repository,
+  RemoveUsers(
+      UserRepository repository,
       AccessControl accessControl,
       AuditLogService auditLogService,
       Clock clock) {
+
     this.repository = repository;
     this.accessControl = accessControl;
     this.auditLogService = auditLogService;
     this.clock = clock;
   }
 
-  public void removePrivileges(@NotNull List<Identifier> identifiers) {
+  public void removeUsers(@NotNull List<Identifier> identifiers) {
 
     if (identifiers.isEmpty()) {
       return;
     }
 
-    if (!this.accessControl.isPrivilegeRemovable()) {
-      throw new AccessDeniedException(
-          "Not allowed to remove privilege with identifiers " + identifiers);
+    if (!this.accessControl.isUserRemovable()) {
+      throw new AccessDeniedException("Not allowed to remove user with identifiers " + identifiers);
     }
 
-    List<Privilege> privileges = identifiers.stream().map(this::loadPrivilege).toList();
+    List<User> users = identifiers.stream().map(this::loadUser).toList();
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("remove privileges: {}", identifiers);
+      LOGGER.info("remove users: {}", identifiers);
     }
 
-    this.repository.remove(privileges.stream().map(Privilege::id).collect(Collectors.toList()));
+    this.repository.remove(users.stream().map(User::id).collect(Collectors.toList()));
 
     Instant now = Instant.now(this.clock);
-    privileges.forEach(
-        privilege ->
+    String batchId = this.auditLogService.generateAuditBatchId();
+    users.forEach(
+        user ->
             this.auditLogService.createAuditLog(
                 new CreateAuditLogCommand(
-                    "Removed privileges",
-                    "privilege",
-                    privilege.id(),
-                    "remove",
-                    "{}",
-                    "{}",
-                    now,
-                    null)));
+                    "Removed user", "user", user.id(), "remove", "{}", "{}", now, batchId)));
   }
 
-  private Privilege loadPrivilege(@NotNull Identifier identifier) {
+  private User loadUser(@NotNull Identifier identifier) {
     final String id =
         identifier.resolveId(
             (anchor) ->
@@ -81,6 +76,6 @@ public final class RemovePrivileges {
 
     return this.repository
         .get(id)
-        .orElseThrow(() -> new IllegalArgumentException("Privilege with id " + id + " not found."));
+        .orElseThrow(() -> new IllegalArgumentException("User with id " + id + " not found."));
   }
 }

@@ -4,10 +4,10 @@ import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
-import com.sitepark.ies.userrepository.core.port.AccessTokenRepository;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,8 +16,6 @@ public final class PurgeUser {
   private final UserRepository repository;
 
   private final IdentifierResolver identifierResolver;
-
-  private final AccessTokenRepository accessTokenRepository;
 
   private final ExtensionsNotifier extensionsNotifier;
 
@@ -30,14 +28,12 @@ public final class PurgeUser {
       UserRepository repository,
       IdentifierResolver identifierResolver,
       ExtensionsNotifier extensionsNotifier,
-      AccessControl accessControl,
-      AccessTokenRepository accessTokenRepository) {
+      AccessControl accessControl) {
 
     this.repository = repository;
     this.extensionsNotifier = extensionsNotifier;
     this.identifierResolver = identifierResolver;
     this.accessControl = accessControl;
-    this.accessTokenRepository = accessTokenRepository;
   }
 
   public void purgeUser(Identifier identifier) {
@@ -52,9 +48,7 @@ public final class PurgeUser {
       LOGGER.info("purge user: {}", id);
     }
 
-    this.repository.remove(id);
-
-    this.accessTokenRepository.purgeByUser(id);
+    this.repository.remove(List.of(id));
 
     this.extensionsNotifier.notifyPurge(id);
   }

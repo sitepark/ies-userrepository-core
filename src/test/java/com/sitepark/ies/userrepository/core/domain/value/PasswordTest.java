@@ -1,8 +1,7 @@
-package com.sitepark.ies.userrepository.core.domain.entity;
+package com.sitepark.ies.userrepository.core.domain.value;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.sitepark.ies.userrepository.core.domain.value.Password;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +42,7 @@ class PasswordTest {
   void testToString() {
     Password password = Password.builder().hashAlgorithm("a").hash("b").clearText("c").build();
     assertEquals(
-        "Password [hashAlgorithm=a, hash=******, clearText=******]",
+        "Password{hashAlgorithm='a', hash='******', clearText='******'}",
         password.toString(),
         "unexpected toString");
   }
@@ -52,7 +51,7 @@ class PasswordTest {
   void testToStringWithNull() {
     Password password = Password.builder().hashAlgorithm("a").build();
     assertEquals(
-        "Password [hashAlgorithm=a, hash=null, clearText=null]",
+        "Password{hashAlgorithm='a', hash='null', clearText='null'}",
         password.toString(),
         "unexpected toString");
   }

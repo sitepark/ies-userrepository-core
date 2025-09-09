@@ -16,7 +16,7 @@ public final class Or implements Filter {
   }
 
   public List<Filter> getOr() {
-    return this.or;
+    return List.copyOf(this.or);
   }
 
   @Override

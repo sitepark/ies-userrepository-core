@@ -34,7 +34,7 @@ public final class Query {
   }
 
   public List<SortCriteria> getSort() {
-    return this.sort;
+    return List.copyOf(this.sort);
   }
 
   @Nullable

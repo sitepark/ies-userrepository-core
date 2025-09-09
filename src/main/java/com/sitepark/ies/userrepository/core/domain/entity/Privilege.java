@@ -1,29 +1,32 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import java.util.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Defines user privileges to manage permissions and access control based on the provided privilege
  */
+@SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.TooManyMethods"})
 public final class Privilege {
 
-  private final String id;
+  @Nullable private final String id;
 
-  private final Anchor anchor;
+  @Nullable private final Anchor anchor;
 
   private final String name;
 
-  private final String description;
+  @Nullable private final String description;
 
   private final Set<String> roleIds;
 
-  private final Permission permission;
+  @Nullable private final Permission permission;
 
   private Privilege(Builder builder) {
     this.id = builder.id;
@@ -38,27 +41,33 @@ public final class Privilege {
     return new Builder();
   }
 
-  public String getId() {
+  @JsonProperty
+  public String id() {
     return this.id;
   }
 
-  public Anchor getAnchor() {
+  @JsonProperty
+  public Anchor anchor() {
     return this.anchor;
   }
 
-  public String getName() {
+  @JsonProperty
+  public String name() {
     return this.name;
   }
 
-  public String getDescription() {
+  @JsonProperty
+  public String description() {
     return this.description;
   }
 
-  public Set<String> getRoleIds() {
-    return this.roleIds;
+  @JsonProperty
+  public Set<String> roleIds() {
+    return Set.copyOf(this.roleIds);
   }
 
-  public Permission getPermission() {
+  @JsonProperty
+  public Permission permission() {
     return this.permission;
   }
 
@@ -101,10 +110,9 @@ public final class Privilege {
         + ", description='"
         + description
         + '\''
-        + ", roleIds='"
+        + ", roleIds="
         + roleIds
-        + '\''
-        + ", permission='"
+        + ", permission="
         + permission
         + '}';
   }
@@ -141,7 +149,6 @@ public final class Privilege {
     }
 
     public Builder identifier(Identifier identifier) {
-      assert identifier.getId() != null || identifier.getAnchor() != null;
       if (identifier.getAnchor() != null) {
         this.anchor = identifier.getAnchor();
         return this;

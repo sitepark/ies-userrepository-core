@@ -1,81 +1,97 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.userrepository.core.domain.value.Address;
+import com.sitepark.ies.userrepository.core.domain.value.Contact;
 import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
+import com.sitepark.ies.userrepository.core.domain.value.Organisation;
 import com.sitepark.ies.userrepository.core.domain.value.Password;
 import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
-/** Represents user */
+@SuppressWarnings({
+  "PMD.AvoidFieldNameMatchingMethodName",
+  "PMD.TooManyMethods",
+  "PMD.DataClass",
+  "PMD.TooManyFields"
+})
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
-  private final String id;
+  @Nullable private final String id;
 
-  private final Anchor anchor;
+  @Nullable private final Anchor anchor;
 
-  private final String login;
+  @Nullable private final String title;
 
-  private final Password password;
+  @Nullable private final String firstName;
 
-  private final String firstName;
+  @Nullable private final String lastName;
 
-  private final String lastName;
-
-  private final String email;
+  @Nullable private final String email;
 
   private final GenderType gender;
 
-  private final String description;
+  @Nullable private final String description;
 
-  private final UserValidity validity;
+  @Nullable private final Instant createdAt;
+
+  @Nullable private final Instant changedAt;
+
+  private final String login;
+
+  @Nullable private final Password password;
 
   private final List<Identity> identities;
 
+  private final UserValidity validity;
+
+  @Nullable private final Address address;
+
+  @Nullable private final Contact contact;
+
+  @Nullable private final Organisation organisation;
+
   private final List<String> roleIds;
-
-  private final OffsetDateTime createdAt;
-
-  private final OffsetDateTime changedAt;
 
   private User(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
-    this.login = builder.login;
-    this.password = builder.password;
+    this.title = builder.title;
     this.firstName = builder.firstName;
     this.lastName = builder.lastName;
     this.email = builder.email;
     this.gender = builder.gender;
     this.description = builder.description;
-    this.validity = builder.validity;
-    this.identities = List.copyOf(builder.identities);
-    this.roleIds = List.copyOf(builder.roleIds);
     this.createdAt = builder.createdAt;
     this.changedAt = builder.changedAt;
+    this.login = builder.login;
+    this.password = builder.password;
+    this.identities = List.copyOf(builder.identities);
+    this.validity = builder.validity;
+    this.address = builder.address;
+    this.contact = builder.contact;
+    this.organisation = builder.organisation;
+    this.roleIds = List.copyOf(builder.roleIds);
   }
 
   public static Builder builder() {
     return new Builder();
   }
 
-  public String getId() {
-    return this.id;
-  }
-
-  @JsonIgnore
   @Nullable
-  public Identifier getIdentifier() {
+  public Identifier toIdentifier() {
     if (this.id != null) {
       return Identifier.ofId(this.id);
     }
@@ -85,32 +101,7 @@ public final class User {
     return null;
   }
 
-  @Nullable
-  public Anchor getAnchor() {
-    return this.anchor;
-  }
-
-  public String getLogin() {
-    return this.login;
-  }
-
-  @Nullable
-  public Password getPassword() {
-    return this.password;
-  }
-
-  @Nullable
-  public OffsetDateTime getCreatedAt() {
-    return this.createdAt;
-  }
-
-  @Nullable
-  public OffsetDateTime getChangedAt() {
-    return this.changedAt;
-  }
-
-  @JsonIgnore
-  public String getName() {
+  public String toDisplayName() {
     StringBuilder name = new StringBuilder();
     if (this.lastName != null) {
       name.append(this.lastName);
@@ -121,39 +112,12 @@ public final class User {
       }
       name.append(this.firstName);
     }
+
+    if (this.title != null) {
+      name.append(", ").append(this.title);
+    }
+
     return name.toString();
-  }
-
-  @Nullable
-  public String getFirstName() {
-    return this.firstName;
-  }
-
-  @Nullable
-  public String getLastName() {
-    return this.lastName;
-  }
-
-  @Nullable
-  public String getEmail() {
-    return this.email;
-  }
-
-  public GenderType getGender() {
-    return this.gender;
-  }
-
-  @Nullable
-  public String getDescription() {
-    return this.description;
-  }
-
-  public UserValidity getValidity() {
-    return this.validity;
-  }
-
-  public List<Identity> getIdentities() {
-    return this.identities;
   }
 
   @Nullable
@@ -166,8 +130,94 @@ public final class User {
     return null;
   }
 
-  public List<String> getRoleIds() {
-    return this.roleIds;
+  @JsonProperty
+  public String id() {
+    return this.id;
+  }
+
+  @JsonProperty
+  public Anchor anchor() {
+    return this.anchor;
+  }
+
+  @JsonProperty
+  public String title() {
+    return this.title;
+  }
+
+  @JsonProperty
+  public String firstName() {
+    return this.firstName;
+  }
+
+  @JsonProperty
+  public String lastName() {
+    return this.lastName;
+  }
+
+  @JsonProperty
+  public String email() {
+    return this.email;
+  }
+
+  @JsonProperty
+  public GenderType gender() {
+    return this.gender;
+  }
+
+  @JsonProperty
+  public String description() {
+    return this.description;
+  }
+
+  @JsonProperty
+  public Instant createdAt() {
+    return this.createdAt;
+  }
+
+  @JsonProperty
+  public Instant changedAt() {
+    return this.changedAt;
+  }
+
+  @JsonProperty
+  public String login() {
+    return this.login;
+  }
+
+  @JsonProperty
+  public Password password() {
+    return this.password;
+  }
+
+  @JsonProperty
+  public List<Identity> identities() {
+    return List.copyOf(this.identities);
+  }
+
+  @JsonProperty
+  public UserValidity validity() {
+    return this.validity;
+  }
+
+  @JsonProperty
+  public Address address() {
+    return this.address;
+  }
+
+  @JsonProperty
+  public Contact contact() {
+    return this.contact;
+  }
+
+  @JsonProperty
+  public Organisation organisation() {
+    return this.organisation;
+  }
+
+  @JsonProperty
+  public List<String> roleIds() {
+    return List.copyOf(this.roleIds);
   }
 
   public Builder toBuilder() {
@@ -179,18 +229,22 @@ public final class User {
     return Objects.hash(
         this.id,
         this.anchor,
-        this.login,
-        this.password,
+        this.title,
         this.firstName,
         this.lastName,
-        this.email,
         this.gender,
-        this.validity,
-        this.identities,
+        this.email,
         this.description,
-        this.roleIds,
         this.createdAt,
-        this.changedAt);
+        this.changedAt,
+        this.login,
+        this.password,
+        this.identities,
+        this.validity,
+        this.address,
+        this.contact,
+        this.organisation,
+        this.roleIds);
   }
 
   @Override
@@ -202,90 +256,117 @@ public final class User {
 
     return Objects.equals(this.id, entity.id)
         && Objects.equals(this.anchor, entity.anchor)
-        && Objects.equals(this.login, entity.login)
-        && Objects.equals(this.password, entity.password)
+        && Objects.equals(this.title, entity.title)
         && Objects.equals(this.firstName, entity.firstName)
         && Objects.equals(this.lastName, entity.lastName)
-        && Objects.equals(this.email, entity.email)
         && Objects.equals(this.gender, entity.gender)
+        && Objects.equals(this.email, entity.email)
         && Objects.equals(this.description, entity.description)
-        && Objects.equals(this.validity, entity.validity)
-        && Objects.equals(this.identities, entity.identities)
-        && Objects.equals(this.roleIds, entity.roleIds)
         && Objects.equals(this.createdAt, entity.createdAt)
-        && Objects.equals(this.changedAt, entity.changedAt);
+        && Objects.equals(this.changedAt, entity.changedAt)
+        && Objects.equals(this.login, entity.login)
+        && Objects.equals(this.password, entity.password)
+        && Objects.equals(this.identities, entity.identities)
+        && Objects.equals(this.validity, entity.validity)
+        && Objects.equals(this.address, entity.address)
+        && Objects.equals(this.contact, entity.contact)
+        && Objects.equals(this.organisation, entity.organisation)
+        && Objects.equals(this.roleIds, entity.roleIds);
   }
 
   @Override
   public String toString() {
-    return "User [id="
-        + this.id
+    return "User{"
+        + "id='"
+        + id
+        + '\''
         + ", anchor="
-        + this.anchor
-        + ", login="
-        + this.login
-        + ", password="
-        + this.password
-        + ", firstname="
-        + this.firstName
-        + ", lastname="
-        + this.lastName
-        + ", email="
-        + this.email
+        + anchor
+        + ", title='"
+        + title
+        + '\''
+        + ", firstName='"
+        + firstName
+        + '\''
+        + ", lastName='"
+        + lastName
+        + '\''
+        + ", email='"
+        + email
+        + '\''
         + ", gender="
-        + this.gender
-        + ", note="
-        + this.description
-        + ", validity="
-        + this.validity
-        + ", identities="
-        + this.identities
-        + ", roles="
-        + this.roleIds
+        + gender
+        + ", description='"
+        + description
+        + '\''
         + ", createdAt="
-        + this.createdAt
+        + createdAt
         + ", changedAt="
-        + this.changedAt
-        + "]";
+        + changedAt
+        + ", login='"
+        + login
+        + '\''
+        + ", password="
+        + password
+        + ", identities="
+        + identities
+        + ", validity="
+        + validity
+        + ", address="
+        + address
+        + ", contact="
+        + contact
+        + ", organisation="
+        + organisation
+        + ", roleIds="
+        + roleIds
+        + '}';
   }
 
   @SuppressWarnings("PMD.TooManyMethods")
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final List<Identity> identities = new ArrayList<>();
-    private final List<String> roleIds = new ArrayList<>();
     private String id;
+    private String title;
     private Anchor anchor;
-    private String login;
-    private Password password;
     private String firstName;
     private String lastName;
-    private String email;
     private GenderType gender = GenderType.UNKNOWN;
+    private String email;
     private String description;
+    private Instant createdAt;
+    private Instant changedAt;
+    private String login;
+    private Password password;
+    private final List<Identity> identities = new ArrayList<>();
     private UserValidity validity = UserValidity.ALWAYS_VALID;
-    private OffsetDateTime createdAt;
-
-    private OffsetDateTime changedAt;
+    private Address address;
+    private Contact contact;
+    private Organisation organisation;
+    private final List<String> roleIds = new ArrayList<>();
 
     private Builder() {}
 
     private Builder(User user) {
       this.id = user.id;
       this.anchor = user.anchor;
-      this.login = user.login;
-      this.password = user.password;
+      this.title = user.title;
       this.firstName = user.firstName;
       this.lastName = user.lastName;
       this.email = user.email;
       this.gender = user.gender;
       this.description = user.description;
-      this.validity = user.validity;
-      this.identities.addAll(user.identities);
-      this.roleIds.addAll(user.roleIds);
       this.createdAt = user.createdAt;
       this.changedAt = user.changedAt;
+      this.login = user.login;
+      this.password = user.password;
+      this.identities.addAll(user.identities);
+      this.validity = user.validity;
+      this.address = user.address;
+      this.contact = user.contact;
+      this.organisation = user.organisation;
+      this.roleIds.addAll(user.roleIds);
     }
 
     public Builder id(String id) {
@@ -298,7 +379,7 @@ public final class User {
     }
 
     public Builder identifier(Identifier identifier) {
-      assert identifier.getId() != null || identifier.getAnchor() != null;
+      Objects.requireNonNull(identifier, "identifier is null");
       if (identifier.getAnchor() != null) {
         this.anchor = identifier.getAnchor();
         return this;
@@ -334,6 +415,11 @@ public final class User {
 
     public Builder lastName(String lastname) {
       this.lastName = this.trimToNull(lastname);
+      return this;
+    }
+
+    public Builder title(String lastname) {
+      this.title = this.trimToNull(lastname);
       return this;
     }
 
@@ -416,13 +502,28 @@ public final class User {
       return this;
     }
 
-    public Builder createdAt(OffsetDateTime createdAt) {
+    public Builder createdAt(Instant createdAt) {
       Objects.requireNonNull(createdAt, "createdAt is null");
       this.createdAt = createdAt;
       return this;
     }
 
-    public Builder changedAt(OffsetDateTime changedAt) {
+    public Builder address(Address address) {
+      this.address = address;
+      return this;
+    }
+
+    public Builder contact(Contact contact) {
+      this.contact = contact;
+      return this;
+    }
+
+    public Builder organisation(Organisation organisation) {
+      this.organisation = organisation;
+      return this;
+    }
+
+    public Builder changedAt(Instant changedAt) {
       Objects.requireNonNull(changedAt, "changedAt is null");
       this.changedAt = changedAt;
       return this;
@@ -431,6 +532,12 @@ public final class User {
     public User build() {
       if (this.login == null) {
         throw new IllegalStateException("login is not set");
+      }
+      if (this.gender == null) {
+        this.gender = GenderType.UNKNOWN;
+      }
+      if (this.validity == null) {
+        this.validity = UserValidity.ALWAYS_VALID;
       }
       return new User(this);
     }

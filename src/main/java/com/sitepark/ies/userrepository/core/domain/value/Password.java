@@ -39,10 +39,7 @@ public final class Password {
   }
 
   public Builder toBuilder() {
-    return new Builder()
-        .hashAlgorithm(this.hashAlgorithm)
-        .hash(this.hash)
-        .clearText(this.clearText);
+    return new Builder(this);
   }
 
   @Override
@@ -62,13 +59,17 @@ public final class Password {
 
   @Override
   public String toString() {
-    return "Password [hashAlgorithm="
+    return "Password{"
+        + "hashAlgorithm='"
         + hashAlgorithm
-        + ", hash="
+        + '\''
+        + ", hash='"
         + (hash != null ? "******" : null)
-        + ", clearText="
+        + '\''
+        + ", clearText='"
         + (clearText != null ? "******" : null)
-        + "]";
+        + '\''
+        + '}';
   }
 
   @JsonPOJOBuilder(withPrefix = "")
@@ -80,6 +81,12 @@ public final class Password {
     private String clearText;
 
     private Builder() {}
+
+    private Builder(Password password) {
+      this.hashAlgorithm = password.hashAlgorithm;
+      this.hash = password.hash;
+      this.clearText = password.clearText;
+    }
 
     public Builder hashAlgorithm(String hashAlgorithm) {
       this.hashAlgorithm = hashAlgorithm;

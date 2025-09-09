@@ -12,17 +12,17 @@ import java.util.Objects;
 @JsonDeserialize(builder = LdapIdentity.Builder.class)
 public final class LdapIdentity implements Identity {
 
-  private final int server;
+  private final String serverId;
 
   private final String dn;
 
   private LdapIdentity(Builder builder) {
-    this.server = builder.server;
+    this.serverId = builder.serverId;
     this.dn = builder.dn;
   }
 
-  public int getServer() {
-    return this.server;
+  public String getServerId() {
+    return this.serverId;
   }
 
   public String getDn() {
@@ -39,13 +39,12 @@ public final class LdapIdentity implements Identity {
 
   @Override
   public int hashCode() {
-    int hash = this.server;
-    return (this.dn != null) ? (31 * hash) + this.dn.hashCode() : hash;
+    return Objects.hash(this.serverId, this.dn);
   }
 
   @Override
   public String toString() {
-    return "LdapIdentity [server=" + this.server + ", dn=" + this.dn + "]";
+    return "LdapIdentity [serverId=" + this.serverId + ", dn=" + this.dn + "]";
   }
 
   @Override
@@ -55,29 +54,27 @@ public final class LdapIdentity implements Identity {
       return false;
     }
 
-    return Objects.equals(this.server, that.server) && Objects.equals(this.dn, that.dn);
+    return Objects.equals(this.serverId, that.serverId) && Objects.equals(this.dn, that.dn);
   }
 
   @JsonPOJOBuilder(withPrefix = "")
   @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   public static final class Builder {
 
-    private int server;
+    private String serverId;
 
     private String dn;
 
     private Builder() {}
 
     public Builder(LdapIdentity ldapIdentity) {
-      this.server = ldapIdentity.server;
+      this.serverId = ldapIdentity.serverId;
       this.dn = ldapIdentity.dn;
     }
 
-    public Builder server(int server) {
-      if (server <= 0) {
-        throw new IllegalArgumentException("server should be greater then 0");
-      }
-      this.server = server;
+    public Builder serverId(String serverId) {
+      Objects.requireNonNull(serverId, "serverId is null");
+      this.serverId = serverId;
       return this;
     }
 
@@ -92,8 +89,8 @@ public final class LdapIdentity implements Identity {
 
     public LdapIdentity build() {
 
-      if (this.server == 0) {
-        throw new IllegalStateException("server is not set");
+      if (this.serverId == null) {
+        throw new IllegalStateException("serverId is not set");
       }
       if (this.dn == null) {
         throw new IllegalStateException("dn is not set");

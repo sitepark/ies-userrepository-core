@@ -6,6 +6,7 @@ import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.List;
+import java.util.Set;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ class RoleTest {
   @Test
   void testName() {
     Role role = Role.builder().name("testrole").build();
-    assertEquals("testrole", role.getName(), "unexpected name");
+    assertEquals("testrole", role.name(), "unexpected name");
   }
 
   @Test
@@ -38,7 +39,7 @@ class RoleTest {
   @Test
   void testId() {
     Role role = Role.builder().name("testrole").id("123").build();
-    assertEquals("123", role.getId(), "unexpected id");
+    assertEquals("123", role.id(), "unexpected id");
   }
 
   @Test
@@ -53,89 +54,67 @@ class RoleTest {
   @Test
   void testIdentifierWithId() {
     Role role = Role.builder().name("testrole").identifier(Identifier.ofId("123")).build();
-    assertEquals("123", role.getId(), "unexpected id");
+    assertEquals("123", role.id(), "unexpected id");
   }
 
   @Test
   void testIdentifierWithAnchor() {
     Role role = Role.builder().name("testrole").identifier(Identifier.ofAnchor("myanchor")).build();
-    assertEquals(Anchor.ofString("myanchor"), role.getAnchor(), "unexpected anchor");
+    assertEquals(Anchor.ofString("myanchor"), role.anchor(), "unexpected anchor");
   }
 
   @Test
   void testWithInvalidIdentifier() {
     Role role = Role.builder().name("testrole").identifier(Identifier.ofId("123")).build();
-    assertEquals("123", role.getId(), "unexpected id");
+    assertEquals("123", role.id(), "unexpected id");
   }
 
   @Test
   void testAnchorString() {
     Role role = Role.builder().name("testrole").anchor(Anchor.ofString("myanchor")).build();
-    assertEquals(Anchor.ofString("myanchor"), role.getAnchor(), "unexpected anchor");
+    assertEquals(Anchor.ofString("myanchor"), role.anchor(), "unexpected anchor");
   }
 
   @Test
   void testAnchor() {
     Role role = Role.builder().name("testrole").anchor("myanchor").build();
-    assertEquals(Anchor.ofString("myanchor"), role.getAnchor(), "unexpected anchor");
+    assertEquals(Anchor.ofString("myanchor"), role.anchor(), "unexpected anchor");
   }
 
   @Test
   void testDescription() {
     Role role = Role.builder().name("testrole").description("description").build();
-    assertEquals("description", role.getDescription(), "unexpected description");
+    assertEquals("description", role.description(), "unexpected description");
   }
 
   @Test
   void testEmptyDescription() {
     Role role = Role.builder().name("testrole").description("").build();
-    assertNull(role.getDescription(), "unexpected description");
+    assertNull(role.description(), "unexpected description");
   }
 
   @Test
   void testNullDescription() {
     Role role = Role.builder().name("testrole").description(null).build();
-    assertNull(role.getDescription(), "unexpected description");
+    assertNull(role.description(), "unexpected description");
   }
 
   @Test
   void testPrivilegesArray() {
-    Role role =
-        Role.builder()
-            .name("testrole")
-            .privilegeIds(Identifier.ofId("123"), Identifier.ofId("234"))
-            .build();
-    assertEquals(
-        List.of(Identifier.ofId("123"), Identifier.ofId("234")),
-        role.getPrivilegeIds(),
-        "unexpected privileges");
+    Role role = Role.builder().name("testrole").privilegeIds("123", "234").build();
+    assertEquals(Set.of("123", "234"), role.privilegeIds(), "unexpected privileges");
   }
 
   @Test
   void testPrivilegesList() {
-    Role role =
-        Role.builder()
-            .name("testrole")
-            .privilegeIds(List.of(Identifier.ofId("123"), Identifier.ofId("234")))
-            .build();
-    assertEquals(
-        List.of(Identifier.ofId("123"), Identifier.ofId("234")),
-        role.getPrivilegeIds(),
-        "unexpected privileges");
+    Role role = Role.builder().name("testrole").privilegeIds(List.of("123", "234")).build();
+    assertEquals(Set.of("123", "234"), role.privilegeIds(), "unexpected privileges");
   }
 
   @Test
   void testPrivilege() {
-    Role role =
-        Role.builder()
-            .name("testrole")
-            .privilegeId(Identifier.ofId("123"))
-            .privilegeId(Identifier.ofId("234"))
-            .build();
-    assertEquals(
-        List.of(Identifier.ofId("123"), Identifier.ofId("234")),
-        role.getPrivilegeIds(),
-        "unexpected privileges");
+    Role role = Role.builder().name("testrole").privilegeId("123").privilegeId("234").build();
+    assertEquals(Set.of("123", "234"), role.privilegeIds(), "unexpected privileges");
   }
 
   @Test
@@ -145,8 +124,8 @@ class RoleTest {
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description")
-            .privilegeId(Identifier.ofId("123"))
-            .privilegeId(Identifier.ofId("234"))
+            .privilegeId("123")
+            .privilegeId("234")
             .build();
     Role copy = role.toBuilder().description("description2").build();
 
@@ -155,8 +134,8 @@ class RoleTest {
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description2")
-            .privilegeId(Identifier.ofId("123"))
-            .privilegeId(Identifier.ofId("234"))
+            .privilegeId("123")
+            .privilegeId("234")
             .build();
 
     assertEquals(expected, copy, "unexpected privileges");

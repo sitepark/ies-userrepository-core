@@ -3,9 +3,8 @@ package com.sitepark.ies.userrepository.core.domain.value;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Encapsulates user properties indicating whether a user is blocked or has a limited validity
@@ -17,8 +16,8 @@ public class UserValidity {
 
   public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
   private final boolean blocked;
-  private final OffsetDateTime validFrom;
-  private final OffsetDateTime validTo;
+  private final Instant validFrom;
+  private final Instant validTo;
 
   protected UserValidity(Builder builder) {
     this.blocked = builder.blocked;
@@ -34,18 +33,16 @@ public class UserValidity {
     return this.blocked;
   }
 
-  @Nullable
-  public OffsetDateTime getValidFrom() {
+  public Instant getValidFrom() {
     return this.validFrom;
   }
 
-  @Nullable
-  public OffsetDateTime getValidTo() {
+  public Instant getValidTo() {
     return this.validTo;
   }
 
   @JsonIgnore
-  public boolean isValid(OffsetDateTime base) {
+  public boolean isValid(Instant base) {
 
     Objects.requireNonNull(base, "base is null");
 
@@ -58,7 +55,7 @@ public class UserValidity {
 
   @JsonIgnore
   public boolean isNowValid() {
-    return this.isValid(OffsetDateTime.now());
+    return this.isValid(Instant.now());
   }
 
   public Builder toBuilder() {
@@ -83,13 +80,14 @@ public class UserValidity {
 
   @Override
   public String toString() {
-    return "UserValidity [blocked="
-        + this.blocked
+    return "UserValidity{"
+        + "blocked="
+        + blocked
         + ", validFrom="
-        + this.validFrom
+        + validFrom
         + ", validTo="
-        + this.validTo
-        + "]";
+        + validTo
+        + '}';
   }
 
   @JsonPOJOBuilder(withPrefix = "")
@@ -98,9 +96,9 @@ public class UserValidity {
 
     private boolean blocked;
 
-    private OffsetDateTime validFrom;
+    private Instant validFrom;
 
-    private OffsetDateTime validTo;
+    private Instant validTo;
 
     private Builder() {}
 
@@ -115,13 +113,13 @@ public class UserValidity {
       return this;
     }
 
-    public Builder validFrom(OffsetDateTime validFrom) {
+    public Builder validFrom(Instant validFrom) {
       Objects.requireNonNull(validFrom, "validFrom is null");
       this.validFrom = validFrom;
       return this;
     }
 
-    public Builder validTo(OffsetDateTime validTo) {
+    public Builder validTo(Instant validTo) {
       Objects.requireNonNull(validTo, "validTo is null");
       this.validTo = validTo;
       return this;

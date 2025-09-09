@@ -1,4 +1,4 @@
-package com.sitepark.ies.userrepository.core.domain.entity;
+package com.sitepark.ies.userrepository.core.domain.value;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,12 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -37,12 +35,9 @@ class UserValidityTest {
   @Test
   void testToBuilder() {
 
-    OffsetDateTime validFrom =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
-    OffsetDateTime validTo =
-        LocalDate.of(2023, 8, 22).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
-    OffsetDateTime validToChanged =
-        LocalDate.of(2023, 8, 23).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validFrom = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
+    Instant validTo = LocalDate.of(2023, 8, 22).atStartOfDay(ZONE_ID).toInstant();
+    Instant validToChanged = LocalDate.of(2023, 8, 23).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity =
         UserValidity.builder().blocked(false).validFrom(validFrom).validTo(validTo).build();
@@ -58,17 +53,16 @@ class UserValidityTest {
   @Test
   void testToString() {
 
-    OffsetDateTime validFrom =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
-    OffsetDateTime validTo =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validFrom = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
+    Instant validTo = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity =
         UserValidity.builder().blocked(false).validFrom(validFrom).validTo(validTo).build();
 
     String expected =
-        "UserValidity [blocked=false, validFrom=2023-08-21T00:00+02:00, "
-            + "validTo=2023-08-21T00:00+02:00]";
+        """
+        UserValidity{blocked=false, validFrom=2023-08-20T22:00:00Z, validTo=2023-08-20T22:00:00Z}\
+        """;
 
     assertEquals(expected, userValidity.toString(), "unexpected string representation");
   }
@@ -100,8 +94,7 @@ class UserValidityTest {
 
     UserValidity userValidity = UserValidity.builder().blocked(true).build();
 
-    OffsetDateTime base =
-        LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant base = LocalDate.of(2023, 8, 30).atStartOfDay(ZONE_ID).toInstant();
 
     assertFalse(userValidity.isValid(base), "validity should not be valid");
   }
@@ -109,11 +102,9 @@ class UserValidityTest {
   @Test
   void testIsValidFrom() {
 
-    OffsetDateTime validFrom =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validFrom = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
 
-    OffsetDateTime base =
-        LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant base = LocalDate.of(2023, 8, 30).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity = UserValidity.builder().validFrom(validFrom).build();
 
@@ -123,11 +114,9 @@ class UserValidityTest {
   @Test
   void testIsNotValidFrom() {
 
-    OffsetDateTime validFrom =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validFrom = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
 
-    OffsetDateTime base =
-        LocalDate.of(2023, 8, 20).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant base = LocalDate.of(2023, 8, 20).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity = UserValidity.builder().validFrom(validFrom).build();
 
@@ -137,11 +126,9 @@ class UserValidityTest {
   @Test
   void testIsValidTo() {
 
-    OffsetDateTime validTo =
-        LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validTo = LocalDate.of(2023, 8, 30).atStartOfDay(ZONE_ID).toInstant();
 
-    OffsetDateTime base =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant base = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity = UserValidity.builder().validTo(validTo).build();
 
@@ -151,11 +138,9 @@ class UserValidityTest {
   @Test
   void testIsNotValidTo() {
 
-    OffsetDateTime validTo =
-        LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validTo = LocalDate.of(2023, 8, 30).atStartOfDay(ZONE_ID).toInstant();
 
-    OffsetDateTime base =
-        LocalDate.of(2023, 9, 1).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant base = LocalDate.of(2023, 9, 1).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity = UserValidity.builder().validTo(validTo).build();
 
@@ -165,8 +150,7 @@ class UserValidityTest {
   @Test
   void testSetValidFrom() {
 
-    OffsetDateTime validFrom =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validFrom = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity = UserValidity.builder().validFrom(validFrom).build();
 
@@ -181,8 +165,7 @@ class UserValidityTest {
   @Test
   void testSetValidTo() {
 
-    OffsetDateTime validTo =
-        LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
+    Instant validTo = LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant();
 
     UserValidity userValidity = UserValidity.builder().validTo(validTo).build();
 
@@ -206,8 +189,8 @@ class UserValidityTest {
     UserValidity userValidity =
         UserValidity.builder()
             .blocked(false)
-            .validFrom(LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime())
-            .validTo(LocalDate.of(2023, 10, 1).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime())
+            .validFrom(LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant())
+            .validTo(LocalDate.of(2023, 10, 1).atStartOfDay(ZONE_ID).toInstant())
             .build();
 
     String json = mapper.writeValueAsString(userValidity);
@@ -216,8 +199,8 @@ class UserValidityTest {
         """
         {\
         "blocked":false,\
-        "validFrom":"2023-08-21T00:00:00+02:00",\
-        "validTo":"2023-10-01T00:00:00+02:00"}\
+        "validFrom":"2023-08-20T22:00:00Z",\
+        "validTo":"2023-09-30T22:00:00Z"}\
         """;
 
     assertEquals(expected, json, "unexpected json");
@@ -244,18 +227,8 @@ class UserValidityTest {
     UserValidity expected =
         UserValidity.builder()
             .blocked(false)
-            .validFrom(
-                LocalDate.of(2023, 8, 21)
-                    .atStartOfDay()
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime()
-                    .withOffsetSameInstant(ZoneOffset.UTC))
-            .validTo(
-                LocalDate.of(2023, 10, 1)
-                    .atStartOfDay()
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime()
-                    .withOffsetSameInstant(ZoneOffset.UTC))
+            .validFrom(LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant())
+            .validTo(LocalDate.of(2023, 10, 1).atStartOfDay(ZONE_ID).toInstant())
             .build();
 
     assertEquals(expected, userValidity, "unexpected userValidity");

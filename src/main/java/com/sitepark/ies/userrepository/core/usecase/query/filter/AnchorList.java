@@ -17,7 +17,7 @@ public final class AnchorList implements Filter {
   }
 
   public List<Anchor> getAnchorList() {
-    return this.anchorList;
+    return List.copyOf(this.anchorList);
   }
 
   @Override

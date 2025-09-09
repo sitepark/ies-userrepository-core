@@ -7,17 +7,18 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PrivilegeRepository {
+
   String create(Privilege privilege);
 
   void update(Privilege privilege);
+
+  void remove(List<String> ids);
 
   Optional<Privilege> get(String id);
 
   List<Privilege> getAll();
 
   List<Privilege> getByIds(List<String> ids);
-
-  void remove(List<String> ids);
 
   Optional<String> resolveAnchor(Anchor anchor);
 

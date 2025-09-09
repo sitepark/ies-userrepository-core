@@ -12,125 +12,144 @@ import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
-import com.sitepark.ies.userrepository.core.port.RoleAssigner;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UpsertPrivilegeTest {
 
-  private PrivilegeRepository repository;
-  private RoleAssigner roleAssigner;
   private AccessControl accessControl;
+  private PrivilegeRepository repository;
+  private CreatePrivilege createPrivilegeUseCase;
+  private UpdatePrivilege updatePrivilegeUseCase;
 
-  private UpsertPrivilege usecase;
+  private UpsertPrivilege useCase;
 
-  public @BeforeEach void setUp() {
-    this.repository = mock();
-    this.accessControl = mock();
-    this.roleAssigner = mock();
+  @BeforeEach
+  void setUp() {
+    this.accessControl = mock(AccessControl.class);
+    this.repository = mock(PrivilegeRepository.class);
+    this.createPrivilegeUseCase = mock(CreatePrivilege.class);
+    this.updatePrivilegeUseCase = mock(UpdatePrivilege.class);
 
-    this.usecase = new UpsertPrivilege(this.repository, this.roleAssigner, this.accessControl);
+    this.useCase =
+        new UpsertPrivilege(
+            this.accessControl,
+            this.repository,
+            this.createPrivilegeUseCase,
+            this.updatePrivilegeUseCase);
   }
 
   @Test
-  void testPermissionNotSet() {
-    Privilege privilege = Privilege.builder().name("test").build();
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> this.usecase.upsertPrivilege(privilege, new String[] {}),
-        "Expected IllegalArgumentException for privilege without permissions");
-  }
+  void testAccessDeniedCreatable() {
 
-  @Test
-  void testRoleWritable() {
+    when(this.accessControl.isPrivilegeCreatable()).thenReturn(false);
+    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+
     Privilege privilege =
-        Privilege.builder().name("test").permission(new Permission("test", null)).build();
+        Privilege.builder()
+            .id("1")
+            .anchor("anchor")
+            .name("test")
+            .permission(new Permission("test", null))
+            .build();
     assertThrows(
         AccessDeniedException.class,
-        () -> this.usecase.upsertPrivilege(privilege, new String[] {"1"}),
-        "Expected IllegalArgumentException for privilege with ID");
+        () -> this.useCase.upsertPrivilege(privilege, null),
+        "upsert privilege should be denied");
   }
 
   @Test
-  void testCreatablePrivilege() {
-    Privilege privilege =
-        Privilege.builder().name("test").permission(new Permission("test", null)).build();
-    assertThrows(
-        AccessDeniedException.class,
-        () -> this.usecase.upsertPrivilege(privilege, new String[] {}),
-        "Expected AccessDeniedException for creating privilege without permission");
-  }
-
-  @Test
-  void testCreatePrivilege() {
+  void testAccessDeniedWritable() {
 
     when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
+    when(this.accessControl.isPrivilegeWritable()).thenReturn(false);
+
     Privilege privilege =
-        Privilege.builder().name("test").permission(new Permission("test", null)).build();
-    this.usecase.upsertPrivilege(privilege, new String[] {});
-
-    verify(this.repository).create(privilege);
-  }
-
-  @Test
-  void testAssignRolesForCreatedPrivilege() {
-
-    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
-    when(this.repository.create(any())).thenReturn("1");
-    Privilege privilege =
-        Privilege.builder().name("test").permission(new Permission("test", null)).build();
-    this.usecase.upsertPrivilege(privilege, new String[] {"2"});
-
-    verify(this.roleAssigner).assignPrivilegesToRoles(List.of("2"), List.of("1"));
-  }
-
-  @Test
-  void testWritablePrivilege() {
-    Privilege privilege =
-        Privilege.builder().id("1").name("test").permission(new Permission("test", null)).build();
+        Privilege.builder()
+            .id("1")
+            .anchor("anchor")
+            .name("test")
+            .permission(new Permission("test", null))
+            .build();
     assertThrows(
         AccessDeniedException.class,
-        () -> this.usecase.upsertPrivilege(privilege, new String[] {}),
-        "Expected AccessDeniedException for creating privilege without permission");
+        () -> this.useCase.upsertPrivilege(privilege, null),
+        "upsert privilege should be denied");
   }
 
   @Test
-  void testUpdatePrivilege() {
+  void testWithoutIdAndAnchor() {
 
+    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
     when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+
+    Privilege privilege =
+        Privilege.builder().name("test").permission(new Permission("test", null)).build();
+
+    this.useCase.upsertPrivilege(privilege, null);
+
+    verify(this.createPrivilegeUseCase).createPrivilege(privilege, null);
+  }
+
+  @Test
+  void testWithId() {
+
+    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
+    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+
     Privilege privilege =
         Privilege.builder().id("1").name("test").permission(new Permission("test", null)).build();
-    this.usecase.upsertPrivilege(privilege, new String[] {});
 
-    verify(this.repository).update(privilege);
+    this.useCase.upsertPrivilege(privilege, null);
+
+    verify(this.updatePrivilegeUseCase).updatePrivilege(privilege, null);
   }
 
   @Test
-  void testUpdatePrivilegeWithAnchor() {
+  void testWithUnknownAnchor() {
 
+    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
     when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
-    when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("1"));
+
     Privilege privilege =
         Privilege.builder()
             .anchor("anchor")
             .name("test")
             .permission(new Permission("test", null))
             .build();
-    this.usecase.upsertPrivilege(privilege, new String[] {});
 
-    Privilege expected = privilege.toBuilder().id("1").build();
+    this.useCase.upsertPrivilege(privilege, null);
 
-    verify(this.repository).update(expected);
+    verify(this.createPrivilegeUseCase).createPrivilege(privilege, null);
   }
 
   @Test
-  void testUpdatePrivilegeWithExistsAnchor() {
+  void testWithKnownAnchor() {
 
+    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
     when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
-    when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("2"));
+    when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("1"));
+
+    Privilege privilege =
+        Privilege.builder()
+            .anchor("anchor")
+            .name("test")
+            .permission(new Permission("test", null))
+            .build();
+
+    this.useCase.upsertPrivilege(privilege, null);
+
+    Privilege expected = privilege.toBuilder().id("1").build();
+
+    verify(this.updatePrivilegeUseCase).updatePrivilege(expected, null);
+  }
+
+  @Test
+  void testWithAlreadyExistsAnchor() {
+
+    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
+    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+    when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("2"));
 
     Privilege privilege =
         Privilege.builder()
@@ -142,38 +161,7 @@ class UpsertPrivilegeTest {
 
     assertThrows(
         AnchorAlreadyExistsException.class,
-        () -> this.usecase.upsertPrivilege(privilege, new String[] {}),
+        () -> this.useCase.upsertPrivilege(privilege, null),
         "Expected AnchorAlreadyExistsException for privilege with existing anchor");
-  }
-
-  @Test
-  void testUpdatePrivilegeWithUnchangedAnchor() {
-
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
-    when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("1"));
-
-    Privilege privilege =
-        Privilege.builder()
-            .id("1")
-            .anchor("anchor")
-            .name("test")
-            .permission(new Permission("test", null))
-            .build();
-
-    this.usecase.upsertPrivilege(privilege, new String[] {});
-
-    verify(this.repository).update(privilege);
-  }
-
-  @Test
-  void testAssignRolesForUpdatePrivilege() {
-
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
-    Privilege privilege =
-        Privilege.builder().id("1").name("test").permission(new Permission("test", null)).build();
-    this.usecase.upsertPrivilege(privilege, new String[] {"2"});
-
-    verify(this.roleAssigner).reassignPrivilegesToRoles(List.of("2"), List.of("1"));
   }
 }

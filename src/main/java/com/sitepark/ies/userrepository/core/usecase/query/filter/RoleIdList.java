@@ -16,7 +16,7 @@ public final class RoleIdList implements Filter {
   }
 
   public List<String> getRoleIdList() {
-    return this.roleIdList;
+    return List.copyOf(this.roleIdList);
   }
 
   @Override

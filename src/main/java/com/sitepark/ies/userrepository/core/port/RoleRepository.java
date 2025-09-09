@@ -7,19 +7,19 @@ import java.util.Optional;
 
 public interface RoleRepository {
 
-  void create(Role entity);
+  String create(Role role);
 
-  void update(Role entity);
+  void update(Role role);
+
+  void remove(List<String> ids);
 
   Optional<Role> get(String id);
+
+  List<Role> getAll();
 
   List<Role> getByIds(List<String> ids);
 
   List<Role> getByPrivilegeIds(List<String> privilegeIds);
-
-  List<Role> getAll();
-
-  void remove(String id);
 
   Optional<String> resolveAnchor(Anchor anchor);
 }

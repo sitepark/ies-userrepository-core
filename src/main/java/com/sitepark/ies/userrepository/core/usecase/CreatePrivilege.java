@@ -39,7 +39,7 @@ public final class CreatePrivilege {
 
     this.validateAnchor(privilege);
 
-    this.repository.validatePermission(privilege.getPermission());
+    this.repository.validatePermission(privilege.permission());
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("create privilege: {}", privilege);
@@ -54,13 +54,13 @@ public final class CreatePrivilege {
   }
 
   private void validatePrivilege(Privilege privilege) {
-    if (privilege.getId() != null) {
+    if (privilege.id() != null) {
       throw new IllegalArgumentException("The ID of the privilege must not be set when creating.");
     }
-    if (privilege.getName() == null || privilege.getName().isBlank()) {
+    if (privilege.name() == null || privilege.name().isBlank()) {
       throw new IllegalArgumentException("The name of the privilege must not be null or empty.");
     }
-    if (privilege.getPermission() == null) {
+    if (privilege.permission() == null) {
       throw new IllegalArgumentException("The permission of the privilege must not be null.");
     }
   }
@@ -81,11 +81,11 @@ public final class CreatePrivilege {
   }
 
   private void validateAnchor(Privilege privilege) {
-    if (privilege.getAnchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(privilege.getAnchor());
+    if (privilege.anchor() != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(privilege.anchor());
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(privilege.getAnchor(), owner);
+            throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
           });
     }
   }

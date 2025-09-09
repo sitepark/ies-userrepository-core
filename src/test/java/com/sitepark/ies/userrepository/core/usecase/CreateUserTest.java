@@ -18,7 +18,6 @@ import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsE
 import com.sitepark.ies.userrepository.core.domain.value.Password;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
-import com.sitepark.ies.userrepository.core.port.IdGenerator;
 import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -37,11 +36,11 @@ class CreateUserTest {
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
-    User user = User.builder().login("test").build();
+    User user = User.builder().login("test").lastName("Test").build();
 
     var createUserUseCase =
-        new CreateUser(repository, null, accessControl, null, extensionsNotifier, passwordHasher);
-    assertThrows(AccessDeniedException.class, () -> createUserUseCase.createUser(user));
+        new CreateUser(repository, null, accessControl, extensionsNotifier, passwordHasher);
+    assertThrows(AccessDeniedException.class, () -> createUserUseCase.createUser(user, null));
   }
 
   @Test
@@ -49,8 +48,8 @@ class CreateUserTest {
 
     User user = User.builder().id("123").login("test").build();
 
-    var createUserUseCase = new CreateUser(null, null, null, null, null, null);
-    assertThrows(IllegalArgumentException.class, () -> createUserUseCase.createUser(user));
+    var createUserUseCase = new CreateUser(null, null, null, null, null);
+    assertThrows(IllegalArgumentException.class, () -> createUserUseCase.createUser(user, null));
   }
 
   @Test
@@ -63,12 +62,13 @@ class CreateUserTest {
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
-    User user = User.builder().anchor("test.user").login("test").build();
+    User user = User.builder().anchor("test.user").login("test").lastName("Test").build();
 
     var createUserUseCase =
-        new CreateUser(repository, null, accessControl, null, extensionsNotifier, passwordHasher);
+        new CreateUser(repository, null, accessControl, extensionsNotifier, passwordHasher);
 
-    assertThrows(AnchorAlreadyExistsException.class, () -> createUserUseCase.createUser(user));
+    assertThrows(
+        AnchorAlreadyExistsException.class, () -> createUserUseCase.createUser(user, null));
   }
 
   @Test
@@ -77,33 +77,24 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreatable()).thenReturn(true);
-    IdGenerator idGenerator = mock();
-    when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     UserRepository repository = mock();
     when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
+    when(repository.create(any())).thenReturn("123");
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roleIds("333").build();
+    User user = User.builder().login("test").lastName("Test").build();
 
     var createUserUseCase =
-        new CreateUser(
-            repository,
-            roleAssigner,
-            accessControl,
-            idGenerator,
-            extensionsNotifier,
-            passwordHasher);
+        new CreateUser(repository, roleAssigner, accessControl, extensionsNotifier, passwordHasher);
 
-    String id = createUserUseCase.createUser(user);
+    String id = createUserUseCase.createUser(user, new String[] {"333"});
 
     assertEquals("123", id, "unexpected id");
 
-    User effectiveUser = User.builder().id("123").login("test").roleIds("333").build();
-
-    verify(repository).create(eq(effectiveUser));
+    verify(repository).create(eq(user));
     verify(roleAssigner).assignUsersToRoles(List.of("333"), List.of("123"));
   }
 
@@ -112,32 +103,23 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreatable()).thenReturn(true);
-    IdGenerator idGenerator = mock();
-    when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     UserRepository repository = mock();
     when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
     when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
+    when(repository.create(any())).thenReturn("123");
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().anchor("test.anchor").login("test").build();
+    User user = User.builder().anchor("test.anchor").login("test").lastName("Test").build();
 
     var createUserUseCase =
-        new CreateUser(
-            repository,
-            roleAssigner,
-            accessControl,
-            idGenerator,
-            extensionsNotifier,
-            passwordHasher);
+        new CreateUser(repository, roleAssigner, accessControl, extensionsNotifier, passwordHasher);
 
-    createUserUseCase.createUser(user);
+    createUserUseCase.createUser(user, null);
 
-    User effectiveUser = User.builder().id("123").anchor("test.anchor").login("test").build();
-
-    verify(repository).create(eq(effectiveUser));
+    verify(repository).create(eq(user));
   }
 
   @Test
@@ -145,29 +127,26 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreatable()).thenReturn(true);
-    IdGenerator idGenerator = mock();
-    when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
     UserRepository repository = mock();
     when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
     when(repository.resolveLogin(anyString())).thenReturn(Optional.empty());
+    when(repository.create(any())).thenReturn("123");
     RoleAssigner roleAssigner = mock();
 
     User user =
-        User.builder().login("test").password(Password.builder().clearText("text").build()).build();
+        User.builder()
+            .login("test")
+            .lastName("Test")
+            .password(Password.builder().clearText("text").build())
+            .build();
 
     var createUserUseCase =
-        new CreateUser(
-            repository,
-            roleAssigner,
-            accessControl,
-            idGenerator,
-            extensionsNotifier,
-            passwordHasher);
+        new CreateUser(repository, roleAssigner, accessControl, extensionsNotifier, passwordHasher);
 
-    createUserUseCase.createUser(user);
+    createUserUseCase.createUser(user, null);
 
     verify(passwordHasher).hash("text");
   }
@@ -178,8 +157,6 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreatable()).thenReturn(true);
-    IdGenerator idGenerator = mock();
-    when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
 
@@ -187,19 +164,14 @@ class CreateUserTest {
     when(repository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
     RoleAssigner roleAssigner = mock();
 
-    User user = User.builder().login("test").roleIds("333").build();
+    User user = User.builder().login("test").lastName("Test").roleIds("333").build();
 
     var createUserUseCase =
-        new CreateUser(
-            repository,
-            roleAssigner,
-            accessControl,
-            idGenerator,
-            extensionsNotifier,
-            passwordHasher);
+        new CreateUser(repository, roleAssigner, accessControl, extensionsNotifier, passwordHasher);
 
     LoginAlreadyExistsException e =
-        assertThrows(LoginAlreadyExistsException.class, () -> createUserUseCase.createUser(user));
+        assertThrows(
+            LoginAlreadyExistsException.class, () -> createUserUseCase.createUser(user, null));
     assertEquals("test", e.getLogin(), "unexpected login");
     assertEquals("345", e.getOwner(), "unexpected owner");
     assertNotNull(e.getMessage(), "message is null");

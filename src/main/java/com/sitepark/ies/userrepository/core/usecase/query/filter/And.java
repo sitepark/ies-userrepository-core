@@ -16,7 +16,7 @@ public final class And implements Filter {
   }
 
   public List<Filter> getAnd() {
-    return this.and;
+    return List.copyOf(this.and);
   }
 
   @Override

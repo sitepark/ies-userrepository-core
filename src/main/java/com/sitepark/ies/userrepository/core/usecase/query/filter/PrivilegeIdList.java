@@ -14,7 +14,7 @@ public final class PrivilegeIdList implements Filter {
   }
 
   public List<String> getPrivilegedList() {
-    return this.privilegedList;
+    return List.copyOf(this.privilegedList);
   }
 
   @Override

@@ -9,17 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
-  void create(User entity);
 
-  void update(User entity);
+  String create(User user);
+
+  void update(User user);
+
+  void remove(List<String> ids);
 
   Optional<User> get(String id);
 
   List<User> getAll(Filter filter);
 
-  Result<User> search(Query query);
+  List<User> getByIds(List<String> ids);
 
-  void remove(String id);
+  Result<User> search(Query query);
 
   Optional<String> resolveLogin(String login);
 

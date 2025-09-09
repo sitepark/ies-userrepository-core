@@ -5,9 +5,9 @@ import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogCommand;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
-import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
+import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
@@ -17,17 +17,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-public final class RemovePrivileges {
+public final class RemoveRoles {
 
   private static final Logger LOGGER = LogManager.getLogger();
-  private final PrivilegeRepository repository;
+  private final RoleRepository repository;
   private final AccessControl accessControl;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
   @Inject
-  RemovePrivileges(
-      PrivilegeRepository repository,
+  RemoveRoles(
+      RoleRepository repository,
       AccessControl accessControl,
       AuditLogService auditLogService,
       Clock clock) {
@@ -37,41 +37,34 @@ public final class RemovePrivileges {
     this.clock = clock;
   }
 
-  public void removePrivileges(@NotNull List<Identifier> identifiers) {
+  public void removeRoles(@NotNull List<Identifier> identifiers) {
 
     if (identifiers.isEmpty()) {
       return;
     }
 
     if (!this.accessControl.isPrivilegeRemovable()) {
-      throw new AccessDeniedException(
-          "Not allowed to remove privilege with identifiers " + identifiers);
+      throw new AccessDeniedException("Not allowed to remove role with identifiers " + identifiers);
     }
 
-    List<Privilege> privileges = identifiers.stream().map(this::loadPrivilege).toList();
+    List<Role> roles = identifiers.stream().map(this::loadRole).toList();
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("remove privileges: {}", identifiers);
+      LOGGER.info("remove roles: {}", identifiers);
     }
 
-    this.repository.remove(privileges.stream().map(Privilege::id).collect(Collectors.toList()));
+    this.repository.remove(roles.stream().map(Role::id).collect(Collectors.toList()));
 
     Instant now = Instant.now(this.clock);
-    privileges.forEach(
-        privilege ->
+    String batchId = this.auditLogService.generateAuditBatchId();
+    roles.forEach(
+        role ->
             this.auditLogService.createAuditLog(
                 new CreateAuditLogCommand(
-                    "Removed privileges",
-                    "privilege",
-                    privilege.id(),
-                    "remove",
-                    "{}",
-                    "{}",
-                    now,
-                    null)));
+                    "Removed roles", "role", role.id(), "remove", "{}", "{}", now, batchId)));
   }
 
-  private Privilege loadPrivilege(@NotNull Identifier identifier) {
+  private Role loadRole(@NotNull Identifier identifier) {
     final String id =
         identifier.resolveId(
             (anchor) ->
