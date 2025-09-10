@@ -89,7 +89,7 @@ class LdapIdentityTest {
 
     String json = mapper.writeValueAsString(ldapIdentity);
 
-    String expected = "{\"@type\":\"ldap\",\"serverId\":\"2\",\"dn\":\"userdn\"}";
+    String expected = "{\"serverId\":\"2\",\"dn\":\"userdn\",\"type\":\"ldap\"}";
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -107,7 +107,7 @@ class LdapIdentityTest {
     String json =
         mapper.writerFor(new TypeReference<List<Identity>>() {}).writeValueAsString(identities);
 
-    String expected = "[{\"@type\":\"ldap\",\"serverId\":\"2\",\"dn\":\"userdn\"}]";
+    String expected = "[{\"serverId\":\"2\",\"dn\":\"userdn\",\"type\":\"ldap\"}]";
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -120,7 +120,7 @@ class LdapIdentityTest {
     SimpleModule module = new SimpleModule();
     mapper.registerModule(module);
 
-    String json = "{\"@type\":\"ldap\",\"serverId\":\"2\",\"dn\":\"userdn\"}";
+    String json = "{\"serverId\":\"2\",\"dn\":\"userdn\",\"type\":\"ldap\"}";
 
     LdapIdentity ldapIdentity = mapper.readValue(json, LdapIdentity.class);
 

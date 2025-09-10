@@ -21,6 +21,11 @@ public final class LdapIdentity implements Identity {
     this.dn = builder.dn;
   }
 
+  @Override
+  public String getType() {
+    return "ldap";
+  }
+
   public String getServerId() {
     return this.serverId;
   }
@@ -84,6 +89,12 @@ public final class LdapIdentity implements Identity {
         throw new IllegalArgumentException("dn should not be blank");
       }
       this.dn = dn;
+      return this;
+    }
+
+    @com.fasterxml.jackson.annotation.JsonSetter("type")
+    public Builder type(String type) {
+      // Ignore type during deserialization - it's handled by Jackson's type system
       return this;
     }
 

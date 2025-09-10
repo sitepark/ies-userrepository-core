@@ -9,6 +9,12 @@ import com.sitepark.ies.userrepository.core.domain.value.identity.LdapIdentity;
  * Classes like {@link LdapIdentity} implement this interface to specify how users can authenticate
  * themselves using different identity providers.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    property = "type",
+    include = JsonTypeInfo.As.EXISTING_PROPERTY)
 @JsonSubTypes({@JsonSubTypes.Type(value = LdapIdentity.class, name = "ldap")})
-public interface Identity {}
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
+public interface Identity {
+  String getType();
+}

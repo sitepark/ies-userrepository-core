@@ -543,7 +543,7 @@ class UserTest {
 
     String expected =
         """
-        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"@type":"ldap","serverId":"2","dn":"userdn"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
+        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
         """;
 
     assertEquals(expected, json, "unexpected json");
@@ -559,7 +559,7 @@ class UserTest {
 
     String json =
         """
-        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"@type":"ldap","serverId":"2","dn":"userdn"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
+        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
         """;
 
     User user = mapper.readValue(json, User.class);
