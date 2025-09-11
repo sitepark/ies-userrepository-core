@@ -63,7 +63,7 @@ public final class CreateUser {
     String id = this.repository.create(userWithIdAndHashPassword);
 
     if (roleIds != null && roleIds.length > 0) {
-      this.roleAssigner.assignUsersToRoles(Arrays.asList(roleIds), List.of(id));
+      this.roleAssigner.assignRolesToUsers(List.of(id), Arrays.asList(roleIds));
     }
 
     this.extensionsNotifier.notifyCreated(userWithIdAndHashPassword.toBuilder().id(id).build());

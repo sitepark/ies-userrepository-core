@@ -12,6 +12,9 @@ public final class Or implements Filter {
 
   Or(@JsonProperty("or") Filter... or) {
     Objects.requireNonNull(or, "or is null");
+    if (or.length == 0) {
+      throw new IllegalArgumentException("or is empty");
+    }
     this.or = List.of(or);
   }
 

@@ -121,7 +121,7 @@ class AssignPrivilegesToRolesTest {
 
   @Test
   void testResolvePrivilegeAnchorNotFound() {
-    when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.empty());
+    when(this.privilegeRepository.resolveAnchor(any())).thenReturn(Optional.empty());
     when(this.accessControl.isRoleWritable()).thenReturn(true);
 
     assertThrows(

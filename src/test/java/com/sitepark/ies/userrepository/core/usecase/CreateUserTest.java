@@ -95,7 +95,7 @@ class CreateUserTest {
     assertEquals("123", id, "unexpected id");
 
     verify(repository).create(eq(user));
-    verify(roleAssigner).assignUsersToRoles(List.of("333"), List.of("123"));
+    verify(roleAssigner).assignRolesToUsers(List.of("123"), List.of("333"));
   }
 
   @Test

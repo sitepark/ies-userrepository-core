@@ -4,19 +4,23 @@ import java.util.List;
 
 public interface RoleAssigner {
 
-  void assignUsersToRoles(List<String> rolesIds, List<String> userIds);
+  // user-role
 
-  void reassignUsersToRoles(List<String> roleIds, List<String> userIds);
+  void assignRolesToUsers(List<String> userIds, List<String> roleIds);
 
-  void revokeUsersFromRoles(List<String> roleIds, List<String> userIds);
+  void reassignRoleToUsers(List<String> userIds, List<String> roleIds);
+
+  void revokeRolesFromUsers(List<String> userIds, List<String> roleIds);
 
   void revokeAllRolesFromUsers(List<String> userIds);
 
-  void revokeAllUsersFromRoles(List<String> rolesIds);
+  void revokeAllUsersFromRoles(List<String> roleIds);
 
-  void assignPrivilegesToRoles(List<String> rolesIds, List<String> privilegeIds);
+  // role-privilege
 
-  void reassignPrivilegesToRoles(List<String> rolesIds, List<String> privilegeIds);
+  void assignPrivilegesToRoles(List<String> roleIds, List<String> privilegeIds);
+
+  void reassignPrivilegesToRoles(List<String> roleIds, List<String> privilegeIds);
 
   void revokePrivilegesFromRoles(List<String> roleIds, List<String> privilegeIds);
 
@@ -24,7 +28,9 @@ public interface RoleAssigner {
 
   void revokeAllRolesFromPrivileges(List<String> privilegeIds);
 
+  // getter
+
   List<String> getRolesAssignByUser(String userId);
 
-  List<String> getUserAssignByRole(String roleId);
+  List<String> getUsersAssignByRole(String roleId);
 }

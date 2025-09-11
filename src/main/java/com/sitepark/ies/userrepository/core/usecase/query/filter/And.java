@@ -12,6 +12,9 @@ public final class And implements Filter {
 
   And(@JsonProperty("and") Filter... and) {
     Objects.requireNonNull(and, "and is null");
+    if (and.length == 0) {
+      throw new IllegalArgumentException("and is empty");
+    }
     this.and = List.of(and);
   }
 

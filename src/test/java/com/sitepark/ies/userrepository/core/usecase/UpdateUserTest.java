@@ -160,7 +160,7 @@ class UpdateUserTest {
 
     verify(repository).get(anyString());
     verify(repository).resolveLogin(anyString());
-    verify(roleAssigner).reassignUsersToRoles(List.of("333"), List.of("123"));
+    verify(roleAssigner).reassignRoleToUsers(List.of("123"), List.of("333"));
 
     verifyNoMoreInteractions(repository);
   }
