@@ -71,7 +71,7 @@ public final class UpdateUser {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("reassign user to roles: {} -> {}", List.of(id), Arrays.asList(roleIds));
       }
-      this.roleAssigner.reassignRoleToUsers(List.of(id), Arrays.asList(roleIds));
+      this.roleAssigner.reassignRolesToUsers(List.of(id), Arrays.asList(roleIds));
     }
 
     return id;

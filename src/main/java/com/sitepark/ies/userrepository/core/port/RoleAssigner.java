@@ -8,7 +8,7 @@ public interface RoleAssigner {
 
   void assignRolesToUsers(List<String> userIds, List<String> roleIds);
 
-  void reassignRoleToUsers(List<String> userIds, List<String> roleIds);
+  void reassignRolesToUsers(List<String> userIds, List<String> roleIds);
 
   void revokeRolesFromUsers(List<String> userIds, List<String> roleIds);
 
