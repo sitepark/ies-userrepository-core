@@ -33,4 +33,8 @@ public interface RoleAssigner {
   List<String> getRolesAssignByUser(String userId);
 
   List<String> getUsersAssignByRole(String roleId);
+
+  List<String> getPrivilegesAssignByRole(String roleId);
+
+  List<String> getRolesAssignByPrivilege(String privilegeId);
 }
