@@ -83,7 +83,7 @@ class LdapIdentityTest {
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new Jdk8Module());
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
 
@@ -99,7 +99,7 @@ class LdapIdentityTest {
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new Jdk8Module());
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
 

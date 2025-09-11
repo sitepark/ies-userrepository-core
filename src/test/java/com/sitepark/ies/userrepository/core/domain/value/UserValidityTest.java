@@ -184,7 +184,7 @@ class UserValidityTest {
     mapper.registerModule(new Jdk8Module());
     mapper.registerModule(new JavaTimeModule());
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
 
     UserValidity userValidity =
         UserValidity.builder()
