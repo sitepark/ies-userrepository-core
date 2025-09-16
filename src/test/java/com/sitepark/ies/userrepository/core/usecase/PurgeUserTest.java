@@ -12,7 +12,6 @@ import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class PurgeUserTest {
@@ -45,7 +44,7 @@ class PurgeUserTest {
         new PurgeUser(repository, identifierResolver, extensionsNotifier, accessControl);
     purgeEntity.purgeUser(Identifier.ofId("10"));
 
-    verify(repository).remove(List.of("10"));
+    verify(repository).remove("10");
     verify(extensionsNotifier).notifyPurge("10");
   }
 }

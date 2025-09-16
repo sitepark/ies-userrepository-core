@@ -11,7 +11,7 @@ public interface RoleRepository {
 
   void update(Role role);
 
-  void remove(List<String> ids);
+  void remove(String id);
 
   Optional<Role> get(String id);
 

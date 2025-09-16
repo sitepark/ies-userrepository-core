@@ -9,10 +9,12 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogCommand;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.time.Clock;
@@ -68,7 +70,7 @@ class RemoveUsersTest {
 
     this.useCase.removeUsers(identifiers);
 
-    verify(this.repository).remove(List.of("1"));
+    verify(this.repository).remove("1");
   }
 
   @Test
@@ -91,7 +93,7 @@ class RemoveUsersTest {
 
     this.useCase.removeUsers(identifiers);
 
-    verify(this.repository).remove(List.of("1"));
+    verify(this.repository).remove("1");
   }
 
   @Test
@@ -101,20 +103,18 @@ class RemoveUsersTest {
     User user = User.builder().id("1").login("test").lastName("test").build();
     when(this.accessControl.isUserRemovable()).thenReturn(true);
     when(this.repository.get(any())).thenReturn(Optional.of(user));
-    when(this.auditLogService.generateAuditBatchId()).thenReturn("batchId");
 
     this.useCase.removeUsers(identifiers);
 
-    CreateAuditLogCommand auditCommand =
-        new CreateAuditLogCommand(
-            "Removed user",
-            "user",
+    CreateAuditLogRequest auditCommand =
+        new CreateAuditLogRequest(
+            AuditLogEntityType.USER.name(),
             user.id(),
-            "remove",
-            "{}",
-            "{}",
+            AuditLogAction.REMOVE.name(),
+            null,
+            null,
             Instant.now(this.fixedClock),
-            "batchId");
+            null);
 
     verify(this.auditLogService).createAuditLog(auditCommand);
   }

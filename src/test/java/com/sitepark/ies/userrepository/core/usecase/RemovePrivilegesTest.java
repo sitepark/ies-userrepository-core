@@ -7,12 +7,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogCommand;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -39,10 +44,14 @@ class RemovePrivilegesTest {
     this.repository = mock();
     this.accessControl = mock();
     this.auditLogService = mock();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new Jdk8Module());
+    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     this.fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
-    this.usecase = new RemovePrivileges(repository, accessControl, auditLogService, fixedClock);
+    this.usecase =
+        new RemovePrivileges(repository, accessControl, auditLogService, mapper, fixedClock);
   }
 
   @Test
@@ -94,7 +103,7 @@ class RemovePrivilegesTest {
                     .build()));
     this.usecase.removePrivileges(List.of(Identifier.ofId("1")));
 
-    verify(this.repository).remove(List.of("1"));
+    verify(this.repository).remove("1");
   }
 
   @Test
@@ -112,13 +121,12 @@ class RemovePrivilegesTest {
 
     verify(this.auditLogService)
         .createAuditLog(
-            new CreateAuditLogCommand(
-                "Removed privileges",
-                "privilege",
+            new CreateAuditLogRequest(
+                AuditLogEntityType.PRIVILEGE.name(),
                 "1",
-                "remove",
-                "{}",
-                "{}",
+                AuditLogAction.REMOVE.name(),
+                "{\"id\":\"1\",\"name\":\"test\",\"permission\":{\"type\":\"test\"}}",
+                null,
                 Instant.now(this.fixedClock),
                 null));
   }

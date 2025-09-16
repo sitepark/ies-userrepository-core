@@ -7,7 +7,6 @@ import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,7 +47,7 @@ public final class PurgeUser {
       LOGGER.info("purge user: {}", id);
     }
 
-    this.repository.remove(List.of(id));
+    this.repository.remove(id);
 
     this.extensionsNotifier.notifyPurge(id);
   }

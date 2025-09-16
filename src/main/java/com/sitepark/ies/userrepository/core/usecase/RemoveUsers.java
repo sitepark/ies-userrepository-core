@@ -2,17 +2,18 @@ package com.sitepark.ies.userrepository.core.usecase;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogCommand;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -55,15 +56,23 @@ public final class RemoveUsers {
       LOGGER.info("remove users: {}", identifiers);
     }
 
-    this.repository.remove(users.stream().map(User::id).collect(Collectors.toList()));
+    for (User user : users) {
+      this.repository.remove(user.id());
+    }
 
     Instant now = Instant.now(this.clock);
-    String batchId = this.auditLogService.generateAuditBatchId();
+    String batchId = identifiers.size() > 1 ? this.auditLogService.createAuditBatch(now) : null;
     users.forEach(
         user ->
             this.auditLogService.createAuditLog(
-                new CreateAuditLogCommand(
-                    "Removed user", "user", user.id(), "remove", "{}", "{}", now, batchId)));
+                new CreateAuditLogRequest(
+                    AuditLogEntityType.USER.name(),
+                    user.id(),
+                    AuditLogAction.REMOVE.name(),
+                    null,
+                    null,
+                    now,
+                    batchId)));
   }
 
   private User loadUser(@NotNull Identifier identifier) {

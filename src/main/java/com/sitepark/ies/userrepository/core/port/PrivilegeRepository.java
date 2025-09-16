@@ -12,7 +12,9 @@ public interface PrivilegeRepository {
 
   void update(Privilege privilege);
 
-  void remove(List<String> ids);
+  void remove(String id);
+
+  void restore(Privilege privilege);
 
   Optional<Privilege> get(String id);
 

@@ -14,7 +14,7 @@ public interface UserRepository {
 
   void update(User user);
 
-  void remove(List<String> ids);
+  void remove(String id);
 
   Optional<User> get(String id);
 

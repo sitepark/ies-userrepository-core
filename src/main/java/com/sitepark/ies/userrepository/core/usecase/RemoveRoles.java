@@ -2,17 +2,18 @@ package com.sitepark.ies.userrepository.core.usecase;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogCommand;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -53,15 +54,23 @@ public final class RemoveRoles {
       LOGGER.info("remove roles: {}", identifiers);
     }
 
-    this.repository.remove(roles.stream().map(Role::id).collect(Collectors.toList()));
+    for (Role role : roles) {
+      this.repository.remove(role.id());
+    }
 
     Instant now = Instant.now(this.clock);
-    String batchId = this.auditLogService.generateAuditBatchId();
+    String batchId = identifiers.size() > 1 ? this.auditLogService.createAuditBatch(now) : null;
     roles.forEach(
         role ->
             this.auditLogService.createAuditLog(
-                new CreateAuditLogCommand(
-                    "Removed roles", "role", role.id(), "remove", "{}", "{}", now, batchId)));
+                new CreateAuditLogRequest(
+                    AuditLogEntityType.ROLE.name(),
+                    role.id(),
+                    AuditLogAction.REMOVE.name(),
+                    null,
+                    null,
+                    now,
+                    batchId)));
   }
 
   private Role loadRole(@NotNull Identifier identifier) {

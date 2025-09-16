@@ -8,10 +8,12 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogCommand;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import java.time.Clock;
@@ -68,7 +70,7 @@ class RemoveRolesTest {
 
     this.useCase.removeRoles(identifiers);
 
-    verify(this.repository).remove(List.of("1"));
+    verify(this.repository).remove("1");
   }
 
   @Test
@@ -91,7 +93,7 @@ class RemoveRolesTest {
 
     this.useCase.removeRoles(identifiers);
 
-    verify(this.repository).remove(List.of("1"));
+    verify(this.repository).remove("1");
   }
 
   @Test
@@ -101,20 +103,18 @@ class RemoveRolesTest {
     Role role = Role.builder().id("1").name("test").build();
     when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
     when(this.repository.get(any())).thenReturn(Optional.of(role));
-    when(this.auditLogService.generateAuditBatchId()).thenReturn("batchId");
 
     this.useCase.removeRoles(identifiers);
 
-    CreateAuditLogCommand auditCommand =
-        new CreateAuditLogCommand(
-            "Removed roles",
-            "role",
+    CreateAuditLogRequest auditCommand =
+        new CreateAuditLogRequest(
+            AuditLogEntityType.ROLE.name(),
             role.id(),
-            "remove",
-            "{}",
-            "{}",
+            AuditLogAction.REMOVE.name(),
+            null,
+            null,
             Instant.now(this.fixedClock),
-            "batchId");
+            null);
 
     verify(this.auditLogService).createAuditLog(auditCommand);
   }

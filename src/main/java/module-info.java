@@ -10,6 +10,7 @@ module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.usecase.query.filter;
   exports com.sitepark.ies.userrepository.core.usecase.query.limit;
   exports com.sitepark.ies.userrepository.core.domain.exception;
+  exports com.sitepark.ies.userrepository.core.domain.service;
   exports com.sitepark.ies.userrepository.core.port;
   exports com.sitepark.ies.userrepository.core.usecase;
   exports com.sitepark.ies.userrepository.core.api;
@@ -23,13 +24,14 @@ module com.sitepark.ies.userrepository.core {
   requires com.fasterxml.jackson.annotation;
   requires static org.jetbrains.annotations;
   requires com.fasterxml.jackson.databind;
+  requires jdk.jfr;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
+  opens com.sitepark.ies.userrepository.core.domain.value.identity;
+  opens com.sitepark.ies.userrepository.core.domain.value;
   opens com.sitepark.ies.userrepository.core.usecase.query;
   opens com.sitepark.ies.userrepository.core.usecase.query.sort;
   opens com.sitepark.ies.userrepository.core.usecase.query.filter;
   opens com.sitepark.ies.userrepository.core.usecase.query.limit;
-  opens com.sitepark.ies.userrepository.core.domain.value.identity;
-  opens com.sitepark.ies.userrepository.core.domain.value;
   opens com.sitepark.ies.userrepository.core.usecase;
 }
