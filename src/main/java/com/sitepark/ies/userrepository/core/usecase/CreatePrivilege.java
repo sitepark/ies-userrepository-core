@@ -1,19 +1,24 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
+import com.sitepark.ies.sharedkernel.audit.AuditLogService;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import jakarta.inject.Inject;
-import java.util.Arrays;
+import java.io.IOException;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class CreatePrivilege {
 
@@ -21,34 +26,48 @@ public final class CreatePrivilege {
   private final PrivilegeRepository repository;
   private final RoleAssigner roleAssigner;
   private final AccessControl accessControl;
+  private final AuditLogService auditLogService;
+  private final Clock clock;
 
   @Inject
   CreatePrivilege(
-      PrivilegeRepository repository, RoleAssigner roleAssigner, AccessControl accessControl) {
+      PrivilegeRepository repository,
+      RoleAssigner roleAssigner,
+      AccessControl accessControl,
+      AuditLogService auditLogService,
+      Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
     this.accessControl = accessControl;
+    this.auditLogService = auditLogService;
+    this.clock = clock;
   }
 
-  @SuppressWarnings("PMD.UseVarargs")
-  public String createPrivilege(@NotNull Privilege privilege, @Nullable String[] roleIds) {
+  public String createPrivilege(CreatePrivilegeRequest request) {
 
-    this.validatePrivilege(privilege);
+    this.validatePrivilege(request.privilege());
 
-    this.checkAccessControl(privilege, roleIds);
+    this.checkAccessControl(request.privilege(), request.roleIds());
 
-    this.validateAnchor(privilege);
+    this.validateAnchor(request.privilege());
 
-    this.repository.validatePermission(privilege.permission());
+    this.repository.validatePermission(request.privilege().permission());
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("create privilege: {}", privilege);
+      LOGGER.info("create privilege: {}", request.privilege());
     }
 
-    String id = this.repository.create(privilege);
-    if (roleIds != null && roleIds.length > 0) {
-      this.roleAssigner.assignPrivilegesToRoles(Arrays.asList(roleIds), List.of(id));
+    String id = this.repository.create(request.privilege());
+
+    if (!request.roleIds().isEmpty()) {
+      this.roleAssigner.assignPrivilegesToRoles(request.roleIds(), List.of(id));
     }
+
+    CreateAuditLogRequest createAuditLogRequest =
+        this.buildCreateAuditLogRequest(
+            request.privilege().toBuilder().id(id).roleIds(request.roleIds()).build(),
+            request.auditParentId());
+    this.auditLogService.createAuditLog(createAuditLogRequest);
 
     return id;
   }
@@ -65,18 +84,14 @@ public final class CreatePrivilege {
     }
   }
 
-  @SuppressWarnings("PMD.UseVarargs")
-  private void checkAccessControl(Privilege privilege, @Nullable String[] roleIds) {
+  private void checkAccessControl(Privilege privilege, List<String> roleIds) {
     if (!this.accessControl.isPrivilegeCreatable()) {
       throw new AccessDeniedException("Not allowed to create privilege " + privilege);
     }
 
-    if (roleIds != null && roleIds.length > 0 && !this.accessControl.isRoleWritable()) {
+    if (!roleIds.isEmpty() && !this.accessControl.isRoleWritable()) {
       throw new AccessDeniedException(
-          "Not allowed to update role to add privilege "
-              + privilege
-              + " -> "
-              + Arrays.toString(roleIds));
+          "Not allowed to update role to add privilege " + privilege + " -> " + roleIds);
     }
   }
 
@@ -88,5 +103,26 @@ public final class CreatePrivilege {
             throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
           });
     }
+  }
+
+  private CreateAuditLogRequest buildCreateAuditLogRequest(Privilege privilege, String parentId) {
+
+    String json;
+    try {
+      json = this.auditLogService.serialize(privilege);
+    } catch (IOException e) {
+      throw new CreateAuditLogEntryFailedException(
+          AuditLogEntityType.PRIVILEGE.name(), privilege.id(), privilege.name(), e);
+    }
+
+    return new CreateAuditLogRequest(
+        AuditLogEntityType.PRIVILEGE.name(),
+        privilege.id(),
+        privilege.name(),
+        AuditLogAction.CREATE.name(),
+        null,
+        json,
+        Instant.now(this.clock),
+        parentId);
   }
 }

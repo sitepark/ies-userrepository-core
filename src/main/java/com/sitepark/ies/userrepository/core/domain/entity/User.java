@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
@@ -217,7 +219,7 @@ public final class User {
 
   @JsonProperty
   public List<String> roleIds() {
-    return List.copyOf(this.roleIds);
+    return this.roleIds;
   }
 
   public Builder toBuilder() {
@@ -344,7 +346,7 @@ public final class User {
     private Address address;
     private Contact contact;
     private Organisation organisation;
-    private final List<String> roleIds = new ArrayList<>();
+    private final Set<String> roleIds = new TreeSet<>();
 
     private Builder() {}
 

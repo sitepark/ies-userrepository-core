@@ -61,18 +61,18 @@ public final class RemoveUsers {
     }
 
     Instant now = Instant.now(this.clock);
-    String batchId = identifiers.size() > 1 ? this.auditLogService.createAuditBatch(now) : null;
     users.forEach(
         user ->
             this.auditLogService.createAuditLog(
                 new CreateAuditLogRequest(
                     AuditLogEntityType.USER.name(),
                     user.id(),
+                    user.toDisplayName(),
                     AuditLogAction.REMOVE.name(),
                     null,
                     null,
                     now,
-                    batchId)));
+                    null)));
   }
 
   private User loadUser(@NotNull Identifier identifier) {

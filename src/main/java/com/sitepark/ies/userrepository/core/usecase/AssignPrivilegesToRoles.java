@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -11,7 +10,6 @@ import jakarta.inject.Inject;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 public final class AssignPrivilegesToRoles {
 
@@ -33,15 +31,14 @@ public final class AssignPrivilegesToRoles {
     this.accessControl = accessControl;
   }
 
-  public void assignPrivilegesToRoles(
-      @NotNull List<Identifier> roleIdentifiers, @NotNull List<Identifier> privilegeIdentifiers) {
+  public void assignPrivilegesToRoles(AssignPrivilegesToRolesRequest request) {
 
-    if (roleIdentifiers.isEmpty() || privilegeIdentifiers.isEmpty()) {
+    if (request.roleIdentifiers().isEmpty() || request.privilegeIdentifiers().isEmpty()) {
       return;
     }
 
     List<String> roleIds =
-        roleIdentifiers.stream()
+        request.roleIdentifiers().stream()
             .map(
                 role ->
                     role.resolveId(
@@ -52,7 +49,7 @@ public final class AssignPrivilegesToRoles {
             .toList();
 
     List<String> privilegeIds =
-        privilegeIdentifiers.stream()
+        request.privilegeIdentifiers().stream()
             .map(
                 privilege ->
                     privilege.resolveId(
@@ -67,8 +64,7 @@ public final class AssignPrivilegesToRoles {
     }
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info(
-          "assign privileges to roles({}) -> privileges({})", roleIds, privilegeIdentifiers);
+      LOGGER.info("assign privileges to roles({}) -> privileges({})", roleIds, privilegeIds);
     }
 
     this.roleAssigner.assignPrivilegesToRoles(roleIds, privilegeIds);

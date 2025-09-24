@@ -88,7 +88,8 @@ class UpsertPrivilegeTest {
 
     this.useCase.upsertPrivilege(privilege, null);
 
-    verify(this.createPrivilegeUseCase).createPrivilege(privilege, null);
+    verify(this.createPrivilegeUseCase)
+        .createPrivilege(CreatePrivilegeRequest.builder().privilege(privilege).build());
   }
 
   @Test
@@ -102,7 +103,8 @@ class UpsertPrivilegeTest {
 
     this.useCase.upsertPrivilege(privilege, null);
 
-    verify(this.updatePrivilegeUseCase).updatePrivilege(privilege, null);
+    verify(this.updatePrivilegeUseCase)
+        .updatePrivilege(UpdatePrivilegeRequest.builder().privilege(privilege).build());
   }
 
   @Test
@@ -120,7 +122,8 @@ class UpsertPrivilegeTest {
 
     this.useCase.upsertPrivilege(privilege, null);
 
-    verify(this.createPrivilegeUseCase).createPrivilege(privilege, null);
+    verify(this.createPrivilegeUseCase)
+        .createPrivilege(CreatePrivilegeRequest.builder().privilege(privilege).build());
   }
 
   @Test
@@ -141,7 +144,8 @@ class UpsertPrivilegeTest {
 
     Privilege expected = privilege.toBuilder().id("1").build();
 
-    verify(this.updatePrivilegeUseCase).updatePrivilege(expected, null);
+    verify(this.updatePrivilegeUseCase)
+        .updatePrivilege(UpdatePrivilegeRequest.builder().privilege(expected).build());
   }
 
   @Test

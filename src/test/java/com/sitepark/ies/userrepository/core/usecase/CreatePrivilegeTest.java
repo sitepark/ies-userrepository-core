@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
+import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.exception.InvalidPermissionException;
@@ -15,6 +16,8 @@ import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
+import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +27,6 @@ class CreatePrivilegeTest {
   private PrivilegeRepository repository;
   private RoleAssigner roleAssigner;
   private AccessControl accessControl;
-
   private CreatePrivilege usecase;
 
   @BeforeEach
@@ -32,8 +34,12 @@ class CreatePrivilegeTest {
     this.repository = mock();
     this.roleAssigner = mock();
     this.accessControl = mock();
+    AuditLogService auditLogService = mock();
+    OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
+    Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
-    this.usecase = new CreatePrivilege(repository, roleAssigner, accessControl);
+    this.usecase =
+        new CreatePrivilege(repository, roleAssigner, accessControl, auditLogService, fixedClock);
   }
 
   @Test
@@ -42,7 +48,9 @@ class CreatePrivilegeTest {
         IllegalArgumentException.class,
         () ->
             this.usecase.createPrivilege(
-                Privilege.builder().id("2").name("name").build(), new String[] {}),
+                CreatePrivilegeRequest.builder()
+                    .privilege(Privilege.builder().id("2").name("name").build())
+                    .build()),
         "Expected IllegalArgumentException for privilege with ID");
   }
 
@@ -51,7 +59,10 @@ class CreatePrivilegeTest {
     assertThrows(
         IllegalArgumentException.class,
         () ->
-            this.usecase.createPrivilege(Privilege.builder().name("name").build(), new String[] {}),
+            this.usecase.createPrivilege(
+                CreatePrivilegeRequest.builder()
+                    .privilege(Privilege.builder().name("name").build())
+                    .build()),
         "Expected IllegalArgumentException for privilege with ID");
   }
 
@@ -63,8 +74,13 @@ class CreatePrivilegeTest {
         AccessDeniedException.class,
         () ->
             this.usecase.createPrivilege(
-                Privilege.builder().name("name").permission(new Permission("type", null)).build(),
-                new String[] {}),
+                CreatePrivilegeRequest.builder()
+                    .privilege(
+                        Privilege.builder()
+                            .name("name")
+                            .permission(new Permission("type", null))
+                            .build())
+                    .build()),
         "Expected AccessDeniedException for privilege creation");
   }
 
@@ -77,8 +93,14 @@ class CreatePrivilegeTest {
         AccessDeniedException.class,
         () ->
             this.usecase.createPrivilege(
-                Privilege.builder().name("name").permission(new Permission("type", null)).build(),
-                new String[] {"1"}),
+                CreatePrivilegeRequest.builder()
+                    .privilege(
+                        Privilege.builder()
+                            .name("name")
+                            .permission(new Permission("type", null))
+                            .build())
+                    .roleIds("1")
+                    .build()),
         "Expected IllegalArgumentException for privilege with ID");
   }
 
@@ -91,12 +113,14 @@ class CreatePrivilegeTest {
         AnchorAlreadyExistsException.class,
         () ->
             this.usecase.createPrivilege(
-                Privilege.builder()
-                    .name("name")
-                    .anchor("anchor")
-                    .permission(new Permission("type", null))
-                    .build(),
-                new String[] {}),
+                CreatePrivilegeRequest.builder()
+                    .privilege(
+                        Privilege.builder()
+                            .name("name")
+                            .anchor("anchor")
+                            .permission(new Permission("type", null))
+                            .build())
+                    .build()),
         "Expected IllegalArgumentException for privilege with ID");
   }
 
@@ -112,12 +136,14 @@ class CreatePrivilegeTest {
         InvalidPermissionException.class,
         () ->
             this.usecase.createPrivilege(
-                Privilege.builder()
-                    .name("name")
-                    .anchor("anchor")
-                    .permission(new Permission("type", null))
-                    .build(),
-                new String[] {}),
+                CreatePrivilegeRequest.builder()
+                    .privilege(
+                        Privilege.builder()
+                            .name("name")
+                            .anchor("anchor")
+                            .permission(new Permission("type", null))
+                            .build())
+                    .build()),
         "Expected IllegalArgumentException for privilege with ID");
   }
 
@@ -130,12 +156,14 @@ class CreatePrivilegeTest {
 
     String id =
         this.usecase.createPrivilege(
-            Privilege.builder()
-                .name("name")
-                .anchor("anchor")
-                .permission(new Permission("type", null))
-                .build(),
-            new String[] {});
+            CreatePrivilegeRequest.builder()
+                .privilege(
+                    Privilege.builder()
+                        .name("name")
+                        .anchor("anchor")
+                        .permission(new Permission("type", null))
+                        .build())
+                .build());
 
     verify(this.repository).create(any());
     assertEquals("456", id, "Expected ID to be returned after creation");
@@ -149,12 +177,15 @@ class CreatePrivilegeTest {
     when(this.repository.create(any())).thenReturn("456");
 
     this.usecase.createPrivilege(
-        Privilege.builder()
-            .name("name")
-            .anchor("anchor")
-            .permission(new Permission("type", null))
-            .build(),
-        new String[] {"1"});
+        CreatePrivilegeRequest.builder()
+            .privilege(
+                Privilege.builder()
+                    .name("name")
+                    .anchor("anchor")
+                    .permission(new Permission("type", null))
+                    .build())
+            .roleId("1")
+            .build());
 
     verify(this.roleAssigner).assignPrivilegesToRoles(List.of("1"), List.of("456"));
   }

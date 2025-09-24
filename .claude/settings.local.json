@@ -4,7 +4,9 @@
       "Bash(mvn test:*)",
       "Bash(mvn:*)",
       "Bash(javac:*)",
-      "Bash(java:*)"
+      "Bash(java:*)",
+      "Read(//home/veltrup/git/ies-4/ies-userrepository-adapter/src/main/java/com/sitepark/ies/userrepository/adapter/persistence/**)",
+      "Read(//home/veltrup/git/ies-4/**)"
     ],
     "deny": [],
     "ask": []

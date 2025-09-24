@@ -3,13 +3,15 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
  * allowing for custom role definitions in the application logic.
  */
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
+@JsonDeserialize(builder = Role.Builder.class)
 public final class Role {
 
   @Nullable private final String id;
@@ -27,14 +30,14 @@ public final class Role {
 
   @Nullable private final String description;
 
-  private final Set<String> privilegeIds;
+  private final List<String> privilegeIds;
 
   private Role(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
     this.name = builder.name;
     this.description = builder.description;
-    this.privilegeIds = Set.copyOf(builder.privilegeIds);
+    this.privilegeIds = List.copyOf(builder.privilegeIds);
   }
 
   public static Builder builder() {
@@ -62,8 +65,8 @@ public final class Role {
   }
 
   @JsonProperty
-  public Set<String> privilegeIds() {
-    return Set.copyOf(this.privilegeIds);
+  public List<String> privilegeIds() {
+    return this.privilegeIds;
   }
 
   public Builder toBuilder() {
@@ -112,7 +115,7 @@ public final class Role {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final Set<String> privilegeIds = new HashSet<>();
+    private final Set<String> privilegeIds = new TreeSet<>();
     private String id;
     private Anchor anchor;
     private String name;

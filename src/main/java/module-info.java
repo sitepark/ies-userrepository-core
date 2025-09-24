@@ -25,6 +25,7 @@ module com.sitepark.ies.userrepository.core {
   requires static org.jetbrains.annotations;
   requires com.fasterxml.jackson.databind;
   requires jdk.jfr;
+  requires jsr305;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
   opens com.sitepark.ies.userrepository.core.domain.value.identity;

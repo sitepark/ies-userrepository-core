@@ -37,9 +37,11 @@ public final class UpsertPrivilege {
 
     Privilege privilegeResolved = this.toPrivilegeWithId(privilege);
     if (privilegeResolved.id() == null) {
-      return this.createPrivilegeUseCase.createPrivilege(privilegeResolved, roleIds);
+      return this.createPrivilegeUseCase.createPrivilege(
+          CreatePrivilegeRequest.builder().privilege(privilegeResolved).roleIds(roleIds).build());
     } else {
-      return this.updatePrivilegeUseCase.updatePrivilege(privilegeResolved, roleIds);
+      return this.updatePrivilegeUseCase.updatePrivilege(
+          UpdatePrivilegeRequest.builder().privilege(privilegeResolved).roleIds(roleIds).build());
     }
   }
 

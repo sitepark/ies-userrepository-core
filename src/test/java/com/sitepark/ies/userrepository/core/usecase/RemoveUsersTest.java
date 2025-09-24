@@ -110,6 +110,7 @@ class RemoveUsersTest {
         new CreateAuditLogRequest(
             AuditLogEntityType.USER.name(),
             user.id(),
+            user.toDisplayName(),
             AuditLogAction.REMOVE.name(),
             null,
             null,

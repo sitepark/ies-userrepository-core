@@ -6,8 +6,8 @@ import static org.mockito.Mockito.mock;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.domain.value.Address;
@@ -38,6 +38,11 @@ class UserTest {
   @Test
   void testEquals() {
     EqualsVerifier.forClass(User.class).verify();
+  }
+
+  @Test
+  void testToString() {
+    ToStringVerifier.forClass(User.class).verify();
   }
 
   @Test
@@ -288,7 +293,7 @@ class UserTest {
     User user = this.createBuilderWithRequiredValues().roleId("123").build();
     User added = user.toBuilder().roleId("456").build();
 
-    List<String> expected = Arrays.asList("123", "456");
+    List<String> expected = List.of("123", "456");
 
     assertEquals(expected, added.roleIds(), "unexpected roles");
   }
@@ -497,28 +502,6 @@ class UserTest {
   }
 
   @Test
-  void testToString() {
-    User user =
-        User.builder()
-            .id("14842")
-            .anchor("user.peterpan")
-            .firstName("Peter")
-            .lastName("Pan")
-            .email("peter.pan@nimmer.land")
-            .gender(GenderType.MALE)
-            .login("peterpan")
-            .roleIds("345", "123")
-            .identity(TEST_IDENTITY)
-            .description("a note")
-            .build();
-    String expected =
-        """
-        User{id='14842', anchor=user.peterpan, title='null', firstName='Peter', lastName='Pan', email='peter.pan@nimmer.land', gender=MALE, description='a note', createdAt=null, changedAt=null, login='peterpan', password=null, identities=[LdapIdentity [serverId=2, dn=userdn]], validity=UserValidity{blocked=false, validFrom=null, validTo=null}, address=null, contact=null, organisation=null, roleIds=[345, 123]}\
-        """;
-    assertEquals(expected, user.toString(), "unexpected string representation");
-  }
-
-  @Test
   void testSerialize() throws JsonProcessingException {
 
     ObjectMapper mapper = new ObjectMapper();
@@ -543,7 +526,7 @@ class UserTest {
 
     String expected =
         """
-        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
+        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false},"roleIds":["123","345"]}\
         """;
 
     assertEquals(expected, json, "unexpected json");
@@ -554,8 +537,6 @@ class UserTest {
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new Jdk8Module());
-    SimpleModule module = new SimpleModule();
-    mapper.registerModule(module);
 
     String json =
         """

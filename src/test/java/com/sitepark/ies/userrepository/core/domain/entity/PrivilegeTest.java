@@ -3,12 +3,15 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import java.util.List;
-import java.util.Set;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -105,19 +108,19 @@ class PrivilegeTest {
   @Test
   void testRoleIdsCollection() {
     Privilege privilege = Privilege.builder().name("privilegerole").roleIds(List.of("123")).build();
-    assertEquals(Set.of("123"), privilege.roleIds(), "unexpected roleIds");
+    assertEquals(List.of("123"), privilege.roleIds(), "unexpected roleIds");
   }
 
   @Test
   void testRoleIdsArray() {
     Privilege privilege = Privilege.builder().name("privilegerole").roleIds("123").build();
-    assertEquals(Set.of("123"), privilege.roleIds(), "unexpected roleIds");
+    assertEquals(List.of("123"), privilege.roleIds(), "unexpected roleIds");
   }
 
   @Test
   void testRoleId() {
     Privilege privilege = Privilege.builder().name("privilegerole").roleId("123").build();
-    assertEquals(Set.of("123"), privilege.roleIds(), "unexpected roleIds");
+    assertEquals(List.of("123"), privilege.roleIds(), "unexpected roleIds");
   }
 
   @Test
@@ -131,7 +134,7 @@ class PrivilegeTest {
   void testToBuilder() {
     Privilege privilege =
         Privilege.builder()
-            .name("testrole")
+            .name("testprivilege")
             .anchor(Anchor.ofString("myanchor"))
             .description("description")
             .build();
@@ -139,11 +142,57 @@ class PrivilegeTest {
 
     Privilege expected =
         Privilege.builder()
-            .name("testrole")
+            .name("testprivilege")
             .anchor(Anchor.ofString("myanchor"))
             .description("description2")
             .build();
 
     assertEquals(expected, copy, "unexpected privileges");
+  }
+
+  @Test
+  void testSerialize() throws JsonProcessingException {
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new Jdk8Module());
+    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+
+    Privilege privilege =
+        Privilege.builder()
+            .name("testprivilege")
+            .anchor(Anchor.ofString("myanchor"))
+            .description("description")
+            .build();
+
+    String json = mapper.writeValueAsString(privilege);
+
+    String expected =
+        """
+        {"anchor":"myanchor","name":"testprivilege","description":"description"}\
+        """;
+    assertEquals(expected, json, "unexpected json");
+  }
+
+  @Test
+  void testDeserialize() throws JsonProcessingException {
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new Jdk8Module());
+
+    String json =
+        """
+        {"anchor":"myanchor","name":"testprivilege","description":"description"}\
+        """;
+
+    Privilege privilege = mapper.readValue(json, Privilege.class);
+
+    Privilege expected =
+        Privilege.builder()
+            .name("testprivilege")
+            .anchor(Anchor.ofString("myanchor"))
+            .description("description")
+            .build();
+
+    assertEquals(expected, privilege, "unexpected privilege");
   }
 }

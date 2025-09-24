@@ -59,18 +59,18 @@ public final class RemoveRoles {
     }
 
     Instant now = Instant.now(this.clock);
-    String batchId = identifiers.size() > 1 ? this.auditLogService.createAuditBatch(now) : null;
     roles.forEach(
         role ->
             this.auditLogService.createAuditLog(
                 new CreateAuditLogRequest(
                     AuditLogEntityType.ROLE.name(),
                     role.id(),
+                    role.name(),
                     AuditLogAction.REMOVE.name(),
                     null,
                     null,
                     now,
-                    batchId)));
+                    null)));
   }
 
   private Role loadRole(@NotNull Identifier identifier) {

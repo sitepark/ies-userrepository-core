@@ -53,11 +53,18 @@ public final class RestorePrivilege {
 
     Privilege privilege = request.privilege();
     String[] roleIds = request.roleIds();
-    String auditBatchId = request.auditBatchId();
+    String auditBatchId = request.auditParentId();
 
     this.validatePrivilege(privilege);
 
     this.checkAccessControl(privilege, roleIds);
+
+    if (this.repository.get(privilege.id()).isPresent()) {
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("Skip restore, privilege with ID {} already exists.", privilege.id());
+      }
+      return;
+    }
 
     this.validateAnchor(privilege);
 
@@ -72,8 +79,8 @@ public final class RestorePrivilege {
     Privilege privilegeForAuditLog =
         roleIds.length > 0 ? privilege.toBuilder().roleIds(roleIds).build() : privilege;
 
-    CreateAuditLogRequest createAuditLogCommand =
-        this.buildCreateAuditLogCommand(privilegeForAuditLog, now, auditBatchId);
+    CreateAuditLogRequest createAuditLogRequest =
+        this.buildCreateAuditLogRequest(privilegeForAuditLog, now, auditBatchId);
 
     this.repository.restore(privilege);
     if (roleIds.length > 0) {
@@ -82,7 +89,7 @@ public final class RestorePrivilege {
       this.roleAssigner.assignPrivilegesToRoles(Arrays.asList(roleIds), List.of(privilegeId));
     }
 
-    this.auditLogService.createAuditLog(createAuditLogCommand);
+    this.auditLogService.createAuditLog(createAuditLogRequest);
   }
 
   private void validatePrivilege(Privilege privilege) {
@@ -94,14 +101,6 @@ public final class RestorePrivilege {
     }
     if (privilege.permission() == null) {
       throw new IllegalArgumentException("The permission of the privilege must not be null.");
-    }
-    validatePrivilegeDoesNotExist(privilege.id());
-  }
-
-  private void validatePrivilegeDoesNotExist(String privilegeId) {
-    if (this.repository.get(privilegeId).isPresent()) {
-      throw new IllegalArgumentException(
-          "The privilege with id " + privilegeId + " already exists.");
     }
   }
 
@@ -130,15 +129,16 @@ public final class RestorePrivilege {
     }
   }
 
-  private CreateAuditLogRequest buildCreateAuditLogCommand(
+  private CreateAuditLogRequest buildCreateAuditLogRequest(
       Privilege privilege, Instant now, String batchId) {
     String json = serializePrivilege(privilege);
     return new CreateAuditLogRequest(
         AuditLogEntityType.PRIVILEGE.name(),
         privilege.id(),
+        privilege.name(),
         AuditLogAction.RESTORE.name(),
-        json,
         null,
+        json,
         now,
         batchId);
   }
@@ -148,7 +148,7 @@ public final class RestorePrivilege {
       return this.objectMapper.writeValueAsString(privilege);
     } catch (JsonProcessingException e) {
       throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.PRIVILEGE.name(), privilege.id(), e);
+          AuditLogEntityType.PRIVILEGE.name(), privilege.id(), privilege.name(), e);
     }
   }
 }

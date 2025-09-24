@@ -110,6 +110,7 @@ class RemoveRolesTest {
         new CreateAuditLogRequest(
             AuditLogEntityType.ROLE.name(),
             role.id(),
+            role.name(),
             AuditLogAction.REMOVE.name(),
             null,
             null,

@@ -47,8 +47,10 @@ class AssignPrivilegesToRolesTest {
         AccessDeniedException.class,
         () ->
             this.usecase.assignPrivilegesToRoles(
-                List.of(Identifier.ofId("1"), Identifier.ofId("2")),
-                List.of(Identifier.ofId("3"), Identifier.ofId("4"))));
+                AssignPrivilegesToRolesRequest.builder()
+                    .roleIds("1", "2")
+                    .privilegeIds("3", "4")
+                    .build()));
   }
 
   @Test
@@ -57,8 +59,7 @@ class AssignPrivilegesToRolesTest {
     when(this.accessControl.isRoleWritable()).thenReturn(true);
 
     this.usecase.assignPrivilegesToRoles(
-        List.of(Identifier.ofId("1"), Identifier.ofId("2")),
-        List.of(Identifier.ofId("3"), Identifier.ofId("4")));
+        AssignPrivilegesToRolesRequest.builder().roleIds("1", "2").privilegeIds("3", "4").build());
 
     verify(this.roleAssigner).assignPrivilegesToRoles(List.of("1", "2"), List.of("3", "4"));
   }
@@ -69,7 +70,7 @@ class AssignPrivilegesToRolesTest {
     when(this.accessControl.isRoleWritable()).thenReturn(true);
 
     this.usecase.assignPrivilegesToRoles(
-        List.of(), List.of(Identifier.ofId("3"), Identifier.ofId("4")));
+        AssignPrivilegesToRolesRequest.builder().privilegeIds("3", "4").build());
 
     verify(this.accessControl, never()).isRoleWritable();
   }
@@ -77,7 +78,7 @@ class AssignPrivilegesToRolesTest {
   @Test
   void testEmptyPrivilegeIdentifiers() {
     this.usecase.assignPrivilegesToRoles(
-        List.of(Identifier.ofId("1"), Identifier.ofId("2")), List.of());
+        AssignPrivilegesToRolesRequest.builder().roleIds("1", "2").build());
 
     verify(this.accessControl, never()).isRoleWritable();
   }
@@ -88,8 +89,10 @@ class AssignPrivilegesToRolesTest {
     when(this.accessControl.isRoleWritable()).thenReturn(true);
 
     this.usecase.assignPrivilegesToRoles(
-        List.of(Identifier.ofAnchor("anchor")),
-        List.of(Identifier.ofId("3"), Identifier.ofId("4")));
+        AssignPrivilegesToRolesRequest.builder()
+            .roleIdentifier(Identifier.ofAnchor("anchor"))
+            .privilegeIds("3", "4")
+            .build());
 
     verify(this.roleAssigner).assignPrivilegesToRoles(List.of("1"), List.of("3", "4"));
   }
@@ -103,8 +106,10 @@ class AssignPrivilegesToRolesTest {
         AnchorNotFoundException.class,
         () ->
             this.usecase.assignPrivilegesToRoles(
-                List.of(Identifier.ofAnchor("anchor")),
-                List.of(Identifier.ofId("3"), Identifier.ofId("4"))));
+                AssignPrivilegesToRolesRequest.builder()
+                    .roleIdentifier(Identifier.ofAnchor("anchor"))
+                    .privilegeIds("3", "4")
+                    .build()));
   }
 
   @Test
@@ -113,8 +118,10 @@ class AssignPrivilegesToRolesTest {
     when(this.accessControl.isRoleWritable()).thenReturn(true);
 
     this.usecase.assignPrivilegesToRoles(
-        List.of(Identifier.ofId("1"), Identifier.ofId("2")),
-        List.of(Identifier.ofAnchor("anchor")));
+        AssignPrivilegesToRolesRequest.builder()
+            .roleIds("1", "2")
+            .privilegeIdentifier(Identifier.ofAnchor("anchor"))
+            .build());
 
     verify(this.roleAssigner).assignPrivilegesToRoles(List.of("1", "2"), List.of("3"));
   }
@@ -128,7 +135,9 @@ class AssignPrivilegesToRolesTest {
         AnchorNotFoundException.class,
         () ->
             this.usecase.assignPrivilegesToRoles(
-                List.of(Identifier.ofId("1"), Identifier.ofId("2")),
-                List.of(Identifier.ofAnchor("anchor"))));
+                AssignPrivilegesToRolesRequest.builder()
+                    .roleIds("1", "2")
+                    .privilegeIdentifier(Identifier.ofAnchor("anchor"))
+                    .build()));
   }
 }

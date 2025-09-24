@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -117,8 +116,6 @@ class LdapIdentityTest {
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new Jdk8Module());
-    SimpleModule module = new SimpleModule();
-    mapper.registerModule(module);
 
     String json = "{\"serverId\":\"2\",\"dn\":\"userdn\",\"type\":\"ldap\"}";
 

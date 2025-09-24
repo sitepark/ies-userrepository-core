@@ -2,59 +2,102 @@ package com.sitepark.ies.userrepository.core.usecase;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
+import com.sitepark.ies.sharedkernel.audit.AuditLogService;
+import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
+import com.sitepark.ies.sharedkernel.patch.PatchDocument;
+import com.sitepark.ies.sharedkernel.patch.PatchService;
+import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.exception.UpdatePrivilegeFailedException;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
+import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
-import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import jakarta.inject.Inject;
-import java.util.Arrays;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class UpdatePrivilege {
 
   private static final Logger LOGGER = LogManager.getLogger();
+
+  private final AssignPrivilegesToRoles assignPrivilegesToRolesUseCase;
   private final PrivilegeRepository repository;
-  private final RoleAssigner roleAssigner;
   private final AccessControl accessControl;
+  private final AuditLogService auditLogService;
+  private final PatchService<Privilege> patchService;
+  private final Clock clock;
 
   @Inject
   UpdatePrivilege(
-      PrivilegeRepository repository, RoleAssigner roleAssigner, AccessControl accessControl) {
+      AssignPrivilegesToRoles assignPrivilegesToRolesUseCase,
+      PrivilegeRepository repository,
+      AccessControl accessControl,
+      AuditLogService auditLogService,
+      PatchServiceFactory patchServiceFactory,
+      Clock clock) {
+    this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
     this.repository = repository;
-    this.roleAssigner = roleAssigner;
     this.accessControl = accessControl;
+    this.auditLogService = auditLogService;
+    this.patchService = patchServiceFactory.createPatchService(Privilege.class);
+    this.clock = clock;
   }
 
-  @SuppressWarnings("PMD.UseVarargs")
-  public String updatePrivilege(@NotNull Privilege privilege, @Nullable String[] roleIds) {
+  public String updatePrivilege(UpdatePrivilegeRequest request) {
 
-    this.validatePrivilege(privilege);
+    this.validatePrivilege(request.privilege());
 
-    this.checkAccessControl(privilege, roleIds);
+    this.checkAccessControl(request.privilege(), request.roleIds());
 
-    Privilege privilegeWithId = this.toPrivilegeWithId(privilege);
+    Privilege newPrivilege = this.toPrivilegeWithId(request.privilege());
 
-    this.validateAnchor(privilegeWithId);
-    this.repository.validatePermission(privilegeWithId.permission());
+    this.validateAnchor(newPrivilege);
+    this.repository.validatePermission(newPrivilege.permission());
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("update privilege: {}", privilege);
+      LOGGER.info("update privilege: {}", request.privilege());
     }
 
-    this.repository.update(privilegeWithId);
+    Privilege oldPrivilege =
+        this.repository
+            .get(newPrivilege.id())
+            .orElseThrow(
+                () ->
+                    new UpdatePrivilegeFailedException(
+                        "No privilege with ID " + newPrivilege.id() + " found."))
+            .toBuilder()
+            .clearRoleIds()
+            .build();
 
-    if (roleIds != null && roleIds.length > 0) {
-      this.roleAssigner.assignPrivilegesToRoles(
-          Arrays.asList(roleIds), List.of(privilegeWithId.id()));
+    PatchDocument patch = this.patchService.createPatch(oldPrivilege, newPrivilege);
+
+    if (patch.isEmpty()) {
+      if (LOGGER.isInfoEnabled()) {
+        LOGGER.info("Skip update, privilege with ID {} is unchanged.", newPrivilege.id());
+      }
+    } else {
+      this.repository.update(newPrivilege);
+      PatchDocument revertPatch = this.patchService.createPatch(newPrivilege, oldPrivilege);
+      this.auditLogService.createAuditLog(
+          this.buildCreateAuditLogRequest(
+              newPrivilege.id(), newPrivilege.name(), patch, revertPatch, request.auditParentId()));
     }
 
-    return privilegeWithId.id();
+    if (!request.roleIds().isEmpty()) {
+      this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
+          AssignPrivilegesToRolesRequest.builder()
+              .roleIds(request.roleIds())
+              .privilegeId(newPrivilege.id())
+              .build());
+    }
+
+    return newPrivilege.id();
   }
 
   private void validatePrivilege(Privilege privilege) {
@@ -66,18 +109,14 @@ public final class UpdatePrivilege {
     }
   }
 
-  @SuppressWarnings("PMD.UseVarargs")
-  private void checkAccessControl(Privilege privilege, @Nullable String[] roleIds) {
+  private void checkAccessControl(Privilege privilege, List<String> roleIds) {
     if (!this.accessControl.isPrivilegeWritable()) {
       throw new AccessDeniedException("Not allowed to update privilege " + privilege);
     }
 
-    if (roleIds != null && roleIds.length > 0 && !this.accessControl.isRoleWritable()) {
+    if (!roleIds.isEmpty() && !this.accessControl.isRoleWritable()) {
       throw new AccessDeniedException(
-          "Not allowed to update role to add privilege "
-              + privilege
-              + " -> "
-              + Arrays.toString(roleIds));
+          "Not allowed to update role to add privilege " + privilege + " -> " + roleIds);
     }
   }
 
@@ -106,5 +145,23 @@ public final class UpdatePrivilege {
             }
           });
     }
+  }
+
+  private CreateAuditLogRequest buildCreateAuditLogRequest(
+      String entityId,
+      String entityName,
+      PatchDocument patch,
+      PatchDocument revertPatch,
+      String parentId) {
+
+    return new CreateAuditLogRequest(
+        AuditLogEntityType.PRIVILEGE.name(),
+        entityId,
+        entityName,
+        AuditLogAction.UPDATE.name(),
+        revertPatch.toJson(),
+        patch.toJson(),
+        Instant.now(this.clock),
+        parentId);
   }
 }
