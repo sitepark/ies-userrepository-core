@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.exception;
 
+import com.sitepark.ies.sharedkernel.domain.DomainException;
 import java.io.Serial;
 
 /**
@@ -7,7 +8,7 @@ import java.io.Serial;
  * with a login or username that already exists in the system, violating the uniqueness constraint
  * for user logins.
  */
-public class LoginAlreadyExistsException extends UserRepositoryException {
+public class LoginAlreadyExistsException extends DomainException {
 
   @Serial private static final long serialVersionUID = 1L;
 
