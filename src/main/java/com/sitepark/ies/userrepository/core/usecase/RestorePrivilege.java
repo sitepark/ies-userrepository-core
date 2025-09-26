@@ -13,10 +13,10 @@ import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
+import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -51,8 +51,8 @@ public final class RestorePrivilege {
 
   public void restorePrivilege(RestorePrivilegeRequest request) {
 
-    Privilege privilege = request.privilege();
-    String[] roleIds = request.roleIds();
+    Privilege privilege = request.data().privilege();
+    List<String> roleIds = request.data().roleIds();
     String auditBatchId = request.auditParentId();
 
     this.validatePrivilege(privilege);
@@ -76,17 +76,16 @@ public final class RestorePrivilege {
 
     Instant now = Instant.now(this.clock);
 
-    Privilege privilegeForAuditLog =
-        roleIds.length > 0 ? privilege.toBuilder().roleIds(roleIds).build() : privilege;
+    PrivilegeSnapshot restoreData = new PrivilegeSnapshot(privilege, roleIds);
 
     CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(privilegeForAuditLog, now, auditBatchId);
+        this.buildCreateAuditLogRequest(restoreData, now, auditBatchId);
 
     this.repository.restore(privilege);
-    if (roleIds.length > 0) {
+    if (!roleIds.isEmpty()) {
       String privilegeId = privilege.id();
       assert privilegeId != null : "privilege.id() was validated in validatePrivilege()";
-      this.roleAssigner.assignPrivilegesToRoles(Arrays.asList(roleIds), List.of(privilegeId));
+      this.roleAssigner.assignPrivilegesToRoles(roleIds, List.of(privilegeId));
     }
 
     this.auditLogService.createAuditLog(createAuditLogRequest);
@@ -104,18 +103,14 @@ public final class RestorePrivilege {
     }
   }
 
-  @SuppressWarnings("PMD.UseVarargs")
-  private void checkAccessControl(Privilege privilege, @Nullable String[] roleIds) {
+  private void checkAccessControl(Privilege privilege, @Nullable List<String> roleIds) {
     if (!this.accessControl.isPrivilegeCreatable()) {
       throw new AccessDeniedException("Not allowed to create privilege " + privilege);
     }
 
-    if (roleIds != null && roleIds.length > 0 && !this.accessControl.isRoleWritable()) {
+    if (roleIds != null && !roleIds.isEmpty() && !this.accessControl.isRoleWritable()) {
       throw new AccessDeniedException(
-          "Not allowed to update role to create privilege "
-              + privilege
-              + " -> "
-              + Arrays.toString(roleIds));
+          "Not allowed to update role to create privilege " + privilege + " -> " + roleIds);
     }
   }
 
@@ -130,25 +125,25 @@ public final class RestorePrivilege {
   }
 
   private CreateAuditLogRequest buildCreateAuditLogRequest(
-      Privilege privilege, Instant now, String batchId) {
-    String json = serializePrivilege(privilege);
+      PrivilegeSnapshot data, Instant now, String auditLogParentId) {
+    String json = serializePrivilege(data);
     return new CreateAuditLogRequest(
         AuditLogEntityType.PRIVILEGE.name(),
-        privilege.id(),
-        privilege.name(),
+        data.privilege().id(),
+        data.privilege().name(),
         AuditLogAction.RESTORE.name(),
         null,
         json,
         now,
-        batchId);
+        auditLogParentId);
   }
 
-  private String serializePrivilege(Privilege privilege) {
+  private String serializePrivilege(PrivilegeSnapshot data) {
     try {
-      return this.objectMapper.writeValueAsString(privilege);
+      return this.objectMapper.writeValueAsString(data);
     } catch (JsonProcessingException e) {
       throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.PRIVILEGE.name(), privilege.id(), privilege.name(), e);
+          AuditLogEntityType.PRIVILEGE.name(), data.privilege().id(), data.privilege().name(), e);
     }
   }
 }

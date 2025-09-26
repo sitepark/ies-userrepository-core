@@ -11,10 +11,13 @@ import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
+import com.sitepark.ies.userrepository.core.port.RoleAssigner;
+import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +27,7 @@ public final class RemovePrivileges {
   private static final Logger LOGGER = LogManager.getLogger();
 
   private final PrivilegeRepository repository;
+  private final RoleAssigner roleAssigner;
   private final AccessControl accessControl;
   private final AuditLogService auditLogService;
   private final Clock clock;
@@ -33,10 +37,12 @@ public final class RemovePrivileges {
   @Inject
   RemovePrivileges(
       PrivilegeRepository repository,
+      RoleAssigner roleAssigner,
       AccessControl accessControl,
       AuditLogService auditLogService,
       Clock clock) {
     this.repository = repository;
+    this.roleAssigner = roleAssigner;
     this.accessControl = accessControl;
     this.auditLogService = auditLogService;
     this.clock = clock;
@@ -81,22 +87,16 @@ public final class RemovePrivileges {
 
   private void removePrivilege(String id, Instant now, String parentId) {
 
-    Privilege privilege = this.loadPrivilege(id);
+    PrivilegeSnapshot snapshot = this.createSnapshot(id);
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("remove privilege: {}", privilege);
+      LOGGER.info("remove privilege: {}", id);
     }
 
     CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(privilege, now, parentId);
-    this.repository.remove(privilege.id());
+        this.buildCreateAuditLogRequest(snapshot, now, parentId);
+    this.repository.remove(id);
     this.auditLogService.createAuditLog(createAuditLogRequest);
-  }
-
-  private Privilege loadPrivilege(String id) {
-    return this.repository
-        .get(id)
-        .orElseThrow(() -> new IllegalArgumentException("Privilege with id " + id + " not found."));
   }
 
   private String createBatchRemoveLog(Instant now, String parentId) {
@@ -113,24 +113,39 @@ public final class RemovePrivileges {
   }
 
   private CreateAuditLogRequest buildCreateAuditLogRequest(
-      Privilege privilege, Instant now, String parentId) {
+      PrivilegeSnapshot snapshot, Instant now, String parentId) {
 
-    String json;
+    String backwardData;
     try {
-      json = this.auditLogService.serialize(privilege);
+      backwardData = this.auditLogService.serialize(snapshot);
     } catch (IOException e) {
       throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.PRIVILEGE.name(), privilege.id(), privilege.name(), e);
+          AuditLogEntityType.PRIVILEGE.name(),
+          snapshot.privilege().id(),
+          snapshot.privilege().name(),
+          e);
     }
 
     return new CreateAuditLogRequest(
         AuditLogEntityType.PRIVILEGE.name(),
-        privilege.id(),
-        privilege.name(),
+        snapshot.privilege().id(),
+        snapshot.privilege().name(),
         AuditLogAction.REMOVE.name(),
-        json,
+        backwardData,
         null,
         now,
         parentId);
+  }
+
+  private PrivilegeSnapshot createSnapshot(String id) {
+    Privilege privilege = this.loadPrivilege(id);
+    List<String> roleIds = this.roleAssigner.getRolesAssignByPrivilege(id);
+    return new PrivilegeSnapshot(privilege, roleIds);
+  }
+
+  private Privilege loadPrivilege(String id) {
+    return this.repository
+        .get(id)
+        .orElseThrow(() -> new IllegalArgumentException("Privilege with id " + id + " not found."));
   }
 }

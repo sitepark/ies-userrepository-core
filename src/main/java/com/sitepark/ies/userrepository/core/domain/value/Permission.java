@@ -1,3 +1,5 @@
 package com.sitepark.ies.userrepository.core.domain.value;
 
-public record Permission(String type, String data) {}
+import com.sitepark.ies.sharedkernel.json.RawJson;
+
+public record Permission(String type, @RawJson String data) {}

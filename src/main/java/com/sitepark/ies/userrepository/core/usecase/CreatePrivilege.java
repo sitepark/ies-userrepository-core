@@ -11,6 +11,7 @@ import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
+import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
@@ -65,7 +66,8 @@ public final class CreatePrivilege {
 
     CreateAuditLogRequest createAuditLogRequest =
         this.buildCreateAuditLogRequest(
-            request.privilege().toBuilder().id(id).roleIds(request.roleIds()).build(),
+            new PrivilegeSnapshot(
+                request.privilege().toBuilder().id(id).build(), request.roleIds()),
             request.auditParentId());
     this.auditLogService.createAuditLog(createAuditLogRequest);
 
@@ -105,24 +107,28 @@ public final class CreatePrivilege {
     }
   }
 
-  private CreateAuditLogRequest buildCreateAuditLogRequest(Privilege privilege, String parentId) {
+  private CreateAuditLogRequest buildCreateAuditLogRequest(
+      PrivilegeSnapshot snapshot, String auditLogParentId) {
 
-    String json;
+    String forwardData;
     try {
-      json = this.auditLogService.serialize(privilege);
+      forwardData = this.auditLogService.serialize(snapshot);
     } catch (IOException e) {
       throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.PRIVILEGE.name(), privilege.id(), privilege.name(), e);
+          AuditLogEntityType.PRIVILEGE.name(),
+          snapshot.privilege().id(),
+          snapshot.privilege().name(),
+          e);
     }
 
     return new CreateAuditLogRequest(
         AuditLogEntityType.PRIVILEGE.name(),
-        privilege.id(),
-        privilege.name(),
+        snapshot.privilege().id(),
+        snapshot.privilege().name(),
         AuditLogAction.CREATE.name(),
         null,
-        json,
+        forwardData,
         Instant.now(this.clock),
-        parentId);
+        auditLogParentId);
   }
 }

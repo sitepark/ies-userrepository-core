@@ -12,6 +12,7 @@ import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
+import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
@@ -63,9 +64,9 @@ public class RevertPrivilegeActionHandler implements ReverseActionHandler {
     if (AuditLogAction.CREATE.name().equals(request.action())) {
       this.revertCreate(request.entityId());
     } else if (AuditLogAction.UPDATE.name().equals(request.action())) {
-      this.revertUpdate(request, request.oldData());
+      this.revertUpdate(request, request.backwardData());
     } else if (AuditLogAction.REMOVE.name().equals(request.action())) {
-      this.revertRemove(request, request.oldData());
+      this.revertRemove(request, request.backwardData());
     } else if (AuditLogAction.BATCH_REMOVE.name().equals(request.action())) {
       this.revertBatchRemove(request);
     } else {
@@ -82,23 +83,22 @@ public class RevertPrivilegeActionHandler implements ReverseActionHandler {
     }
 
     Instant now = Instant.now(this.clock);
-    String parentId = this.createRevertBatchRemoveLog(now);
+    String auditLogParentId = this.createRevertBatchRemoveLog(now);
 
     for (String childId : childIds) {
-      Privilege privilege;
+      PrivilegeSnapshot restoreData;
       try {
-        Optional<Privilege> optPrivilege =
-            this.auditLogService.getOldData(childId, Privilege.class);
-        privilege =
-            optPrivilege.orElseThrow(
+        Optional<PrivilegeSnapshot> dataOpt =
+            this.auditLogService.getOldData(childId, PrivilegeSnapshot.class);
+        restoreData =
+            dataOpt.orElseThrow(
                 () -> new RevertFailedException(request, "No old data for log " + childId));
       } catch (IOException e) {
         throw new RevertFailedException(request, "Failed to deserialize privilege", e);
       }
 
       this.restorePrivilegeUseCase.restorePrivilege(
-          new RestorePrivilegeRequest(
-              privilege, privilege.roleIds().toArray(new String[0]), parentId));
+          new RestorePrivilegeRequest(restoreData, auditLogParentId));
     }
   }
 
@@ -136,15 +136,15 @@ public class RevertPrivilegeActionHandler implements ReverseActionHandler {
 
   private void revertRemove(RevertRequest request, String oldData) {
     try {
-      Privilege privilege = this.auditLogService.deserialize(oldData, Privilege.class);
-      this.revertRemove(privilege);
+      PrivilegeSnapshot restoreData =
+          this.auditLogService.deserialize(oldData, PrivilegeSnapshot.class);
+      this.revertRemove(restoreData);
     } catch (IOException e) {
       throw new RevertFailedException(request, "Failed to deserialize privilege", e);
     }
   }
 
-  private void revertRemove(Privilege privilege) {
-    this.restorePrivilegeUseCase.restorePrivilege(
-        new RestorePrivilegeRequest(privilege, privilege.roleIds().toArray(new String[0]), null));
+  private void revertRemove(PrivilegeSnapshot restoreData) {
+    this.restorePrivilegeUseCase.restorePrivilege(new RestorePrivilegeRequest(restoreData, null));
   }
 }

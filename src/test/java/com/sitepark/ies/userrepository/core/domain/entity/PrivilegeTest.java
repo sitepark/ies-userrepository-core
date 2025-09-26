@@ -11,7 +11,6 @@ import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.domain.value.Permission;
-import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -103,24 +102,6 @@ class PrivilegeTest {
   void testNullDescription() {
     Privilege privilege = Privilege.builder().name("privilegerole").description(null).build();
     assertNull(privilege.description(), "unexpected description");
-  }
-
-  @Test
-  void testRoleIdsCollection() {
-    Privilege privilege = Privilege.builder().name("privilegerole").roleIds(List.of("123")).build();
-    assertEquals(List.of("123"), privilege.roleIds(), "unexpected roleIds");
-  }
-
-  @Test
-  void testRoleIdsArray() {
-    Privilege privilege = Privilege.builder().name("privilegerole").roleIds("123").build();
-    assertEquals(List.of("123"), privilege.roleIds(), "unexpected roleIds");
-  }
-
-  @Test
-  void testRoleId() {
-    Privilege privilege = Privilege.builder().name("privilegerole").roleId("123").build();
-    assertEquals(List.of("123"), privilege.roleIds(), "unexpected roleIds");
   }
 
   @Test

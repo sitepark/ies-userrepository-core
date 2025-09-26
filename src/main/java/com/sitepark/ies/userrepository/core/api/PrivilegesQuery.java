@@ -6,5 +6,7 @@ import java.util.List;
 public interface PrivilegesQuery {
   List<Privilege> getPrivilegesByUserId(String userId);
 
+  List<String> getRolesAssignByPrivilege(String privilegeId);
+
   List<Privilege> getPrivilegesByDataField(String jsonPath, List<String> fieldValues);
 }

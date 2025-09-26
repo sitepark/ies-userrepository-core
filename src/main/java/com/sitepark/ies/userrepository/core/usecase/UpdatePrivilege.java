@@ -72,7 +72,6 @@ public final class UpdatePrivilege {
                     new UpdatePrivilegeFailedException(
                         "No privilege with ID " + newPrivilege.id() + " found."))
             .toBuilder()
-            .clearRoleIds()
             .build();
 
     PatchDocument patch = this.patchService.createPatch(oldPrivilege, newPrivilege);

@@ -18,6 +18,7 @@ import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
+import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
@@ -39,12 +40,14 @@ class RemovePrivilegesTest {
   @BeforeEach
   void setUp() {
     this.repository = mock();
+    RoleAssigner roleAssigner = mock();
     this.accessControl = mock();
     this.auditLogService = mock();
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     this.fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
-    this.usecase = new RemovePrivileges(repository, accessControl, auditLogService, fixedClock);
+    this.usecase =
+        new RemovePrivileges(repository, roleAssigner, accessControl, auditLogService, fixedClock);
   }
 
   @Test
