@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 
 @JsonDeserialize(builder = Password.Builder.class)
+@Immutable
 public final class Password {
 
   private final String hashAlgorithm;

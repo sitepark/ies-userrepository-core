@@ -1,6 +1,9 @@
 package com.sitepark.ies.userrepository.core.usecase.query.filter;
 
+import javax.annotation.concurrent.Immutable;
+
 @SuppressWarnings("PMD.TooManyMethods")
+@Immutable
 public interface Filter {
 
   static Id id(String id) {

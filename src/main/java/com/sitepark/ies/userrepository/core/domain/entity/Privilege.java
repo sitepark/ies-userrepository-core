@@ -8,6 +8,7 @@ import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import java.util.*;
+import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 @JsonDeserialize(builder = Privilege.Builder.class)
+@Immutable
 public final class Privilege {
 
   @Nullable private final String id;

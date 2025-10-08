@@ -3,7 +3,9 @@ package com.sitepark.ies.userrepository.core.usecase.query.filter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 
+@Immutable
 public final class RoleIdList implements Filter {
 
   @SuppressWarnings(

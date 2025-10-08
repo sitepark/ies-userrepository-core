@@ -13,6 +13,8 @@ public interface RoleRepository {
 
   void remove(String id);
 
+  void restore(Role role);
+
   Optional<Role> get(String id);
 
   List<Role> getAll();

@@ -16,6 +16,8 @@ public interface UserRepository {
 
   void remove(String id);
 
+  void restore(User user);
+
   Optional<User> get(String id);
 
   List<User> getAll(Filter filter);

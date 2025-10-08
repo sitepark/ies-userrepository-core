@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -103,32 +102,12 @@ class RoleTest {
   }
 
   @Test
-  void testPrivilegesArray() {
-    Role role = Role.builder().name("testrole").privilegeIds("123", "234").build();
-    assertEquals(List.of("123", "234"), role.privilegeIds(), "unexpected privileges");
-  }
-
-  @Test
-  void testPrivilegesList() {
-    Role role = Role.builder().name("testrole").privilegeIds(List.of("123", "234")).build();
-    assertEquals(List.of("123", "234"), role.privilegeIds(), "unexpected privileges");
-  }
-
-  @Test
-  void testPrivilege() {
-    Role role = Role.builder().name("testrole").privilegeId("123").privilegeId("234").build();
-    assertEquals(List.of("123", "234"), role.privilegeIds(), "unexpected privileges");
-  }
-
-  @Test
   void testToBuilder() {
     Role role =
         Role.builder()
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description")
-            .privilegeId("123")
-            .privilegeId("234")
             .build();
     Role copy = role.toBuilder().description("description2").build();
 
@@ -137,8 +116,6 @@ class RoleTest {
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description2")
-            .privilegeId("123")
-            .privilegeId("234")
             .build();
 
     assertEquals(expected, copy, "unexpected privileges");
@@ -156,15 +133,13 @@ class RoleTest {
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description")
-            .privilegeId("123")
-            .privilegeId("234")
             .build();
 
     String json = mapper.writeValueAsString(role);
 
     String expected =
         """
-        {"anchor":"myanchor","name":"testrole","description":"description","privilegeIds":["123","234"]}\
+        {"anchor":"myanchor","name":"testrole","description":"description"}\
         """;
 
     assertEquals(expected, json, "unexpected json");
@@ -178,7 +153,7 @@ class RoleTest {
 
     String json =
         """
-        {"anchor":"myanchor","name":"testrole","description":"description","privilegeIds":["123","234"]}\
+        {"anchor":"myanchor","name":"testrole","description":"description"}\
         """;
 
     Role role = mapper.readValue(json, Role.class);
@@ -188,8 +163,6 @@ class RoleTest {
             .name("testrole")
             .anchor(Anchor.ofString("myanchor"))
             .description("description")
-            .privilegeId("123")
-            .privilegeId("234")
             .build();
 
     assertEquals(expected, role, "unexpected role");

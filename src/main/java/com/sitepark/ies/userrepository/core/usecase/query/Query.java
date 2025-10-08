@@ -6,10 +6,12 @@ import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.usecase.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.usecase.query.sort.SortCriteria;
 import java.util.*;
+import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = Query.Builder.class)
 @SuppressWarnings("PMD.LawOfDemeter")
+@Immutable
 public final class Query {
 
   private final Filter filter;

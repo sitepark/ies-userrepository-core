@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 
+@Immutable
 public final class AnchorList implements Filter {
 
   @SuppressWarnings(

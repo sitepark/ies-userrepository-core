@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
+@Immutable
 @SuppressWarnings({
   "PMD.AvoidFieldNameMatchingMethodName",
   "PMD.TooManyMethods",
@@ -219,7 +221,7 @@ public final class User {
 
   @JsonProperty
   public List<String> roleIds() {
-    return this.roleIds;
+    return List.copyOf(this.roleIds);
   }
 
   public Builder toBuilder() {
