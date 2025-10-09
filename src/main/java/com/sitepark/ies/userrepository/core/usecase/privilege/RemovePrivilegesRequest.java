@@ -50,17 +50,14 @@ public final class RemovePrivilegesRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof RemovePrivilegesRequest that)) {
-      return false;
-    }
-
-    return Objects.equals(this.identifiers, that.identifiers)
+    return (o instanceof RemovePrivilegesRequest that)
+        && Objects.equals(this.identifiers, that.identifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }
 
   @Override
   public String toString() {
-    return "CreatePrivilegeRequest{"
+    return "RemovePrivilegesRequest{"
         + "identifiers="
         + identifiers
         + ", auditParentId='"

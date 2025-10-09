@@ -242,12 +242,8 @@ public final class User {
 
   @Override
   public boolean equals(Object o) {
-
-    if (!(o instanceof User entity)) {
-      return false;
-    }
-
-    return Objects.equals(this.id, entity.id)
+    return (o instanceof User entity)
+        && Objects.equals(this.id, entity.id)
         && Objects.equals(this.anchor, entity.anchor)
         && Objects.equals(this.title, entity.title)
         && Objects.equals(this.firstName, entity.firstName)

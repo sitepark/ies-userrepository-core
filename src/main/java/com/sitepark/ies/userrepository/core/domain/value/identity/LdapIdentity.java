@@ -56,12 +56,9 @@ public final class LdapIdentity implements Identity {
 
   @Override
   public boolean equals(Object o) {
-
-    if (!(o instanceof LdapIdentity that)) {
-      return false;
-    }
-
-    return Objects.equals(this.serverId, that.serverId) && Objects.equals(this.dn, that.dn);
+    return (o instanceof LdapIdentity that)
+        && Objects.equals(this.serverId, that.serverId)
+        && Objects.equals(this.dn, that.dn);
   }
 
   @JsonPOJOBuilder(withPrefix = "")

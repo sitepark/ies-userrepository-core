@@ -46,10 +46,8 @@ public final class Password {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Password that)) {
-      return false;
-    }
-    return Objects.equals(hashAlgorithm, that.hashAlgorithm)
+    return (o instanceof Password that)
+        && Objects.equals(hashAlgorithm, that.hashAlgorithm)
         && Objects.equals(hash, that.hash)
         && Objects.equals(clearText, that.clearText);
   }

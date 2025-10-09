@@ -19,7 +19,7 @@ public final class CreatePrivilegeRequest {
 
   @NotNull private final Privilege privilege;
 
-  private final List<Identifier> roleIdentifiers;
+  @NotNull private final List<Identifier> roleIdentifiers;
 
   @Nullable private final String auditParentId;
 
@@ -59,11 +59,8 @@ public final class CreatePrivilegeRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof CreatePrivilegeRequest that)) {
-      return false;
-    }
-
-    return Objects.equals(this.privilege, that.privilege)
+    return (o instanceof CreatePrivilegeRequest that)
+        && Objects.equals(this.privilege, that.privilege)
         && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }
@@ -84,8 +81,8 @@ public final class CreatePrivilegeRequest {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final Set<Identifier> roleIdentifiers = new TreeSet<>();
     private Privilege privilege;
+    private final Set<Identifier> roleIdentifiers = new TreeSet<>();
     private String auditParentId;
 
     private Builder() {}
@@ -115,6 +112,7 @@ public final class CreatePrivilegeRequest {
     }
 
     public CreatePrivilegeRequest build() {
+      Objects.requireNonNull(this.privilege, "Privilege must not be null");
       return new CreatePrivilegeRequest(this);
     }
   }

@@ -59,7 +59,7 @@ class RemoveRolesUseCaseTest {
 
   @Test
   void testAccessDenied() {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(false);
+    when(this.accessControl.isRoleRemovable()).thenReturn(false);
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -70,7 +70,7 @@ class RemoveRolesUseCaseTest {
   @Test
   void testRemoveWithId() {
     Role role = Role.builder().id("2").name("test").build();
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.accessControl.isRoleRemovable()).thenReturn(true);
     when(this.repository.get(any())).thenReturn(Optional.of(role));
 
     this.useCase.removeRoles(RemoveRolesRequest.builder().identifiers(b -> b.id("2")).build());
@@ -80,7 +80,7 @@ class RemoveRolesUseCaseTest {
 
   @Test
   void testRemoveWithAnchorNotFound() {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.accessControl.isRoleRemovable()).thenReturn(true);
 
     assertThrows(
         AnchorNotFoundException.class,
@@ -92,7 +92,7 @@ class RemoveRolesUseCaseTest {
   @Test
   void testRemoveWithAnchor() {
     Role role = Role.builder().id("2").name("test").build();
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.accessControl.isRoleRemovable()).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("2"));
     when(this.repository.get(any())).thenReturn(Optional.of(role));
 
@@ -105,7 +105,7 @@ class RemoveRolesUseCaseTest {
   @Test
   void testAudit() {
     Role role = Role.builder().id("2").name("test").build();
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.accessControl.isRoleRemovable()).thenReturn(true);
     when(this.repository.get(any())).thenReturn(Optional.of(role));
 
     this.useCase.removeRoles(RemoveRolesRequest.builder().identifiers(b -> b.id("2")).build());

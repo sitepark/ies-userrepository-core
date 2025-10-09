@@ -51,17 +51,14 @@ public final class RemoveRolesRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof RemoveRolesRequest that)) {
-      return false;
-    }
-
-    return Objects.equals(this.identifiers, that.identifiers)
+    return (o instanceof RemoveRolesRequest that)
+        && Objects.equals(this.identifiers, that.identifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }
 
   @Override
   public String toString() {
-    return "RemoveRoleRequest{"
+    return "RemoveRolesRequest{"
         + "identifiers="
         + identifiers
         + ", auditParentId='"

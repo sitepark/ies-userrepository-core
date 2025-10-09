@@ -84,9 +84,11 @@ public final class CreateRoleUseCase {
   }
 
   private void validateRole(Role role) {
-    assert role.name() != null && !role.name().isBlank();
     if (role.id() != null) {
-      throw new IllegalArgumentException("The ID of the privilege must not be set when creating.");
+      throw new IllegalArgumentException("The ID of the role must not be set when creating.");
+    }
+    if (role.name() == null || role.name().isBlank()) {
+      throw new IllegalArgumentException("The name of the role must not be null or empty.");
     }
   }
 

@@ -82,6 +82,8 @@ public final class UpdatePrivilegeUseCase {
             .toBuilder()
             .build();
 
+    Instant timestamp = Instant.now(this.clock);
+
     PatchDocument patch = this.patchService.createPatch(oldPrivilege, newPrivilege);
 
     if (patch.isEmpty()) {
@@ -93,7 +95,12 @@ public final class UpdatePrivilegeUseCase {
       PatchDocument revertPatch = this.patchService.createPatch(newPrivilege, oldPrivilege);
       this.auditLogService.createAuditLog(
           this.buildCreateAuditLogRequest(
-              newPrivilege.id(), newPrivilege.name(), patch, revertPatch, request.auditParentId()));
+              newPrivilege.id(),
+              newPrivilege.name(),
+              patch,
+              revertPatch,
+              request.auditParentId(),
+              timestamp));
     }
 
     if (!request.roleIdentifiers().isEmpty()) {
@@ -159,7 +166,8 @@ public final class UpdatePrivilegeUseCase {
       String entityName,
       PatchDocument patch,
       PatchDocument revertPatch,
-      String parentId) {
+      String parentId,
+      Instant timestamp) {
 
     return new CreateAuditLogRequest(
         AuditLogEntityType.PRIVILEGE.name(),
@@ -168,7 +176,7 @@ public final class UpdatePrivilegeUseCase {
         AuditLogAction.UPDATE.name(),
         revertPatch.toJson(),
         patch.toJson(),
-        Instant.now(this.clock),
+        timestamp,
         parentId);
   }
 }

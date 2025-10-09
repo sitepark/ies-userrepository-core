@@ -62,11 +62,8 @@ public final class UnassignPrivilegesFromRolesRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof UnassignPrivilegesFromRolesRequest that)) {
-      return false;
-    }
-
-    return Objects.equals(this.privilegeIdentifiers, that.privilegeIdentifiers)
+    return (o instanceof UnassignPrivilegesFromRolesRequest that)
+        && Objects.equals(this.privilegeIdentifiers, that.privilegeIdentifiers)
         && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }

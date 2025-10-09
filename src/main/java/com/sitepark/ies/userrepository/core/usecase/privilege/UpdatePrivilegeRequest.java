@@ -59,11 +59,8 @@ public final class UpdatePrivilegeRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof UpdatePrivilegeRequest that)) {
-      return false;
-    }
-
-    return Objects.equals(this.privilege, that.privilege)
+    return (o instanceof UpdatePrivilegeRequest that)
+        && Objects.equals(this.privilege, that.privilege)
         && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }

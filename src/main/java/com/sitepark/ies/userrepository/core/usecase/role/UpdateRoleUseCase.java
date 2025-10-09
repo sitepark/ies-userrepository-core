@@ -62,8 +62,6 @@ public final class UpdateRoleUseCase {
       newRole = request.role();
     }
 
-    this.validateAnchor(newRole);
-
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("update role: {}", newRole);
     }
@@ -76,6 +74,8 @@ public final class UpdateRoleUseCase {
             .toBuilder()
             .build();
 
+    Instant timestamp = Instant.now(this.clock);
+
     PatchDocument patch = this.patchService.createPatch(oldRole, newRole);
 
     if (patch.isEmpty()) {
@@ -87,7 +87,12 @@ public final class UpdateRoleUseCase {
       PatchDocument revertPatch = this.patchService.createPatch(newRole, oldRole);
       this.auditLogService.createAuditLog(
           this.buildCreateAuditLogRequest(
-              newRole.id(), newRole.name(), patch, revertPatch, request.auditParentId()));
+              newRole.id(),
+              newRole.name(),
+              patch,
+              revertPatch,
+              request.auditParentId(),
+              timestamp));
     }
 
     if (!request.privilegeIdentifiers().isEmpty()) {
@@ -142,7 +147,8 @@ public final class UpdateRoleUseCase {
       String entityName,
       PatchDocument patch,
       PatchDocument revertPatch,
-      String parentId) {
+      String parentId,
+      Instant timestamp) {
 
     return new CreateAuditLogRequest(
         AuditLogEntityType.ROLE.name(),
@@ -151,7 +157,7 @@ public final class UpdateRoleUseCase {
         AuditLogAction.UPDATE.name(),
         revertPatch.toJson(),
         patch.toJson(),
-        Instant.now(this.clock),
+        timestamp,
         parentId);
   }
 }

@@ -77,12 +77,8 @@ public final class Privilege {
 
   @Override
   public boolean equals(Object o) {
-
-    if (!(o instanceof Privilege that)) {
-      return false;
-    }
-
-    return Objects.equals(this.id, that.id)
+    return (o instanceof Privilege that)
+        && Objects.equals(this.id, that.id)
         && Objects.equals(this.anchor, that.anchor)
         && Objects.equals(this.name, that.name)
         && Objects.equals(this.description, that.description)

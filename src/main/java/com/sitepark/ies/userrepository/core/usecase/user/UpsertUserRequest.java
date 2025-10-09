@@ -59,11 +59,8 @@ public final class UpsertUserRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof UpsertUserRequest that)) {
-      return false;
-    }
-
-    return Objects.equals(this.user, that.user)
+    return (o instanceof UpsertUserRequest that)
+        && Objects.equals(this.user, that.user)
         && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }

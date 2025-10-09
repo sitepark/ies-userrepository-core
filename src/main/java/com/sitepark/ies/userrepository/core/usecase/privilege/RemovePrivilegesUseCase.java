@@ -1,12 +1,12 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
-import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
@@ -65,8 +65,10 @@ public final class RemovePrivilegesUseCase {
             ? createBatchRemoveLog(now, request.auditParentId())
             : request.auditParentId();
 
+    IdentifierResolver identifierResolver = IdentifierResolver.create(this.repository);
+
     for (Identifier identifier : request.identifiers()) {
-      String id = this.toId(identifier);
+      String id = identifierResolver.resolve(identifier);
       if (BUILT_IN_PRIVILEGE_ID_FULL_ACCESS.equals(id)) {
         if (LOGGER.isWarnEnabled()) {
           LOGGER.warn("Skipping removal of built-in privilege with id 1 (FULL_ACCESS).");
@@ -75,14 +77,6 @@ public final class RemovePrivilegesUseCase {
       }
       this.removePrivilege(id, now, parentId);
     }
-  }
-
-  private String toId(Identifier identifier) {
-    return identifier.resolveId(
-        anchor ->
-            this.repository
-                .resolveAnchor(anchor)
-                .orElseThrow(() -> new AnchorNotFoundException(anchor)));
   }
 
   private void removePrivilege(String id, Instant now, String parentId) {

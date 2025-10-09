@@ -52,7 +52,7 @@ public final class RemoveRolesUseCase {
       return;
     }
 
-    if (!this.accessControl.isPrivilegeRemovable()) {
+    if (!this.accessControl.isRoleRemovable()) {
       throw new AccessDeniedException(
           "Not allowed to remove role with identifiers " + request.identifiers());
     }

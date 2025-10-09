@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.usecase.user.AssignRolesToUsersRequest.Builder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;

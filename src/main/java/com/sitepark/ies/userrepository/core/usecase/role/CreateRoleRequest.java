@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.usecase.user.CreateUserRequest.Builder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -60,11 +59,8 @@ public final class CreateRoleRequest {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof CreateRoleRequest that)) {
-      return false;
-    }
-
-    return Objects.equals(this.role, that.role)
+    return (o instanceof CreateRoleRequest that)
+        && Objects.equals(this.role, that.role)
         && Objects.equals(this.privilegeIdentifiers, that.privilegeIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }
