@@ -7,8 +7,8 @@ import com.sitepark.ies.sharedkernel.audit.RevertRequest;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.user.UnassignRolesFromUsers;
 import com.sitepark.ies.userrepository.core.usecase.user.UnassignRolesFromUsersRequest;
+import com.sitepark.ies.userrepository.core.usecase.user.UnassignRolesFromUsersUseCase;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
@@ -19,14 +19,14 @@ public class RevertUserBatchAssignRolesActionHandler implements RevertEntityActi
 
   private final AuditLogService auditLogService;
 
-  private final UnassignRolesFromUsers unassignRolesFromUsersUseCase;
+  private final UnassignRolesFromUsersUseCase unassignRolesFromUsersUseCase;
 
   private final Clock clock;
 
   @Inject
   RevertUserBatchAssignRolesActionHandler(
       AuditLogService auditLogService,
-      UnassignRolesFromUsers unassignRolesFromUsersUseCase,
+      UnassignRolesFromUsersUseCase unassignRolesFromUsersUseCase,
       Clock clock) {
     this.auditLogService = auditLogService;
     this.unassignRolesFromUsersUseCase = unassignRolesFromUsersUseCase;
@@ -53,8 +53,8 @@ public class RevertUserBatchAssignRolesActionHandler implements RevertEntityActi
 
       this.unassignRolesFromUsersUseCase.unassignRolesFromUsers(
           UnassignRolesFromUsersRequest.builder()
-              .userId(request.entityId())
-              .roleIds(roleIds)
+              .userIdentifiers(b -> b.id(request.entityId()))
+              .roleIdentifiers(b -> b.ids(roleIds))
               .auditParentId(auditLogParentId)
               .build());
     }

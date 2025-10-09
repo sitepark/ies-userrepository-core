@@ -5,8 +5,8 @@ import com.sitepark.ies.sharedkernel.audit.RevertFailedException;
 import com.sitepark.ies.sharedkernel.audit.RevertRequest;
 import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.privilege.RestorePrivilege;
 import com.sitepark.ies.userrepository.core.usecase.privilege.RestorePrivilegeRequest;
+import com.sitepark.ies.userrepository.core.usecase.privilege.RestorePrivilegeUseCase;
 import jakarta.inject.Inject;
 import java.io.IOException;
 
@@ -14,11 +14,11 @@ public class RevertPrivilegeRemoveActionHandler implements RevertEntityActionHan
 
   private final AuditLogService auditLogService;
 
-  private final RestorePrivilege restorePrivilegeUseCase;
+  private final RestorePrivilegeUseCase restorePrivilegeUseCase;
 
   @Inject
   RevertPrivilegeRemoveActionHandler(
-      AuditLogService auditLogService, RestorePrivilege restorePrivilegeUseCase) {
+      AuditLogService auditLogService, RestorePrivilegeUseCase restorePrivilegeUseCase) {
     this.auditLogService = auditLogService;
     this.restorePrivilegeUseCase = restorePrivilegeUseCase;
   }

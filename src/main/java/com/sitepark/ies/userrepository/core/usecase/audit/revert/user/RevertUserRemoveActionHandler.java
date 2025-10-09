@@ -5,8 +5,8 @@ import com.sitepark.ies.sharedkernel.audit.RevertFailedException;
 import com.sitepark.ies.sharedkernel.audit.RevertRequest;
 import com.sitepark.ies.userrepository.core.usecase.audit.UserSnapshot;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.user.RestoreUser;
 import com.sitepark.ies.userrepository.core.usecase.user.RestoreUserRequest;
+import com.sitepark.ies.userrepository.core.usecase.user.RestoreUserUseCase;
 import jakarta.inject.Inject;
 import java.io.IOException;
 
@@ -14,10 +14,11 @@ public class RevertUserRemoveActionHandler implements RevertEntityActionHandler 
 
   private final AuditLogService auditLogService;
 
-  private final RestoreUser restoreUserUseCase;
+  private final RestoreUserUseCase restoreUserUseCase;
 
   @Inject
-  RevertUserRemoveActionHandler(AuditLogService auditLogService, RestoreUser restoreUserUseCase) {
+  RevertUserRemoveActionHandler(
+      AuditLogService auditLogService, RestoreUserUseCase restoreUserUseCase) {
     this.auditLogService = auditLogService;
     this.restoreUserUseCase = restoreUserUseCase;
   }

@@ -8,13 +8,13 @@ import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.user.UpdateUser;
 import com.sitepark.ies.userrepository.core.usecase.user.UpdateUserRequest;
+import com.sitepark.ies.userrepository.core.usecase.user.UpdateUserUseCase;
 import jakarta.inject.Inject;
 
 public class RevertUserUpdateActionHandler implements RevertEntityActionHandler {
 
-  private final UpdateUser updateUserUseCase;
+  private final UpdateUserUseCase updateUserUseCase;
 
   private final PatchService<User> patchService;
 
@@ -22,7 +22,7 @@ public class RevertUserUpdateActionHandler implements RevertEntityActionHandler 
 
   @Inject
   RevertUserUpdateActionHandler(
-      UpdateUser updateUserUseCase,
+      UpdateUserUseCase updateUserUseCase,
       PatchServiceFactory patchServiceFactory,
       UserRepository repository) {
     this.updateUserUseCase = updateUserUseCase;

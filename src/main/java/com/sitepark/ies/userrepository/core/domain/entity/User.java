@@ -18,8 +18,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,8 +65,6 @@ public final class User {
 
   @Nullable private final Organisation organisation;
 
-  private final List<String> roleIds;
-
   private User(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
@@ -87,7 +83,6 @@ public final class User {
     this.address = builder.address;
     this.contact = builder.contact;
     this.organisation = builder.organisation;
-    this.roleIds = List.copyOf(builder.roleIds);
   }
 
   public static Builder builder() {
@@ -219,11 +214,6 @@ public final class User {
     return this.organisation;
   }
 
-  @JsonProperty
-  public List<String> roleIds() {
-    return List.copyOf(this.roleIds);
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
@@ -247,8 +237,7 @@ public final class User {
         this.validity,
         this.address,
         this.contact,
-        this.organisation,
-        this.roleIds);
+        this.organisation);
   }
 
   @Override
@@ -274,8 +263,7 @@ public final class User {
         && Objects.equals(this.validity, entity.validity)
         && Objects.equals(this.address, entity.address)
         && Objects.equals(this.contact, entity.contact)
-        && Objects.equals(this.organisation, entity.organisation)
-        && Objects.equals(this.roleIds, entity.roleIds);
+        && Objects.equals(this.organisation, entity.organisation);
   }
 
   @Override
@@ -322,8 +310,6 @@ public final class User {
         + contact
         + ", organisation="
         + organisation
-        + ", roleIds="
-        + roleIds
         + '}';
   }
 
@@ -348,7 +334,6 @@ public final class User {
     private Address address;
     private Contact contact;
     private Organisation organisation;
-    private final Set<String> roleIds = new TreeSet<>();
 
     private Builder() {}
 
@@ -370,7 +355,6 @@ public final class User {
       this.address = user.address;
       this.contact = user.contact;
       this.organisation = user.organisation;
-      this.roleIds.addAll(user.roleIds);
     }
 
     public Builder id(String id) {
@@ -478,31 +462,6 @@ public final class User {
     public Builder identity(Identity identity) {
       Objects.requireNonNull(identity, "identity is null");
       this.identities.add(identity);
-      return this;
-    }
-
-    @JsonSetter
-    public Builder roleIds(String... roleIds) {
-      Objects.requireNonNull(roleIds, "roleIds is null");
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleIds(List<String> roleIds) {
-      Objects.requireNonNull(roleIds, "roleIds is null");
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleId(String roleId) {
-      Objects.requireNonNull(roleId, "roleId is null");
-      this.roleIds.add(roleId);
       return this;
     }
 

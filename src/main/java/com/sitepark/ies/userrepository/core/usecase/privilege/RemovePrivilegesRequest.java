@@ -3,11 +3,12 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import java.util.Collection;
+import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,63 +82,11 @@ public final class RemovePrivilegesRequest {
       this.auditParentId = request.auditParentId;
     }
 
-    public Builder identifiers(Identifier... identifiers) {
-      if (identifiers == null) {
-        return this;
-      }
+    public Builder identifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
       this.identifiers.clear();
-      for (Identifier identifier : identifiers) {
-        this.identifier(identifier);
-      }
-      return this;
-    }
-
-    public Builder identifiers(Collection<Identifier> identifiers) {
-      if (identifiers == null) {
-        return this;
-      }
-      this.identifiers.clear();
-      for (Identifier identifier : identifiers) {
-        this.identifier(identifier);
-      }
-      return this;
-    }
-
-    public Builder identifier(Identifier identifier) {
-      if (identifier == null) {
-        return this;
-      }
-      this.identifiers.add(identifier);
-      return this;
-    }
-
-    public Builder ids(String... ids) {
-      if (ids == null) {
-        return this;
-      }
-      this.identifiers.clear();
-      for (String id : ids) {
-        this.id(id);
-      }
-      return this;
-    }
-
-    public Builder ids(Collection<String> ids) {
-      if (ids == null) {
-        return this;
-      }
-      this.identifiers.clear();
-      for (String identifier : ids) {
-        this.id(identifier);
-      }
-      return this;
-    }
-
-    public Builder id(String id) {
-      if (id == null) {
-        return this;
-      }
-      this.identifiers.add(Identifier.ofId(id));
+      this.identifiers.addAll(listBuilder.build());
       return this;
     }
 

@@ -2,22 +2,22 @@ package com.sitepark.ies.userrepository.core.usecase.audit.revert.user;
 
 import com.sitepark.ies.sharedkernel.audit.RevertRequest;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.user.RemoveUsers;
 import com.sitepark.ies.userrepository.core.usecase.user.RemoveUsersRequest;
+import com.sitepark.ies.userrepository.core.usecase.user.RemoveUsersUseCase;
 import jakarta.inject.Inject;
 
 public class RevertUserCreateActionHandler implements RevertEntityActionHandler {
 
-  private final RemoveUsers removeUsersUseCase;
+  private final RemoveUsersUseCase removeUsersUseCase;
 
   @Inject
-  RevertUserCreateActionHandler(RemoveUsers removeUsersUseCase) {
+  RevertUserCreateActionHandler(RemoveUsersUseCase removeUsersUseCase) {
     this.removeUsersUseCase = removeUsersUseCase;
   }
 
   @Override
   public void revert(RevertRequest request) {
     this.removeUsersUseCase.removeUsers(
-        RemoveUsersRequest.builder().id(request.entityId()).build());
+        RemoveUsersRequest.builder().identifiers(b -> b.add(request.entityId())).build());
   }
 }

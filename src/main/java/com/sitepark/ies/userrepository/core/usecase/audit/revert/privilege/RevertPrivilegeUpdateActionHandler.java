@@ -8,13 +8,13 @@ import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.privilege.UpdatePrivilege;
 import com.sitepark.ies.userrepository.core.usecase.privilege.UpdatePrivilegeRequest;
+import com.sitepark.ies.userrepository.core.usecase.privilege.UpdatePrivilegeUseCase;
 import jakarta.inject.Inject;
 
 public class RevertPrivilegeUpdateActionHandler implements RevertEntityActionHandler {
 
-  private final UpdatePrivilege updatePrivilegeUseCase;
+  private final UpdatePrivilegeUseCase updatePrivilegeUseCase;
 
   private final PatchService<Privilege> patchService;
 
@@ -22,7 +22,7 @@ public class RevertPrivilegeUpdateActionHandler implements RevertEntityActionHan
 
   @Inject
   RevertPrivilegeUpdateActionHandler(
-      UpdatePrivilege updatePrivilegeUseCase,
+      UpdatePrivilegeUseCase updatePrivilegeUseCase,
       PatchServiceFactory patchServiceFactory,
       PrivilegeRepository repository) {
     this.updatePrivilegeUseCase = updatePrivilegeUseCase;

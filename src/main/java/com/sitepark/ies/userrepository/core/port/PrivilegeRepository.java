@@ -6,7 +6,7 @@ import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import java.util.List;
 import java.util.Optional;
 
-public interface PrivilegeRepository {
+public interface PrivilegeRepository extends AnchorResolver {
 
   String create(Privilege privilege);
 
@@ -22,6 +22,7 @@ public interface PrivilegeRepository {
 
   List<Privilege> getByIds(List<String> ids);
 
+  @Override
   Optional<String> resolveAnchor(Anchor anchor);
 
   void validatePermission(Permission permission);

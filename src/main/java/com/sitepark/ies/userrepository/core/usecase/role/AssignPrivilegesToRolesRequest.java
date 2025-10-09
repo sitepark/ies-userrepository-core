@@ -3,11 +3,13 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import java.util.Collection;
+import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
+import com.sitepark.ies.userrepository.core.usecase.user.AssignRolesToUsersRequest.Builder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +27,10 @@ public final class AssignPrivilegesToRolesRequest {
     this.privilegeIdentifiers = List.copyOf(builder.privilegeIdentifiers);
     this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
     this.auditParentId = builder.auditParentId;
+  }
+
+  public boolean isEmpty() {
+    return this.roleIdentifiers.isEmpty() || this.privilegeIdentifiers.isEmpty();
   }
 
   public static Builder builder() {
@@ -77,7 +83,6 @@ public final class AssignPrivilegesToRolesRequest {
   }
 
   @JsonPOJOBuilder(withPrefix = "")
-  @SuppressWarnings("PMD.TooManyMethods")
   public static final class Builder {
 
     private final Set<Identifier> privilegeIdentifiers = new TreeSet<>();
@@ -92,123 +97,19 @@ public final class AssignPrivilegesToRolesRequest {
       this.auditParentId = request.auditParentId;
     }
 
-    public Builder privilegeIdentifiers(Identifier... privilegeIdentifiers) {
-      if (privilegeIdentifiers == null) {
-        return this;
-      }
-      this.privilegeIdentifiers.clear();
-      for (Identifier privilegeIdentifier : privilegeIdentifiers) {
-        this.privilegeIdentifier(privilegeIdentifier);
-      }
-      return this;
-    }
-
-    public Builder privilegeIdentifiers(Collection<Identifier> privilegeIdentifiers) {
-      if (privilegeIdentifiers == null) {
-        return this;
-      }
-      this.privilegeIdentifiers.clear();
-      for (Identifier privilegeIdentifier : privilegeIdentifiers) {
-        this.privilegeIdentifier(privilegeIdentifier);
-      }
-      return this;
-    }
-
-    public Builder privilegeIdentifier(Identifier privilegeIdentifier) {
-      if (privilegeIdentifier == null) {
-        return this;
-      }
-      this.privilegeIdentifiers.add(privilegeIdentifier);
-      return this;
-    }
-
-    public Builder privilegeIds(String... privilegeIds) {
-      if (privilegeIds == null) {
-        return this;
-      }
-      this.privilegeIdentifiers.clear();
-      for (String privilegeId : privilegeIds) {
-        this.privilegeId(privilegeId);
-      }
-      return this;
-    }
-
-    public Builder privilegeIds(Collection<String> privilegeIds) {
-      if (privilegeIds == null) {
-        return this;
-      }
-      this.privilegeIdentifiers.clear();
-      for (String privilegeId : privilegeIds) {
-        this.privilegeId(privilegeId);
-      }
-      return this;
-    }
-
-    public Builder privilegeId(String privilegeId) {
-      if (privilegeId == null) {
-        return this;
-      }
-      this.privilegeIdentifiers.add(Identifier.ofId(privilegeId));
-      return this;
-    }
-
-    public Builder roleIdentifiers(Identifier... roleIdentifiers) {
-      if (roleIdentifiers == null) {
-        return this;
-      }
+    public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
       this.roleIdentifiers.clear();
-      for (Identifier roleIdentifier : roleIdentifiers) {
-        this.roleIdentifier(roleIdentifier);
-      }
+      this.roleIdentifiers.addAll(listBuilder.build());
       return this;
     }
 
-    public Builder roleIdentifiers(Collection<Identifier> roleIdentifiers) {
-      if (roleIdentifiers == null) {
-        return this;
-      }
-      this.roleIdentifiers.clear();
-      for (Identifier roleIdentifier : roleIdentifiers) {
-        this.roleIdentifier(roleIdentifier);
-      }
-      return this;
-    }
-
-    public Builder roleIdentifier(Identifier roleIdentifier) {
-      if (roleIdentifier == null) {
-        return this;
-      }
-      this.roleIdentifiers.add(roleIdentifier);
-      return this;
-    }
-
-    public Builder roleIds(String... roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIdentifiers.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleIds(Collection<String> roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIdentifiers.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleId(String roleId) {
-      if (roleId == null || roleId.isBlank()) {
-        return this;
-      }
-      this.roleIdentifiers.add(Identifier.ofId(roleId));
+    public Builder privilegeIdentifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
+      this.privilegeIdentifiers.clear();
+      this.privilegeIdentifiers.addAll(listBuilder.build());
       return this;
     }
 

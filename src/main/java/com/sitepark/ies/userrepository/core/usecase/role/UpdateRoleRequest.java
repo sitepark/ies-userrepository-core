@@ -2,12 +2,14 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +19,13 @@ public final class UpdateRoleRequest {
 
   @NotNull private final Role role;
 
-  @NotNull private final List<String> privilegeIds;
+  @NotNull private final List<Identifier> privilegeIdentifiers;
 
   @Nullable private final String auditParentId;
 
   private UpdateRoleRequest(Builder builder) {
     this.role = builder.role;
-    this.privilegeIds = List.copyOf(builder.privilegeIds);
+    this.privilegeIdentifiers = List.copyOf(builder.privilegeIdentifiers);
     this.auditParentId = builder.auditParentId;
   }
 
@@ -37,8 +39,8 @@ public final class UpdateRoleRequest {
   }
 
   @NotNull
-  public List<String> privilegeIds() {
-    return this.privilegeIds;
+  public List<Identifier> privilegeIdentifiers() {
+    return this.privilegeIdentifiers;
   }
 
   @Nullable
@@ -52,14 +54,14 @@ public final class UpdateRoleRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.role, this.privilegeIds, this.auditParentId);
+    return Objects.hash(this.role, this.privilegeIdentifiers, this.auditParentId);
   }
 
   @Override
   public boolean equals(Object o) {
     return (o instanceof UpdateRoleRequest that)
         && Objects.equals(this.role, that.role)
-        && Objects.equals(this.privilegeIds, that.privilegeIds)
+        && Objects.equals(this.privilegeIdentifiers, that.privilegeIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }
 
@@ -68,8 +70,8 @@ public final class UpdateRoleRequest {
     return "CreatePrivilegeRequest{"
         + "role="
         + role
-        + ", privilegeIds="
-        + privilegeIds
+        + ", privilegeIdentifiers="
+        + privilegeIdentifiers
         + ", auditParentId='"
         + auditParentId
         + '\''
@@ -79,7 +81,7 @@ public final class UpdateRoleRequest {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final Set<String> privilegeIds = new TreeSet<>();
+    private final Set<Identifier> privilegeIdentifiers = new TreeSet<>();
     private Role role;
     private String auditParentId;
 
@@ -87,7 +89,7 @@ public final class UpdateRoleRequest {
 
     private Builder(UpdateRoleRequest request) {
       this.role = request.role;
-      this.privilegeIds.addAll(request.privilegeIds);
+      this.privilegeIdentifiers.addAll(request.privilegeIdentifiers);
       this.auditParentId = request.auditParentId;
     }
 
@@ -96,33 +98,11 @@ public final class UpdateRoleRequest {
       return this;
     }
 
-    public Builder privilegeIds(String... privilegeIds) {
-      if (privilegeIds == null) {
-        return this;
-      }
-      this.privilegeIds.clear();
-      for (String privilegeId : privilegeIds) {
-        this.privilegeId(privilegeId);
-      }
-      return this;
-    }
-
-    public Builder privilegeIds(Collection<String> privilegeIds) {
-      if (privilegeIds == null) {
-        return this;
-      }
-      this.privilegeIds.clear();
-      for (String privilegeId : privilegeIds) {
-        this.privilegeId(privilegeId);
-      }
-      return this;
-    }
-
-    public Builder privilegeId(String privilegeId) {
-      if (privilegeId == null || privilegeId.isBlank()) {
-        return this;
-      }
-      this.privilegeIds.add(privilegeId);
+    public Builder privilegeIdentifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
+      this.privilegeIdentifiers.clear();
+      this.privilegeIdentifiers.addAll(listBuilder.build());
       return this;
     }
 

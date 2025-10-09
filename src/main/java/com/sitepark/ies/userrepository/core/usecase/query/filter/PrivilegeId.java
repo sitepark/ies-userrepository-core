@@ -1,10 +1,10 @@
 package com.sitepark.ies.userrepository.core.usecase.query.filter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sitepark.ies.sharedkernel.json.UniquePropertyType;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
 
-@Immutable
+@UniquePropertyType(uniqueProperty = "privilegeid")
 public final class PrivilegeId implements Filter {
 
   @SuppressWarnings(

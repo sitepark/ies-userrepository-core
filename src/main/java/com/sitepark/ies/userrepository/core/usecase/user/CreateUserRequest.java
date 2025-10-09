@@ -2,12 +2,15 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import java.util.Collection;
+import com.sitepark.ies.userrepository.core.usecase.user.AssignRolesToUsersRequest.Builder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +20,13 @@ public final class CreateUserRequest {
 
   @NotNull private final User user;
 
-  @NotNull private final List<String> roleIds;
+  @NotNull private final List<Identifier> roleIdentifiers;
 
   @Nullable private final String auditParentId;
 
   private CreateUserRequest(Builder builder) {
     this.user = builder.user;
-    this.roleIds = List.copyOf(builder.roleIds);
+    this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
     this.auditParentId = builder.auditParentId;
   }
 
@@ -37,8 +40,8 @@ public final class CreateUserRequest {
   }
 
   @NotNull
-  public List<String> roleIds() {
-    return this.roleIds;
+  public List<Identifier> roleIdentifiers() {
+    return this.roleIdentifiers;
   }
 
   @Nullable
@@ -52,14 +55,14 @@ public final class CreateUserRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.user, this.roleIds, this.auditParentId);
+    return Objects.hash(this.user, this.roleIdentifiers, this.auditParentId);
   }
 
   @Override
   public boolean equals(Object o) {
     return (o instanceof CreateUserRequest that)
         && Objects.equals(this.user, that.user)
-        && Objects.equals(this.roleIds, that.roleIds)
+        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }
 
@@ -68,8 +71,8 @@ public final class CreateUserRequest {
     return "CreateUserRequest{"
         + "user="
         + user
-        + ", roleIds="
-        + roleIds
+        + ", roleIdentifiers="
+        + roleIdentifiers
         + ", auditParentId='"
         + auditParentId
         + '\''
@@ -80,14 +83,14 @@ public final class CreateUserRequest {
   public static final class Builder {
 
     private User user;
-    private final Set<String> roleIds = new TreeSet<>();
+    private final Set<Identifier> roleIdentifiers = new TreeSet<>();
     private String auditParentId;
 
     private Builder() {}
 
     private Builder(CreateUserRequest request) {
       this.user = request.user;
-      this.roleIds.addAll(request.roleIds);
+      this.roleIdentifiers.addAll(request.roleIdentifiers);
       this.auditParentId = request.auditParentId;
     }
 
@@ -96,33 +99,11 @@ public final class CreateUserRequest {
       return this;
     }
 
-    public Builder roleIds(String... roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleIds(Collection<String> roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleId(String roleId) {
-      if (roleId == null || roleId.isBlank()) {
-        return this;
-      }
-      this.roleIds.add(roleId);
+    public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
+      this.roleIdentifiers.clear();
+      this.roleIdentifiers.addAll(listBuilder.build());
       return this;
     }
 

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sitepark.ies.userrepository.core.domain.databind.DatabindModule;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -130,42 +129,6 @@ class FilterTest {
         "unexpected json-data");
   }
 
-  @Test
-  void testDeserialize() throws Exception {
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new DatabindModule());
-
-    String json =
-        """
-        {
-            "or":[
-                {"idList":["6"]},
-                {"anchor":"abc"},
-                {
-                    "and":[
-                        {"login":"login"},
-                        {"firstName":"firstName"},
-                        {
-                            "not":{"lastName":"lastName"}
-                        }
-                    ]
-                }
-            ]
-        }
-        """;
-
-    Filter filter = objectMapper.readValue(json, Filter.class);
-
-    Filter expected =
-        Filter.or(
-            Filter.idList("6"),
-            Filter.anchor(com.sitepark.ies.sharedkernel.anchor.Anchor.ofString("abc")),
-            Filter.and(
-                Filter.login("login"),
-                Filter.firstName("firstName"),
-                Filter.not(Filter.lastName("lastName"))));
-
-    assertEquals(expected, filter, "unexpected filter");
-  }
+  // Deserialization tests are in infrastructure module
+  // since that's where the actual deserializer implementation lives
 }

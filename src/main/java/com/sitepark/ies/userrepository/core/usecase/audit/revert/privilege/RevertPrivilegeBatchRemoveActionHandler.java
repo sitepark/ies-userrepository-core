@@ -8,8 +8,8 @@ import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.privilege.RestorePrivilege;
 import com.sitepark.ies.userrepository.core.usecase.privilege.RestorePrivilegeRequest;
+import com.sitepark.ies.userrepository.core.usecase.privilege.RestorePrivilegeUseCase;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
@@ -21,13 +21,15 @@ public class RevertPrivilegeBatchRemoveActionHandler implements RevertEntityActi
 
   private final AuditLogService auditLogService;
 
-  private final RestorePrivilege restorePrivilegeUseCase;
+  private final RestorePrivilegeUseCase restorePrivilegeUseCase;
 
   private final Clock clock;
 
   @Inject
   RevertPrivilegeBatchRemoveActionHandler(
-      AuditLogService auditLogService, RestorePrivilege restorePrivilegeUseCase, Clock clock) {
+      AuditLogService auditLogService,
+      RestorePrivilegeUseCase restorePrivilegeUseCase,
+      Clock clock) {
     this.auditLogService = auditLogService;
     this.restorePrivilegeUseCase = restorePrivilegeUseCase;
     this.clock = clock;

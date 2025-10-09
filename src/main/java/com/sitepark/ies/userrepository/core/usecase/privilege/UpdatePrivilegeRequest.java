@@ -2,12 +2,14 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +19,13 @@ public final class UpdatePrivilegeRequest {
 
   @NotNull private final Privilege privilege;
 
-  @NotNull private final List<String> roleIds;
+  private final List<Identifier> roleIdentifiers;
 
   @Nullable private final String auditParentId;
 
   private UpdatePrivilegeRequest(Builder builder) {
     this.privilege = builder.privilege;
-    this.roleIds = List.copyOf(builder.roleIds);
+    this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
     this.auditParentId = builder.auditParentId;
   }
 
@@ -37,8 +39,8 @@ public final class UpdatePrivilegeRequest {
   }
 
   @NotNull
-  public List<String> roleIds() {
-    return this.roleIds;
+  public List<Identifier> roleIdentifiers() {
+    return this.roleIdentifiers;
   }
 
   @Nullable
@@ -52,7 +54,7 @@ public final class UpdatePrivilegeRequest {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.privilege, this.roleIds, this.auditParentId);
+    return Objects.hash(this.privilege, this.roleIdentifiers, this.auditParentId);
   }
 
   @Override
@@ -62,7 +64,7 @@ public final class UpdatePrivilegeRequest {
     }
 
     return Objects.equals(this.privilege, that.privilege)
-        && Objects.equals(this.roleIds, that.roleIds)
+        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
   }
 
@@ -71,8 +73,8 @@ public final class UpdatePrivilegeRequest {
     return "CreatePrivilegeRequest{"
         + "privilege="
         + privilege
-        + ", roleIds="
-        + roleIds
+        + ", roleIdentifiers="
+        + roleIdentifiers
         + ", auditParentId='"
         + auditParentId
         + '\''
@@ -82,7 +84,7 @@ public final class UpdatePrivilegeRequest {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final Set<String> roleIds = new TreeSet<>();
+    private final Set<Identifier> roleIdentifiers = new TreeSet<>();
     private Privilege privilege;
     private String auditParentId;
 
@@ -90,7 +92,7 @@ public final class UpdatePrivilegeRequest {
 
     private Builder(UpdatePrivilegeRequest request) {
       this.privilege = request.privilege;
-      this.roleIds.addAll(request.roleIds);
+      this.roleIdentifiers.addAll(request.roleIdentifiers);
       this.auditParentId = request.auditParentId;
     }
 
@@ -99,33 +101,11 @@ public final class UpdatePrivilegeRequest {
       return this;
     }
 
-    public Builder roleIds(String... roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleIds(Collection<String> roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleId(String roleId) {
-      if (roleId == null || roleId.isBlank()) {
-        return this;
-      }
-      this.roleIds.add(roleId);
+    public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
+      this.roleIdentifiers.clear();
+      this.roleIdentifiers.addAll(listBuilder.build());
       return this;
     }
 

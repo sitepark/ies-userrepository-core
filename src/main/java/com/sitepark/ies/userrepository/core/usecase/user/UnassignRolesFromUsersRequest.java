@@ -3,11 +3,13 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import java.util.Collection;
+import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
+import com.sitepark.ies.userrepository.core.usecase.user.AssignRolesToUsersRequest.Builder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +27,10 @@ public final class UnassignRolesFromUsersRequest {
     this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
     this.userIdentifiers = List.copyOf(builder.userIdentifiers);
     this.auditParentId = builder.auditParentId;
+  }
+
+  public boolean isEmpty() {
+    return this.roleIdentifiers.isEmpty() || this.userIdentifiers.isEmpty();
   }
 
   public static Builder builder() {
@@ -77,7 +83,6 @@ public final class UnassignRolesFromUsersRequest {
   }
 
   @JsonPOJOBuilder(withPrefix = "")
-  @SuppressWarnings("PMD.TooManyMethods")
   public static final class Builder {
 
     private final Set<Identifier> roleIdentifiers = new TreeSet<>();
@@ -92,123 +97,19 @@ public final class UnassignRolesFromUsersRequest {
       this.auditParentId = request.auditParentId;
     }
 
-    public Builder roleIdentifiers(Identifier... roleIdentifiers) {
-      if (roleIdentifiers == null) {
-        return this;
-      }
+    public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
       this.roleIdentifiers.clear();
-      for (Identifier roleIdentifier : roleIdentifiers) {
-        this.roleIdentifier(roleIdentifier);
-      }
+      this.roleIdentifiers.addAll(listBuilder.build());
       return this;
     }
 
-    public Builder roleIdentifiers(Collection<Identifier> roleIdentifiers) {
-      if (roleIdentifiers == null) {
-        return this;
-      }
-      this.roleIdentifiers.clear();
-      for (Identifier roleIdentifier : roleIdentifiers) {
-        this.roleIdentifier(roleIdentifier);
-      }
-      return this;
-    }
-
-    public Builder roleIdentifier(Identifier roleIdentifier) {
-      if (roleIdentifier == null) {
-        return this;
-      }
-      this.roleIdentifiers.add(roleIdentifier);
-      return this;
-    }
-
-    public Builder roleIds(String... roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIdentifiers.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleIds(Collection<String> roleIds) {
-      if (roleIds == null) {
-        return this;
-      }
-      this.roleIdentifiers.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleId(String roleId) {
-      if (roleId == null || roleId.isBlank()) {
-        return this;
-      }
-      this.roleIdentifiers.add(Identifier.ofId(roleId));
-      return this;
-    }
-
-    public Builder userIdentifiers(Identifier... userIdentifiers) {
-      if (userIdentifiers == null) {
-        return this;
-      }
+    public Builder userIdentifiers(Consumer<IdentifierListBuilder> configurer) {
+      IdentifierListBuilder listBuilder = new IdentifierListBuilder();
+      configurer.accept(listBuilder);
       this.userIdentifiers.clear();
-      for (Identifier userIdentifier : userIdentifiers) {
-        this.userIdentifier(userIdentifier);
-      }
-      return this;
-    }
-
-    public Builder userIdentifiers(Collection<Identifier> userIdentifiers) {
-      if (userIdentifiers == null) {
-        return this;
-      }
-      this.userIdentifiers.clear();
-      for (Identifier userIdentifier : userIdentifiers) {
-        this.userIdentifier(userIdentifier);
-      }
-      return this;
-    }
-
-    public Builder userIdentifier(Identifier userIdentifier) {
-      if (userIdentifier == null) {
-        return this;
-      }
-      this.userIdentifiers.add(userIdentifier);
-      return this;
-    }
-
-    public Builder userIds(String... userIds) {
-      if (userIds == null) {
-        return this;
-      }
-      this.userIdentifiers.clear();
-      for (String userId : userIds) {
-        this.userId(userId);
-      }
-      return this;
-    }
-
-    public Builder userIds(Collection<String> userIds) {
-      if (userIds == null) {
-        return this;
-      }
-      this.userIdentifiers.clear();
-      for (String userId : userIds) {
-        this.userId(userId);
-      }
-      return this;
-    }
-
-    public Builder userId(String userId) {
-      if (userId == null) {
-        return this;
-      }
-      this.userIdentifiers.add(Identifier.ofId(userId));
+      this.userIdentifiers.addAll(listBuilder.build());
       return this;
     }
 

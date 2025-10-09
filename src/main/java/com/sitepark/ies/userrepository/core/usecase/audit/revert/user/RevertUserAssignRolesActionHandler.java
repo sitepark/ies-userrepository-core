@@ -4,8 +4,8 @@ import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.RevertFailedException;
 import com.sitepark.ies.sharedkernel.audit.RevertRequest;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.user.UnassignRolesFromUsers;
 import com.sitepark.ies.userrepository.core.usecase.user.UnassignRolesFromUsersRequest;
+import com.sitepark.ies.userrepository.core.usecase.user.UnassignRolesFromUsersUseCase;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.List;
@@ -14,11 +14,12 @@ public class RevertUserAssignRolesActionHandler implements RevertEntityActionHan
 
   private final AuditLogService auditLogService;
 
-  private final UnassignRolesFromUsers unassignRolesFromUsersUseCase;
+  private final UnassignRolesFromUsersUseCase unassignRolesFromUsersUseCase;
 
   @Inject
   RevertUserAssignRolesActionHandler(
-      AuditLogService auditLogService, UnassignRolesFromUsers unassignRolesFromUsersUseCase) {
+      AuditLogService auditLogService,
+      UnassignRolesFromUsersUseCase unassignRolesFromUsersUseCase) {
     this.auditLogService = auditLogService;
     this.unassignRolesFromUsersUseCase = unassignRolesFromUsersUseCase;
   }
@@ -30,8 +31,8 @@ public class RevertUserAssignRolesActionHandler implements RevertEntityActionHan
           this.auditLogService.deserializeList(request.backwardData(), String.class);
       this.unassignRolesFromUsersUseCase.unassignRolesFromUsers(
           UnassignRolesFromUsersRequest.builder()
-              .userId(request.entityId())
-              .roleIds(roleIds)
+              .userIdentifiers(b -> b.id(request.entityId()))
+              .roleIdentifiers(b -> b.ids(roleIds))
               .build());
     } catch (IOException e) {
       throw new RevertFailedException(request, "Failed to deserialize roleIds", e);

@@ -236,74 +236,6 @@ class UserTest {
   }
 
   @Test
-  void testSetRolesAsList() {
-    User user = this.createBuilderWithRequiredValues().roleIds(List.of("123")).build();
-    assertEquals(List.of("123"), user.roleIds(), "unexpected roles");
-  }
-
-  @Test
-  void testSetOverwriteRolesAsList() {
-    User user = this.createBuilderWithRequiredValues().roleIds(List.of("123")).build();
-    User overwritter = user.toBuilder().roleIds(List.of("345")).build();
-    assertEquals(List.of("345"), overwritter.roleIds(), "unexpected roles");
-  }
-
-  @Test
-  void testSetNullRolesAsList() {
-    assertThrows(NullPointerException.class, () -> User.builder().roleIds((List<String>) null));
-  }
-
-  @Test
-  void testSetNullRoleInList() {
-    assertThrows(
-        NullPointerException.class, () -> User.builder().roleIds(Arrays.asList("345", null)));
-  }
-
-  @Test
-  void testSetRolesAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().roleIds("123").build();
-    assertEquals(List.of("123"), user.roleIds(), "unexpected roles");
-  }
-
-  @Test
-  void testSetOverwriteRolesAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().roleIds("123").build();
-    User overwritter = user.toBuilder().roleIds("345").build();
-    assertEquals(List.of("345"), overwritter.roleIds(), "unexpected roles");
-  }
-
-  @Test
-  void testSetNullRolesAsVArgs() {
-    assertThrows(NullPointerException.class, () -> User.builder().roleIds((String[]) null));
-  }
-
-  @Test
-  void testSetNullRoleInVArgs() {
-    assertThrows(NullPointerException.class, () -> User.builder().roleIds("345", null));
-  }
-
-  @Test
-  void testSetRole() {
-    User user = this.createBuilderWithRequiredValues().roleId("123").build();
-    assertEquals(List.of("123"), user.roleIds(), "unexpected roles");
-  }
-
-  @Test
-  void testAddRole() {
-    User user = this.createBuilderWithRequiredValues().roleId("123").build();
-    User added = user.toBuilder().roleId("456").build();
-
-    List<String> expected = List.of("123", "456");
-
-    assertEquals(expected, added.roleIds(), "unexpected roles");
-  }
-
-  @Test
-  void testSetNullRole() {
-    assertThrows(NullPointerException.class, () -> User.builder().roleId(null));
-  }
-
-  @Test
   void testSetIdentitiesAsList() {
     User user = this.createBuilderWithRequiredValues().identities(List.of(TEST_IDENTITY)).build();
     assertEquals(List.of(TEST_IDENTITY), user.identities(), "unexpected identities");
@@ -517,7 +449,6 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roleIds("345", "123")
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();
@@ -526,7 +457,7 @@ class UserTest {
 
     String expected =
         """
-        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false},"roleIds":["123","345"]}\
+        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false}}\
         """;
 
     assertEquals(expected, json, "unexpected json");
@@ -540,7 +471,7 @@ class UserTest {
 
     String json =
         """
-        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false},"roleIds":["345","123"]}\
+        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false}}\
         """;
 
     User user = mapper.readValue(json, User.class);
@@ -554,7 +485,6 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .roleIds("345", "123")
             .identity(TEST_IDENTITY)
             .description("a note")
             .build();

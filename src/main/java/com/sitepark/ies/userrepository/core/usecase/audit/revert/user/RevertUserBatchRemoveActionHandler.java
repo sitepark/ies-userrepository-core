@@ -8,8 +8,8 @@ import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.usecase.audit.UserSnapshot;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
-import com.sitepark.ies.userrepository.core.usecase.user.RestoreUser;
 import com.sitepark.ies.userrepository.core.usecase.user.RestoreUserRequest;
+import com.sitepark.ies.userrepository.core.usecase.user.RestoreUserUseCase;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
@@ -21,13 +21,13 @@ public class RevertUserBatchRemoveActionHandler implements RevertEntityActionHan
 
   private final AuditLogService auditLogService;
 
-  private final RestoreUser restoreUserUseCase;
+  private final RestoreUserUseCase restoreUserUseCase;
 
   private final Clock clock;
 
   @Inject
   RevertUserBatchRemoveActionHandler(
-      AuditLogService auditLogService, RestoreUser restoreUserUseCase, Clock clock) {
+      AuditLogService auditLogService, RestoreUserUseCase restoreUserUseCase, Clock clock) {
     this.auditLogService = auditLogService;
     this.restoreUserUseCase = restoreUserUseCase;
     this.clock = clock;

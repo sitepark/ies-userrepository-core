@@ -31,7 +31,7 @@ public class RolePrivilegeAssignment {
     return List.copyOf(privilegeIds);
   }
 
-  public List<String> getAllPrivilegeIds() {
+  public List<String> getPrivilegeIds() {
     Set<String> allPrivilegeIds = new TreeSet<>();
     for (Set<String> roleIds : this.assignments.values()) {
       allPrivilegeIds.addAll(roleIds);

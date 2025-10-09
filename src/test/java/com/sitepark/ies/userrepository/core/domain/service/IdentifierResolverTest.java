@@ -22,7 +22,7 @@ class IdentifierResolverTest {
     UserRepository repository = mock();
     IdentifierResolver resolver = new IdentifierResolver(repository);
 
-    String id = resolver.resolveIdentifier(identifier);
+    String id = resolver.resolve(identifier);
 
     assertEquals("123", id, "unexpected id");
   }
@@ -36,7 +36,7 @@ class IdentifierResolverTest {
     when(repository.resolveAnchor(any())).thenReturn(Optional.of("123"));
     IdentifierResolver resolver = new IdentifierResolver(repository);
 
-    String id = resolver.resolveIdentifier(identifier);
+    String id = resolver.resolve(identifier);
 
     assertEquals("123", id, "unexpected id");
   }
@@ -50,6 +50,6 @@ class IdentifierResolverTest {
     when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
     IdentifierResolver resolver = new IdentifierResolver(repository);
 
-    assertThrows(AnchorNotFoundException.class, () -> resolver.resolveIdentifier(identifier));
+    assertThrows(AnchorNotFoundException.class, () -> resolver.resolve(identifier));
   }
 }
