@@ -12,7 +12,6 @@ import com.sitepark.ies.userrepository.core.domain.value.Contact;
 import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import com.sitepark.ies.userrepository.core.domain.value.Organisation;
-import com.sitepark.ies.userrepository.core.domain.value.Password;
 import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -22,12 +21,7 @@ import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
 @Immutable
-@SuppressWarnings({
-  "PMD.AvoidFieldNameMatchingMethodName",
-  "PMD.TooManyMethods",
-  "PMD.DataClass",
-  "PMD.TooManyFields"
-})
+@SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.TooManyMethods"})
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
@@ -53,8 +47,6 @@ public final class User {
 
   private final String login;
 
-  @Nullable private final Password password;
-
   private final List<Identity> identities;
 
   private final UserValidity validity;
@@ -77,7 +69,6 @@ public final class User {
     this.createdAt = builder.createdAt;
     this.changedAt = builder.changedAt;
     this.login = builder.login;
-    this.password = builder.password;
     this.identities = List.copyOf(builder.identities);
     this.validity = builder.validity;
     this.address = builder.address;
@@ -185,11 +176,6 @@ public final class User {
   }
 
   @JsonProperty
-  public Password password() {
-    return this.password;
-  }
-
-  @JsonProperty
   public List<Identity> identities() {
     return List.copyOf(this.identities);
   }
@@ -232,7 +218,6 @@ public final class User {
         this.createdAt,
         this.changedAt,
         this.login,
-        this.password,
         this.identities,
         this.validity,
         this.address,
@@ -254,7 +239,6 @@ public final class User {
         && Objects.equals(this.createdAt, entity.createdAt)
         && Objects.equals(this.changedAt, entity.changedAt)
         && Objects.equals(this.login, entity.login)
-        && Objects.equals(this.password, entity.password)
         && Objects.equals(this.identities, entity.identities)
         && Objects.equals(this.validity, entity.validity)
         && Objects.equals(this.address, entity.address)
@@ -294,8 +278,6 @@ public final class User {
         + ", login='"
         + login
         + '\''
-        + ", password="
-        + password
         + ", identities="
         + identities
         + ", validity="
@@ -324,7 +306,6 @@ public final class User {
     private Instant createdAt;
     private Instant changedAt;
     private String login;
-    private Password password;
     private final List<Identity> identities = new ArrayList<>();
     private UserValidity validity = UserValidity.ALWAYS_VALID;
     private Address address;
@@ -345,7 +326,6 @@ public final class User {
       this.createdAt = user.createdAt;
       this.changedAt = user.changedAt;
       this.login = user.login;
-      this.password = user.password;
       this.identities.addAll(user.identities);
       this.validity = user.validity;
       this.address = user.address;
@@ -384,11 +364,6 @@ public final class User {
 
     public Builder login(String login) {
       this.login = this.trimToNull(login);
-      return this;
-    }
-
-    public Builder password(Password password) {
-      this.password = password;
       return this;
     }
 

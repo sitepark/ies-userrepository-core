@@ -16,10 +16,8 @@ import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
-import com.sitepark.ies.userrepository.core.domain.value.Password;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
-import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.time.Clock;
@@ -33,7 +31,6 @@ class CreateUserUseCaseTest {
   private UserRepository userRepository;
   private AssignRolesToUsersUseCase assignRolesToUsersUseCase;
   private AccessControl accessControl;
-  private PasswordHasher passwordHasher;
   private CreateUserUseCase userCase;
 
   @BeforeEach
@@ -43,7 +40,6 @@ class CreateUserUseCaseTest {
     this.assignRolesToUsersUseCase = mock();
     this.accessControl = mock();
     ExtensionsNotifier extensionsNotifier = mock();
-    this.passwordHasher = mock();
 
     AuditLogService auditLogService = mock();
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
@@ -56,7 +52,6 @@ class CreateUserUseCaseTest {
             this.assignRolesToUsersUseCase,
             this.accessControl,
             extensionsNotifier,
-            this.passwordHasher,
             auditLogService,
             fixedClock);
   }
@@ -135,26 +130,6 @@ class CreateUserUseCaseTest {
     this.userCase.createUser(CreateUserRequest.builder().user(user).build());
 
     verify(userRepository).create(eq(user));
-  }
-
-  @Test
-  void testCreateWithPassword() {
-
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
-    when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.empty());
-    when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
-    when(this.userRepository.create(any())).thenReturn("123");
-
-    User user =
-        User.builder()
-            .login("test")
-            .lastName("Test")
-            .password(Password.builder().clearText("text").build())
-            .build();
-
-    this.userCase.createUser(CreateUserRequest.builder().user(user).build());
-
-    verify(passwordHasher).hash("text");
   }
 
   @Test

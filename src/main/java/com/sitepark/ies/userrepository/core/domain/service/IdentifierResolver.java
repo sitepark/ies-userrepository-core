@@ -5,7 +5,7 @@ import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.port.AnchorResolver;
 import java.util.List;
 
-public class IdentifierResolver {
+public final class IdentifierResolver {
 
   private final AnchorResolver anchorResolver;
 

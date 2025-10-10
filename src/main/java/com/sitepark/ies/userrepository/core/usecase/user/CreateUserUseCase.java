@@ -10,10 +10,8 @@ import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsE
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
-import com.sitepark.ies.userrepository.core.domain.value.Password;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
-import com.sitepark.ies.userrepository.core.port.PasswordHasher;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import com.sitepark.ies.userrepository.core.usecase.audit.UserSnapshot;
@@ -25,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 public final class CreateUserUseCase {
 
@@ -35,7 +32,6 @@ public final class CreateUserUseCase {
   private final AssignRolesToUsersUseCase assignRolesToUsersUseCase;
   private final AccessControl accessControl;
   private final ExtensionsNotifier extensionsNotifier;
-  private final PasswordHasher passwordHasher;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
@@ -46,7 +42,6 @@ public final class CreateUserUseCase {
       AssignRolesToUsersUseCase assignRolesToUsersUseCase,
       AccessControl accessControl,
       ExtensionsNotifier extensionsNotifier,
-      PasswordHasher passwordHasher,
       AuditLogService auditLogService,
       Clock clock) {
 
@@ -55,7 +50,6 @@ public final class CreateUserUseCase {
     this.assignRolesToUsersUseCase = assignRolesToUsersUseCase;
     this.accessControl = accessControl;
     this.extensionsNotifier = extensionsNotifier;
-    this.passwordHasher = passwordHasher;
     this.auditLogService = auditLogService;
     this.clock = clock;
   }
@@ -74,11 +68,7 @@ public final class CreateUserUseCase {
       LOGGER.info("create user: {}", request.user());
     }
 
-    Password hashedPassword = this.hashPassword(request.user().password());
-
-    User userWithIdAndHashPassword = request.user().toBuilder().password(hashedPassword).build();
-
-    String id = this.userRepository.create(userWithIdAndHashPassword);
+    String id = this.userRepository.create(request.user());
 
     List<String> roleIds =
         IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
@@ -97,7 +87,7 @@ public final class CreateUserUseCase {
               .build());
     }
 
-    this.extensionsNotifier.notifyCreated(userWithIdAndHashPassword.toBuilder().id(id).build());
+    this.extensionsNotifier.notifyCreated(request.user().toBuilder().id(id).build());
 
     return id;
   }
@@ -133,14 +123,6 @@ public final class CreateUserUseCase {
         owner -> {
           throw new LoginAlreadyExistsException(user.login(), owner);
         });
-  }
-
-  @Nullable
-  private Password hashPassword(Password password) {
-    if (password == null) {
-      return null;
-    }
-    return this.passwordHasher.hash(password.getClearText());
   }
 
   private CreateAuditLogRequest buildCreateAuditLogRequest(
