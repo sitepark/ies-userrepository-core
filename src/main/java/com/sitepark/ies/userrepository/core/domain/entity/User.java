@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.base.ListBuilder;
 import com.sitepark.ies.userrepository.core.domain.value.Address;
 import com.sitepark.ies.userrepository.core.domain.value.Contact;
 import com.sitepark.ies.userrepository.core.domain.value.GenderType;
@@ -17,6 +18,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
@@ -413,26 +415,14 @@ public final class User {
 
     @JsonSetter
     public Builder identities(List<Identity> identities) {
-      Objects.requireNonNull(identities, "identities is null");
-      this.identities.clear();
-      for (Identity identity : identities) {
-        this.identity(identity);
-      }
-      return this;
+      return this.identities(b -> b.set(identities));
     }
 
-    public Builder identities(Identity... identities) {
-      Objects.requireNonNull(identities, "identities is null");
+    public Builder identities(Consumer<ListBuilder<Identity>> configurer) {
+      ListBuilder<Identity> listBuilder = new ListBuilder<>();
+      configurer.accept(listBuilder);
       this.identities.clear();
-      for (Identity identity : identities) {
-        this.identity(identity);
-      }
-      return this;
-    }
-
-    public Builder identity(Identity identity) {
-      Objects.requireNonNull(identity, "identity is null");
-      this.identities.add(identity);
+      this.identities.addAll(listBuilder.build());
       return this;
     }
 

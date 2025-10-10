@@ -85,12 +85,12 @@ public final class UnassignPrivilegesFromRolesUseCase {
             : request.auditParentId();
 
     effectiveUnassignments
-        .getRoleIds()
+        .roleIds()
         .forEach(
             roleId -> {
               CreateAuditLogRequest createAuditLogRequest =
                   buildCreateAuditLogRequest(
-                      roleId, effectiveUnassignments.getPrivilegeIds(roleId), now, parentId);
+                      roleId, effectiveUnassignments.privilegeIds(roleId), now, parentId);
               this.auditLogService.createAuditLog(createAuditLogRequest);
             });
   }
@@ -104,7 +104,7 @@ public final class UnassignPrivilegesFromRolesUseCase {
 
     for (String roleId : roleIds) {
       List<String> effectivePrivilegeIds =
-          privilegeIds.stream().filter(assignments.getPrivilegeIds(roleId)::contains).toList();
+          privilegeIds.stream().filter(assignments.privilegeIds(roleId)::contains).toList();
       if (!effectivePrivilegeIds.isEmpty()) {
         builder.assignments(roleId, effectivePrivilegeIds);
       }

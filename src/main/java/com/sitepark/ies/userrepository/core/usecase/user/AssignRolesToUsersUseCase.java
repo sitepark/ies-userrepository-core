@@ -87,12 +87,12 @@ public final class AssignRolesToUsersUseCase {
             : request.auditParentId();
 
     effectiveAssignments
-        .getUserIds()
+        .userIds()
         .forEach(
             userId -> {
               CreateAuditLogRequest createAuditLogRequest =
                   buildCreateAuditLogRequest(
-                      userId, effectiveAssignments.getRoleIds(userId), now, parentId);
+                      userId, effectiveAssignments.roleIds(userId), now, parentId);
               this.auditLogService.createAuditLog(createAuditLogRequest);
             });
   }
@@ -105,9 +105,7 @@ public final class AssignRolesToUsersUseCase {
 
     for (String userId : userIds) {
       List<String> effectiveRoleIds =
-          rolesIds.stream()
-              .filter(Predicate.not(assignments.getRoleIds(userId)::contains))
-              .toList();
+          rolesIds.stream().filter(Predicate.not(assignments.roleIds(userId)::contains)).toList();
       if (!effectiveRoleIds.isEmpty()) {
         builder.assignments(userId, effectiveRoleIds);
       }

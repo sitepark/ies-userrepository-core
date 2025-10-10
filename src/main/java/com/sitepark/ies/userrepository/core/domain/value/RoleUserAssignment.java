@@ -19,11 +19,11 @@ public class RoleUserAssignment {
     builder.assignments.forEach((key, value) -> this.assignments.put(key, Set.copyOf(value)));
   }
 
-  public List<String> getRoleIds() {
+  public List<String> roleIds() {
     return List.copyOf(this.assignments.keySet());
   }
 
-  public List<String> getUserIds(String roleId) {
+  public List<String> userIds(String roleId) {
     Set<String> userIds = this.assignments.get(roleId);
     if (userIds == null) {
       return List.of();
@@ -31,7 +31,7 @@ public class RoleUserAssignment {
     return List.copyOf(userIds);
   }
 
-  public List<String> getUserIds() {
+  public List<String> userIds() {
     Set<String> allUserIds = new TreeSet<>();
     for (Set<String> userIds : this.assignments.values()) {
       allUserIds.addAll(userIds);

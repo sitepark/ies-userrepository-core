@@ -1,6 +1,7 @@
 package com.sitepark.ies.userrepository.core.domain.value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.time.Instant;
@@ -31,15 +32,18 @@ public class UserValidity {
     return new Builder();
   }
 
-  public boolean isBlocked() {
+  @JsonProperty
+  public boolean blocked() {
     return this.blocked;
   }
 
-  public Instant getValidFrom() {
+  @JsonProperty
+  public Instant validFrom() {
     return this.validFrom;
   }
 
-  public Instant getValidTo() {
+  @JsonProperty
+  public Instant validTo() {
     return this.validTo;
   }
 

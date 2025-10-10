@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.value;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.sitepark.ies.userrepository.core.domain.value.identity.LdapIdentity;
@@ -16,5 +17,6 @@ import com.sitepark.ies.userrepository.core.domain.value.identity.LdapIdentity;
 @JsonSubTypes({@JsonSubTypes.Type(value = LdapIdentity.class, name = "ldap")})
 @SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface Identity {
-  String getType();
+  @JsonProperty
+  String type();
 }

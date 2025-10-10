@@ -19,12 +19,10 @@ import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import com.sitepark.ies.userrepository.core.domain.value.identity.LdapIdentity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.GodClass"})
 @SuppressFBWarnings({
   "PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
   "NP_NULL_PARAM_DEREF_NONVIRTUAL",
@@ -242,72 +240,10 @@ class UserTest {
   }
 
   @Test
-  void testSetOverwriteIdentitiesAsList() {
-    User user = this.createBuilderWithRequiredValues().identities(List.of(TEST_IDENTITY)).build();
-    Identity newIdentity = LdapIdentity.builder().serverId("3").dn("userdn2").build();
-    User overwritter = user.toBuilder().identities(List.of(newIdentity)).build();
-    assertEquals(List.of(newIdentity), overwritter.identities(), "unexpected identities");
-  }
-
-  @Test
-  void testSetNullIdentitiesAsList() {
-    assertThrows(
-        NullPointerException.class, () -> User.builder().identities((List<Identity>) null));
-  }
-
-  @Test
-  void testSetNullIdentityInList() {
-    assertThrows(
-        NullPointerException.class,
-        () -> User.builder().identities(Arrays.asList(TEST_IDENTITY, null)));
-  }
-
-  @Test
-  void testSetIdentitiesAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().identities(TEST_IDENTITY).build();
+  void testSetIdentitiesWithConsumer() {
+    User user =
+        this.createBuilderWithRequiredValues().identities(b -> b.add(TEST_IDENTITY)).build();
     assertEquals(List.of(TEST_IDENTITY), user.identities(), "unexpected identities");
-  }
-
-  @Test
-  void testSetOverwriteIdentitiesAsVArgs() {
-    User user = this.createBuilderWithRequiredValues().identities(TEST_IDENTITY).build();
-    Identity newIdentity = LdapIdentity.builder().serverId("3").dn("userdn2").build();
-    User overwritter = user.toBuilder().identities(newIdentity).build();
-    assertEquals(List.of(newIdentity), overwritter.identities(), "unexpected identities");
-  }
-
-  @Test
-  void testSetNullIdentitiesAsVArgs() {
-    assertThrows(NullPointerException.class, () -> User.builder().identities((Identity[]) null));
-  }
-
-  @Test
-  void testSetNullIdentityInVArgs() {
-    assertThrows(NullPointerException.class, () -> User.builder().identities(TEST_IDENTITY, null));
-  }
-
-  @Test
-  void testSetIndentity() {
-    User user = this.createBuilderWithRequiredValues().identity(TEST_IDENTITY).build();
-    assertEquals(List.of(TEST_IDENTITY), user.identities(), "unexpected identities");
-  }
-
-  @Test
-  void testAddIdentity() {
-    User user = this.createBuilderWithRequiredValues().identity(TEST_IDENTITY).build();
-
-    Identity newIdentity = LdapIdentity.builder().serverId("3").dn("userdn2").build();
-
-    User added = user.toBuilder().identity(newIdentity).build();
-
-    List<Identity> expected = Arrays.asList(TEST_IDENTITY, newIdentity);
-
-    assertEquals(expected, added.identities(), "unexpected roles");
-  }
-
-  @Test
-  void testSetNullIdentity() {
-    assertThrows(NullPointerException.class, () -> User.builder().identity(null));
   }
 
   @Test
@@ -315,8 +251,7 @@ class UserTest {
     Identity otherIdentity = mock(Identity.class);
     User user =
         this.createBuilderWithRequiredValues()
-            .identity(otherIdentity)
-            .identity(TEST_IDENTITY)
+            .identities(b -> b.add(otherIdentity).add(TEST_IDENTITY))
             .build();
     LdapIdentity identity = user.getIdentity(LdapIdentity.class);
     assertEquals(TEST_IDENTITY, identity, "unexpected identity");
@@ -368,7 +303,7 @@ class UserTest {
             .validity(UserValidity.builder().blocked(true).build())
             .build();
 
-    assertTrue(user.validity().isBlocked(), "user should be blocked");
+    assertTrue(user.validity().blocked(), "user should be blocked");
   }
 
   @Test
@@ -379,7 +314,7 @@ class UserTest {
             .validity(UserValidity.builder().blocked(true))
             .build();
 
-    assertTrue(user.validity().isBlocked(), "user should be blocked");
+    assertTrue(user.validity().blocked(), "user should be blocked");
   }
 
   @Test
@@ -449,7 +384,7 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .identity(TEST_IDENTITY)
+            .identities(b -> b.add(TEST_IDENTITY))
             .description("a note")
             .build();
 
@@ -485,7 +420,7 @@ class UserTest {
             .email("peter.pan@nimmer.land")
             .gender(GenderType.MALE)
             .login("peterpan")
-            .identity(TEST_IDENTITY)
+            .identities(b -> b.add(TEST_IDENTITY))
             .description("a note")
             .build();
 

@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.value.identity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
@@ -24,15 +25,17 @@ public final class LdapIdentity implements Identity {
   }
 
   @Override
-  public String getType() {
+  public String type() {
     return "ldap";
   }
 
-  public String getServerId() {
+  @JsonProperty
+  public String serverId() {
     return this.serverId;
   }
 
-  public String getDn() {
+  @JsonProperty
+  public String dn() {
     return this.dn;
   }
 

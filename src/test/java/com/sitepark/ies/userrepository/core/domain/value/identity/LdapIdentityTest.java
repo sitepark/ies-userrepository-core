@@ -31,7 +31,7 @@ class LdapIdentityTest {
   @Test
   void testSetServer() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
-    assertEquals("2", ldapIdentity.getServerId(), "unexpected server");
+    assertEquals("2", ldapIdentity.serverId(), "unexpected server");
   }
 
   @Test
@@ -62,7 +62,7 @@ class LdapIdentityTest {
   @Test
   void testSetDn() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
-    assertEquals(USER_DN, ldapIdentity.getDn(), "unexpected server");
+    assertEquals(USER_DN, ldapIdentity.dn(), "unexpected server");
   }
 
   @Test
