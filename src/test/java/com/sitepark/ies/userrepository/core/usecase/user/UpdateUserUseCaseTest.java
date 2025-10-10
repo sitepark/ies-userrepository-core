@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
@@ -60,7 +59,6 @@ class UpdateUserUseCaseTest {
     this.patchService = mock();
     when(patchServiceFactory.createPatchService(User.class)).thenReturn(this.patchService);
 
-    AuditLogService auditLogService = mock();
     this.fixedClock = Clock.fixed(changedAtAfter, ZoneOffset.UTC);
 
     this.useCase =
@@ -69,7 +67,6 @@ class UpdateUserUseCaseTest {
             this.repository,
             this.accessControl,
             this.extensionsNotifier,
-            auditLogService,
             patchServiceFactory,
             this.fixedClock);
   }
@@ -140,8 +137,13 @@ class UpdateUserUseCaseTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
-    String id = this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
-    assertEquals("123", id, "unexpected id");
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals(
+        new UpdateUserResult.Unchanged("123"),
+        result,
+        "Should return Unchanged result when no changes detected");
 
     verify(repository).get(anyString());
     verify(repository).resolveLogin(anyString());
@@ -165,10 +167,11 @@ class UpdateUserUseCaseTest {
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
-    String id =
+    UpdateUserResult result =
         this.useCase.updateUser(
             UpdateUserRequest.builder().user(user).roleIdentifiers(b -> b.id("333")).build());
-    assertEquals("123", id, "unexpected id");
+
+    assertEquals("123", result.userId(), "Should return correct user ID");
 
     verify(repository).get(anyString());
     verify(repository).resolveLogin(anyString());
@@ -197,7 +200,10 @@ class UpdateUserUseCaseTest {
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
 
     User user = User.builder().id("123").login("test").lastName("B").build();
-    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals("123", result.userId(), "Should return correct user ID");
 
     User effectiveUser =
         User.builder()
@@ -233,7 +239,10 @@ class UpdateUserUseCaseTest {
 
     User user = User.builder().login("test").anchor("user.test").lastName("B").build();
 
-    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals("123", result.userId(), "Should return correct user ID");
 
     User effectiveUser =
         User.builder()
@@ -267,7 +276,10 @@ class UpdateUserUseCaseTest {
 
     User user = User.builder().id("123").login("test").anchor("user.test2").build();
 
-    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals("123", result.userId(), "Should return correct user ID");
 
     User effectiveUser =
         User.builder()
@@ -301,7 +313,10 @@ class UpdateUserUseCaseTest {
 
     User user = User.builder().id("123").login("test2").build();
 
-    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals("123", result.userId(), "Should return correct user ID");
 
     User effectiveUser =
         User.builder()

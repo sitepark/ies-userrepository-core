@@ -41,12 +41,14 @@ public final class UpsertUserUseCase {
               .auditParentId(request.auditParentId())
               .build());
     } else {
-      return this.updateUserUseCase.updateUser(
-          UpdateUserRequest.builder()
-              .user(userResolved)
-              .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
-              .auditParentId(request.auditParentId())
-              .build());
+      return this.updateUserUseCase
+          .updateUser(
+              UpdateUserRequest.builder()
+                  .user(userResolved)
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
+                  .auditParentId(request.auditParentId())
+                  .build())
+          .userId();
     }
   }
 

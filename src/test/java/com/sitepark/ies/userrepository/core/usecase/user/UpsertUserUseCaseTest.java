@@ -79,6 +79,8 @@ class UpsertUserUseCaseTest {
 
     when(this.accessControl.isUserCreatable()).thenReturn(true);
     when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.updateUserUseCase.updateUser(any()))
+        .thenReturn(UpdateUserResult.updated("1", null, null, null, null));
 
     User user = User.builder().id("1").login("test").lastName("test").build();
 
@@ -106,6 +108,8 @@ class UpsertUserUseCaseTest {
     when(this.accessControl.isUserCreatable()).thenReturn(true);
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("1"));
+    when(this.updateUserUseCase.updateUser(any()))
+        .thenReturn(UpdateUserResult.updated("1", null, null, null, null));
 
     User user = User.builder().anchor("anchor").login("test").lastName("test").build();
 

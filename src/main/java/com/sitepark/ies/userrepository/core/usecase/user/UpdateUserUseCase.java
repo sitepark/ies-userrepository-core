@@ -2,8 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
@@ -11,8 +9,6 @@ import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -30,7 +26,6 @@ public final class UpdateUserUseCase {
   private final UserRepository userRepository;
   private final AccessControl accessControl;
   private final ExtensionsNotifier extensionsNotifier;
-  private final AuditLogService auditLogService;
   private final PatchService<User> patchService;
   private final Clock clock;
 
@@ -40,19 +35,17 @@ public final class UpdateUserUseCase {
       UserRepository userRepository,
       AccessControl accessControl,
       ExtensionsNotifier extensionsNotifier,
-      AuditLogService auditLogService,
       PatchServiceFactory patchServiceFactory,
       Clock clock) {
     this.assignRolesToUsersUseCase = assignRolesToUsersUseCase;
     this.userRepository = userRepository;
     this.accessControl = accessControl;
     this.extensionsNotifier = extensionsNotifier;
-    this.auditLogService = auditLogService;
     this.patchService = patchServiceFactory.createPatchService(User.class);
     this.clock = clock;
   }
 
-  public String updateUser(UpdateUserRequest request) {
+  public UpdateUserResult updateUser(UpdateUserRequest request) {
 
     this.checkAccessControl(request.user());
 
@@ -87,21 +80,11 @@ public final class UpdateUserUseCase {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("Skip update, user with ID {} is unchanged.", joinedUser.id());
       }
-      return joinedUser.id();
+      return UpdateUserResult.unchanged(joinedUser.id());
     }
 
     User userForUpdate = joinedUser.toBuilder().changedAt(timestamp).build();
     this.userRepository.update(userForUpdate);
-
-    PatchDocument revertPatch = this.patchService.createPatch(joinedUser, oldUser);
-    this.auditLogService.createAuditLog(
-        this.buildCreateAuditLogRequest(
-            joinedUser.id(),
-            joinedUser.toDisplayName(),
-            patch,
-            revertPatch,
-            request.auditParentId(),
-            timestamp));
 
     if (!request.roleIdentifiers().isEmpty()) {
       this.assignRolesToUsersUseCase.assignRolesToUsers(
@@ -113,7 +96,10 @@ public final class UpdateUserUseCase {
 
     this.extensionsNotifier.notifyUpdated(userForUpdate);
 
-    return userForUpdate.id();
+    PatchDocument revertPatch = this.patchService.createPatch(joinedUser, oldUser);
+
+    return UpdateUserResult.updated(
+        userForUpdate.id(), userForUpdate.toDisplayName(), patch, revertPatch, timestamp);
   }
 
   private User toUserWithId(User user) {
@@ -164,24 +150,5 @@ public final class UpdateUserUseCase {
     builder.changedAt(storedUser.changedAt());
 
     return builder.build();
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      String entityId,
-      String entityName,
-      PatchDocument patch,
-      PatchDocument revertPatch,
-      String parentId,
-      Instant timestamp) {
-
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.USER.name(),
-        entityId,
-        entityName,
-        AuditLogAction.UPDATE.name(),
-        revertPatch.toJson(),
-        patch.toJson(),
-        timestamp,
-        parentId);
   }
 }
