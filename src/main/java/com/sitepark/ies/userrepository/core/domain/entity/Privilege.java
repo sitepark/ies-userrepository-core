@@ -133,6 +133,7 @@ public final class Privilege {
     }
 
     public Builder identifier(Identifier identifier) {
+      Objects.requireNonNull(identifier, "identifier is null");
       if (identifier.getAnchor() != null) {
         this.anchor = identifier.getAnchor();
         return this;

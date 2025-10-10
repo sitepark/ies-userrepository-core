@@ -120,7 +120,7 @@ public final class Role {
     }
 
     public Builder identifier(Identifier identifier) {
-      assert identifier.getId() != null || identifier.getAnchor() != null;
+      Objects.requireNonNull(identifier, "identifier is null");
       if (identifier.getAnchor() != null) {
         this.anchor = identifier.getAnchor();
         return this;

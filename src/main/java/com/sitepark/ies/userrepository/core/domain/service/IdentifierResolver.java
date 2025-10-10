@@ -3,15 +3,13 @@ package com.sitepark.ies.userrepository.core.domain.service;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.userrepository.core.port.AnchorResolver;
-import jakarta.inject.Inject;
 import java.util.List;
 
 public class IdentifierResolver {
 
   private final AnchorResolver anchorResolver;
 
-  @Inject
-  protected IdentifierResolver(AnchorResolver anchorResolver) {
+  private IdentifierResolver(AnchorResolver anchorResolver) {
     this.anchorResolver = anchorResolver;
   }
 

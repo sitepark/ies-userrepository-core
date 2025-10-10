@@ -7,7 +7,7 @@ import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import jakarta.inject.Inject;
 import java.util.List;
 
-public class GetRolesAssignByUsersUseCase {
+public final class GetRolesAssignByUsersUseCase {
   private final RoleAssigner roleAssigner;
   private final AccessControl accessControl;
 
