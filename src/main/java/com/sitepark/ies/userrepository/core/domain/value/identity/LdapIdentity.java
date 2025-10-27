@@ -1,15 +1,18 @@
 package com.sitepark.ies.userrepository.core.domain.value.identity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * The <code>LdapIdentity</code> class represents an identity provider using LDAP for user
  * authentication. It facilitates user authentication and access control using LDAP credentials.
  */
 @JsonDeserialize(builder = LdapIdentity.Builder.class)
+@Immutable
 public final class LdapIdentity implements Identity {
 
   private final String serverId;
@@ -22,15 +25,17 @@ public final class LdapIdentity implements Identity {
   }
 
   @Override
-  public String getType() {
+  public String type() {
     return "ldap";
   }
 
-  public String getServerId() {
+  @JsonProperty
+  public String serverId() {
     return this.serverId;
   }
 
-  public String getDn() {
+  @JsonProperty
+  public String dn() {
     return this.dn;
   }
 
@@ -54,12 +59,9 @@ public final class LdapIdentity implements Identity {
 
   @Override
   public boolean equals(Object o) {
-
-    if (!(o instanceof LdapIdentity that)) {
-      return false;
-    }
-
-    return Objects.equals(this.serverId, that.serverId) && Objects.equals(this.dn, that.dn);
+    return (o instanceof LdapIdentity that)
+        && Objects.equals(this.serverId, that.serverId)
+        && Objects.equals(this.dn, that.dn);
   }
 
   @JsonPOJOBuilder(withPrefix = "")

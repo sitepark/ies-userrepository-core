@@ -15,7 +15,10 @@
   <rule ref="category/java/errorprone.xml/AvoidFieldNameMatchingMethodName">
     <properties>
       <property name="violationSuppressXPath"
-        value="./ancestor-or-self::ClassDeclaration[matches(@SimpleName, '^.*Builder')]"/>
+        value="./ancestor-or-self::ClassDeclaration[
+                matches(@PackageName, '.*\.domain\.entity|.*\.domain\.value') or
+                matches(@SimpleName, '^.*Builder|.*Request|.*Result')
+              ]"/>
     </properties>
   </rule>
 

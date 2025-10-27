@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,7 +31,7 @@ class LdapIdentityTest {
   @Test
   void testSetServer() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
-    assertEquals("2", ldapIdentity.getServerId(), "unexpected server");
+    assertEquals("2", ldapIdentity.serverId(), "unexpected server");
   }
 
   @Test
@@ -63,7 +62,7 @@ class LdapIdentityTest {
   @Test
   void testSetDn() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
-    assertEquals(USER_DN, ldapIdentity.getDn(), "unexpected server");
+    assertEquals(USER_DN, ldapIdentity.dn(), "unexpected server");
   }
 
   @Test
@@ -117,8 +116,6 @@ class LdapIdentityTest {
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new Jdk8Module());
-    SimpleModule module = new SimpleModule();
-    mapper.registerModule(module);
 
     String json = "{\"serverId\":\"2\",\"dn\":\"userdn\",\"type\":\"ldap\"}";
 

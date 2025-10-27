@@ -7,6 +7,8 @@
 .ruleset
 .pmdruleset.xml
 
+.claude
+
 # IntelliJ
 .idea/
 *.iml

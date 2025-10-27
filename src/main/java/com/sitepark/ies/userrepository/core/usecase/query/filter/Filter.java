@@ -1,6 +1,28 @@
 package com.sitepark.ies.userrepository.core.usecase.query.filter;
 
+import com.sitepark.ies.sharedkernel.json.UseUniquePropertyDeserializer;
+import javax.annotation.concurrent.Immutable;
+
+@UseUniquePropertyDeserializer(
+    types = {
+      Anchor.class,
+      AnchorList.class,
+      And.class,
+      Email.class,
+      FirstName.class,
+      Id.class,
+      IdList.class,
+      LastName.class,
+      Login.class,
+      Not.class,
+      Or.class,
+      PrivilegeId.class,
+      PrivilegeIdList.class,
+      RoleId.class,
+      RoleIdList.class
+    })
 @SuppressWarnings("PMD.TooManyMethods")
+@Immutable
 public interface Filter {
 
   static Id id(String id) {

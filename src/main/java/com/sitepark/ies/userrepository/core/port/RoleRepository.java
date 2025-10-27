@@ -5,13 +5,15 @@ import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import java.util.List;
 import java.util.Optional;
 
-public interface RoleRepository {
+public interface RoleRepository extends AnchorResolver {
 
   String create(Role role);
 
   void update(Role role);
 
   void remove(String id);
+
+  void restore(Role role);
 
   Optional<Role> get(String id);
 
@@ -21,5 +23,6 @@ public interface RoleRepository {
 
   List<Role> getByPrivilegeIds(List<String> privilegeIds);
 
+  @Override
   Optional<String> resolveAnchor(Anchor anchor);
 }
