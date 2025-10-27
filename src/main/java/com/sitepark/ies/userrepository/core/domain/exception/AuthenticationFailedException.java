@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.exception;
 
+import com.sitepark.ies.sharedkernel.domain.DomainException;
 import java.io.Serial;
 
 /**
@@ -7,7 +8,7 @@ import java.io.Serial;
  * fails, indicating that the provided credentials are invalid or authentication was unsuccessful
  * for some reason.
  */
-public abstract class AuthenticationFailedException extends UserRepositoryException {
+public abstract class AuthenticationFailedException extends DomainException {
 
   @Serial private static final long serialVersionUID = 1L;
 

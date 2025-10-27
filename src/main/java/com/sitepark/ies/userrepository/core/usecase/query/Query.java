@@ -6,10 +6,12 @@ import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.usecase.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.usecase.query.sort.SortCriteria;
 import java.util.*;
+import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = Query.Builder.class)
 @SuppressWarnings("PMD.LawOfDemeter")
+@Immutable
 public final class Query {
 
   private final Filter filter;
@@ -49,12 +51,8 @@ public final class Query {
 
   @Override
   public boolean equals(Object o) {
-
-    if (!(o instanceof Query that)) {
-      return false;
-    }
-
-    return Objects.equals(this.filter, that.filter)
+    return (o instanceof Query that)
+        && Objects.equals(this.filter, that.filter)
         && Objects.equals(this.sort, that.sort)
         && Objects.equals(this.limit, that.limit);
   }

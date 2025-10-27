@@ -4,6 +4,30 @@
 
 This is the core of the User Repository, serving as an integral part of a Clean Architecture design for user management within a Content Management System (CMS) application named IES. This project provides the fundamental building blocks and interfaces required for managing user data in the IES application.
 
+## Authorization Concept
+
+The authorization system is based on a hierarchical model with three levels:
+
+### Users
+Users represent individuals or system accounts within the IES application. Each user can be assigned multiple roles that define their permissions.
+
+### Roles
+Roles are collections of privileges that define a specific set of permissions. Roles serve as an intermediate layer between users and individual privileges, simplifying permission management by grouping related privileges together.
+
+### Privileges
+Privileges are atomic permission units that grant specific rights within the application. They represent the finest level of access control.
+
+### Assignment Direction
+The authorization flow follows a clear hierarchy:
+
+**Users → Roles → Privileges**
+
+- Users are assigned one or more roles
+- Roles contain one or more privileges
+- Users inherit all privileges from their assigned roles
+
+This indirect assignment through roles provides flexibility and maintainability when managing permissions for large numbers of users.
+
 ## Components
 
 ### Entities
