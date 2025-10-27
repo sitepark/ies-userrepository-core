@@ -7,25 +7,23 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.base.ListBuilder;
 import com.sitepark.ies.userrepository.core.domain.value.Address;
 import com.sitepark.ies.userrepository.core.domain.value.Contact;
 import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import com.sitepark.ies.userrepository.core.domain.value.Organisation;
-import com.sitepark.ies.userrepository.core.domain.value.Password;
 import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings({
-  "PMD.AvoidFieldNameMatchingMethodName",
-  "PMD.TooManyMethods",
-  "PMD.DataClass",
-  "PMD.TooManyFields"
-})
+@Immutable
+@SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.TooManyMethods"})
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
@@ -51,8 +49,6 @@ public final class User {
 
   private final String login;
 
-  @Nullable private final Password password;
-
   private final List<Identity> identities;
 
   private final UserValidity validity;
@@ -62,8 +58,6 @@ public final class User {
   @Nullable private final Contact contact;
 
   @Nullable private final Organisation organisation;
-
-  private final List<String> roleIds;
 
   private User(Builder builder) {
     this.id = builder.id;
@@ -77,13 +71,11 @@ public final class User {
     this.createdAt = builder.createdAt;
     this.changedAt = builder.changedAt;
     this.login = builder.login;
-    this.password = builder.password;
     this.identities = List.copyOf(builder.identities);
     this.validity = builder.validity;
     this.address = builder.address;
     this.contact = builder.contact;
     this.organisation = builder.organisation;
-    this.roleIds = List.copyOf(builder.roleIds);
   }
 
   public static Builder builder() {
@@ -186,11 +178,6 @@ public final class User {
   }
 
   @JsonProperty
-  public Password password() {
-    return this.password;
-  }
-
-  @JsonProperty
   public List<Identity> identities() {
     return List.copyOf(this.identities);
   }
@@ -215,11 +202,6 @@ public final class User {
     return this.organisation;
   }
 
-  @JsonProperty
-  public List<String> roleIds() {
-    return List.copyOf(this.roleIds);
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
@@ -238,23 +220,17 @@ public final class User {
         this.createdAt,
         this.changedAt,
         this.login,
-        this.password,
         this.identities,
         this.validity,
         this.address,
         this.contact,
-        this.organisation,
-        this.roleIds);
+        this.organisation);
   }
 
   @Override
   public boolean equals(Object o) {
-
-    if (!(o instanceof User entity)) {
-      return false;
-    }
-
-    return Objects.equals(this.id, entity.id)
+    return (o instanceof User entity)
+        && Objects.equals(this.id, entity.id)
         && Objects.equals(this.anchor, entity.anchor)
         && Objects.equals(this.title, entity.title)
         && Objects.equals(this.firstName, entity.firstName)
@@ -265,13 +241,11 @@ public final class User {
         && Objects.equals(this.createdAt, entity.createdAt)
         && Objects.equals(this.changedAt, entity.changedAt)
         && Objects.equals(this.login, entity.login)
-        && Objects.equals(this.password, entity.password)
         && Objects.equals(this.identities, entity.identities)
         && Objects.equals(this.validity, entity.validity)
         && Objects.equals(this.address, entity.address)
         && Objects.equals(this.contact, entity.contact)
-        && Objects.equals(this.organisation, entity.organisation)
-        && Objects.equals(this.roleIds, entity.roleIds);
+        && Objects.equals(this.organisation, entity.organisation);
   }
 
   @Override
@@ -306,8 +280,6 @@ public final class User {
         + ", login='"
         + login
         + '\''
-        + ", password="
-        + password
         + ", identities="
         + identities
         + ", validity="
@@ -318,8 +290,6 @@ public final class User {
         + contact
         + ", organisation="
         + organisation
-        + ", roleIds="
-        + roleIds
         + '}';
   }
 
@@ -338,13 +308,11 @@ public final class User {
     private Instant createdAt;
     private Instant changedAt;
     private String login;
-    private Password password;
     private final List<Identity> identities = new ArrayList<>();
     private UserValidity validity = UserValidity.ALWAYS_VALID;
     private Address address;
     private Contact contact;
     private Organisation organisation;
-    private final List<String> roleIds = new ArrayList<>();
 
     private Builder() {}
 
@@ -360,13 +328,11 @@ public final class User {
       this.createdAt = user.createdAt;
       this.changedAt = user.changedAt;
       this.login = user.login;
-      this.password = user.password;
       this.identities.addAll(user.identities);
       this.validity = user.validity;
       this.address = user.address;
       this.contact = user.contact;
       this.organisation = user.organisation;
-      this.roleIds.addAll(user.roleIds);
     }
 
     public Builder id(String id) {
@@ -400,11 +366,6 @@ public final class User {
 
     public Builder login(String login) {
       this.login = this.trimToNull(login);
-      return this;
-    }
-
-    public Builder password(Password password) {
-      this.password = password;
       return this;
     }
 
@@ -454,51 +415,14 @@ public final class User {
 
     @JsonSetter
     public Builder identities(List<Identity> identities) {
-      Objects.requireNonNull(identities, "identities is null");
+      return this.identities(b -> b.set(identities));
+    }
+
+    public Builder identities(Consumer<ListBuilder<Identity>> configurer) {
+      ListBuilder<Identity> listBuilder = new ListBuilder<>();
+      configurer.accept(listBuilder);
       this.identities.clear();
-      for (Identity identity : identities) {
-        this.identity(identity);
-      }
-      return this;
-    }
-
-    public Builder identities(Identity... identities) {
-      Objects.requireNonNull(identities, "identities is null");
-      this.identities.clear();
-      for (Identity identity : identities) {
-        this.identity(identity);
-      }
-      return this;
-    }
-
-    public Builder identity(Identity identity) {
-      Objects.requireNonNull(identity, "identity is null");
-      this.identities.add(identity);
-      return this;
-    }
-
-    @JsonSetter
-    public Builder roleIds(String... roleIds) {
-      Objects.requireNonNull(roleIds, "roleIds is null");
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleIds(List<String> roleIds) {
-      Objects.requireNonNull(roleIds, "roleIds is null");
-      this.roleIds.clear();
-      for (String roleId : roleIds) {
-        this.roleId(roleId);
-      }
-      return this;
-    }
-
-    public Builder roleId(String roleId) {
-      Objects.requireNonNull(roleId, "roleId is null");
-      this.roleIds.add(roleId);
+      this.identities.addAll(listBuilder.build());
       return this;
     }
 

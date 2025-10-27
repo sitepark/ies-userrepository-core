@@ -2,7 +2,9 @@ package com.sitepark.ies.userrepository.core.usecase.query.limit;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 
+@Immutable
 public final class OffsetLimit implements Limit {
 
   private final int offset;

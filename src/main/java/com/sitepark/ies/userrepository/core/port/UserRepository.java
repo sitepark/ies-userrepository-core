@@ -8,13 +8,15 @@ import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository {
+public interface UserRepository extends AnchorResolver {
 
   String create(User user);
 
   void update(User user);
 
   void remove(String id);
+
+  void restore(User user);
 
   Optional<User> get(String id);
 
@@ -26,5 +28,6 @@ public interface UserRepository {
 
   Optional<String> resolveLogin(String login);
 
+  @Override
   Optional<String> resolveAnchor(Anchor anchor);
 }

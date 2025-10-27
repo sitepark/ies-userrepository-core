@@ -2,28 +2,39 @@ package com.sitepark.ies.userrepository.core.domain.service;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import com.sitepark.ies.userrepository.core.port.UserRepository;
-import jakarta.inject.Inject;
+import com.sitepark.ies.userrepository.core.port.AnchorResolver;
+import java.util.List;
 
-public class IdentifierResolver {
+public final class IdentifierResolver {
 
-  private final UserRepository repository;
+  private final AnchorResolver anchorResolver;
 
-  @Inject
-  protected IdentifierResolver(UserRepository repository) {
-    this.repository = repository;
+  private IdentifierResolver(AnchorResolver anchorResolver) {
+    this.anchorResolver = anchorResolver;
   }
 
-  public String resolveIdentifier(Identifier identifier) {
+  public static IdentifierResolver create(AnchorResolver anchorResolver) {
+    return new IdentifierResolver(anchorResolver);
+  }
 
-    if (identifier.getId() != null) {
-      return identifier.getId();
-    }
+  public List<String> resolve(List<Identifier> identifiers) {
 
-    assert identifier.getAnchor() != null;
+    return identifiers.stream()
+        .map(
+            identifier ->
+                identifier.resolveId(
+                    (anchor) ->
+                        this.anchorResolver
+                            .resolveAnchor(identifier.getAnchor())
+                            .orElseThrow(() -> new AnchorNotFoundException(anchor))))
+        .toList();
+  }
 
-    return this.repository
-        .resolveAnchor(identifier.getAnchor())
-        .orElseThrow(() -> new AnchorNotFoundException(identifier.getAnchor()));
+  public String resolve(Identifier identifier) {
+    return identifier.resolveId(
+        (anchor) ->
+            this.anchorResolver
+                .resolveAnchor(identifier.getAnchor())
+                .orElseThrow(() -> new AnchorNotFoundException(anchor)));
   }
 }

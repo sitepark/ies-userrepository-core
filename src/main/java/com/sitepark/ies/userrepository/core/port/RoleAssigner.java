@@ -1,5 +1,9 @@
 package com.sitepark.ies.userrepository.core.port;
 
+import com.sitepark.ies.userrepository.core.domain.value.PrivilegeRoleAssignment;
+import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
+import com.sitepark.ies.userrepository.core.domain.value.RoleUserAssignment;
+import com.sitepark.ies.userrepository.core.domain.value.UserRoleAssignment;
 import java.util.List;
 
 public interface RoleAssigner {
@@ -10,11 +14,11 @@ public interface RoleAssigner {
 
   void reassignRolesToUsers(List<String> userIds, List<String> roleIds);
 
-  void revokeRolesFromUsers(List<String> userIds, List<String> roleIds);
+  void unassignRolesFromUsers(List<String> userIds, List<String> roleIds);
 
-  void revokeAllRolesFromUsers(List<String> userIds);
+  void unassignAllRolesFromUsers(List<String> userIds);
 
-  void revokeAllUsersFromRoles(List<String> roleIds);
+  void unassignAllUsersFromRoles(List<String> roleIds);
 
   // role-privilege
 
@@ -22,11 +26,11 @@ public interface RoleAssigner {
 
   void reassignPrivilegesToRoles(List<String> roleIds, List<String> privilegeIds);
 
-  void revokePrivilegesFromRoles(List<String> roleIds, List<String> privilegeIds);
+  void unassignPrivilegesFromRoles(List<String> roleIds, List<String> privilegeIds);
 
-  void revokeAllPrivilegesFromRoles(List<String> roleIds);
+  void unassignAllPrivilegesFromRoles(List<String> roleIds);
 
-  void revokeAllRolesFromPrivileges(List<String> privilegeIds);
+  void unassignAllRolesFromPrivileges(List<String> privilegeIds);
 
   // getter
 
@@ -37,4 +41,12 @@ public interface RoleAssigner {
   List<String> getPrivilegesAssignByRole(String roleId);
 
   List<String> getRolesAssignByPrivilege(String privilegeId);
+
+  PrivilegeRoleAssignment getRolesAssignByPrivileges(List<String> privilegeIds);
+
+  RolePrivilegeAssignment getPrivilegesAssignByRoles(List<String> roleIds);
+
+  RoleUserAssignment getUsersAssignByRoles(List<String> privilegeIds);
+
+  UserRoleAssignment getRolesAssignByUsers(List<String> roleIds);
 }

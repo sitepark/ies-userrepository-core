@@ -1,7 +1,9 @@
 package com.sitepark.ies.userrepository.core.usecase.query.sort;
 
 import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 
+@Immutable
 public class SortCriteria {
 
   private final Direction direction;

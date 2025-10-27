@@ -154,7 +154,7 @@ class UserValidityTest {
 
     UserValidity userValidity = UserValidity.builder().validFrom(validFrom).build();
 
-    assertEquals(validFrom, userValidity.getValidFrom(), "unexpected validFrom");
+    assertEquals(validFrom, userValidity.validFrom(), "unexpected validFrom");
   }
 
   @Test
@@ -169,7 +169,7 @@ class UserValidityTest {
 
     UserValidity userValidity = UserValidity.builder().validTo(validTo).build();
 
-    assertEquals(validTo, userValidity.getValidTo(), "unexpected validTo");
+    assertEquals(validTo, userValidity.validTo(), "unexpected validTo");
   }
 
   @Test
