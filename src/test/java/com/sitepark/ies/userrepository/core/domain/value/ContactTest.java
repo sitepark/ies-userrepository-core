@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.value;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -22,12 +21,16 @@ final class ContactTest {
   @Test
   void testPhonePrivate() {
     Contact contact = Contact.builder().phonePrivate("0123456789").build();
-    assertThat("Private phone should match", contact.phonePrivate(), is("0123456789"));
+    assertThat(contact.phonePrivate())
+        .withFailMessage("Private phone should match")
+        .isEqualTo("0123456789");
   }
 
   @Test
   void testPhoneOffice() {
     Contact contact = Contact.builder().phoneOffice("0987654321").build();
-    assertThat("Office phone should match", contact.phoneOffice(), is("0987654321"));
+    assertThat(contact.phoneOffice())
+        .withFailMessage("Office phone should match")
+        .isEqualTo("0987654321");
   }
 }
