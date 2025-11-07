@@ -16,4 +16,6 @@ public interface RoleAssigner {
   List<Role> getRolesAssignByUser(String id);
 
   List<Long> getUserAssignByRole(Role role);
+
+  List<String> resolveRolesToIds(List<Role> roleList);
 }

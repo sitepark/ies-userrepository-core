@@ -5,8 +5,8 @@ import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -50,6 +50,7 @@ public final class UpdateUser {
     User updateUser = this.buildUserWithId(user);
     String id = updateUser.getId().get();
     this.validateWritable(id);
+    this.validateRolePermission(user.getRoles());
     User storedUser = this.loadStoredUser(id);
     this.validateLogin(updateUser);
 
@@ -98,6 +99,13 @@ public final class UpdateUser {
 
     List<Role> roleList = this.roleAssigner.getRolesAssignByUser(storedUser.getId().get());
     return storedUser.toBuilder().roles(roleList).build();
+  }
+
+  private void validateRolePermission(List<Role> roleList) {
+    List<String> roleIds = this.roleAssigner.resolveRolesToIds(roleList);
+    if (!this.accessControl.isAllowedAssignRoleToUser(roleIds)) {
+      throw new AccessDeniedException("Not allowed to assign roles " + roleIds + " to user");
+    }
   }
 
   private void validateLogin(User user) {

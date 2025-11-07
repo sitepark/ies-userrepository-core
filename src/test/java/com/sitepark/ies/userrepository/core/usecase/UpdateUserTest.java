@@ -16,8 +16,8 @@ import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedExcepti
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -69,12 +69,15 @@ class UpdateUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
     when(accessControl.isUserWritable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
+    RoleAssigner roleAssigner = mock();
 
     UserRepository repository = mock(UserRepository.class);
 
     var updateUserUseCase =
-        new UpdateUser(repository, identifierResolver, null, accessControl, extensionsNotifier);
+        new UpdateUser(
+            repository, identifierResolver, roleAssigner, accessControl, extensionsNotifier);
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
@@ -96,6 +99,7 @@ class UpdateUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
     when(accessControl.isUserWritable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     RoleAssigner roleAssigner = mock();
 
@@ -131,6 +135,7 @@ class UpdateUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
     when(accessControl.isUserWritable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     RoleAssigner roleAssigner = mock();
 
@@ -162,6 +167,7 @@ class UpdateUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock(AccessControl.class);
     when(accessControl.isUserWritable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     RoleAssigner roleAssigner = mock();
 
@@ -198,6 +204,7 @@ class UpdateUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock();
     when(accessControl.isUserWritable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock();
 
     UserRepository repository = mock();
@@ -236,6 +243,7 @@ class UpdateUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock();
     when(accessControl.isUserWritable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock();
 
     UserRepository repository = mock();
@@ -270,6 +278,7 @@ class UpdateUserTest {
     when(identifierResolver.resolveIdentifier(any())).thenReturn("123");
     AccessControl accessControl = mock();
     when(accessControl.isUserWritable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock();
 
     UserRepository repository = mock();

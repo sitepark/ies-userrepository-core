@@ -18,7 +18,7 @@ import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.exception.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.IdGenerator;
 import com.sitepark.ies.userrepository.core.port.PasswordHasher;
@@ -74,13 +74,16 @@ class CreateUserTest {
     when(repository.resolveAnchor(Anchor.ofString("test.user"))).thenReturn(Optional.of("123"));
     AccessControl accessControl = mock(AccessControl.class);
     when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     ExtensionsNotifier extensionsNotifier = mock(ExtensionsNotifier.class);
     PasswordHasher passwordHasher = mock(PasswordHasher.class);
+    RoleAssigner roleAssigner = mock();
 
     User user = User.builder().anchor("test.user").login("test").build();
 
     var createUserUseCase =
-        new CreateUser(repository, null, accessControl, null, extensionsNotifier, passwordHasher);
+        new CreateUser(
+            repository, roleAssigner, accessControl, null, extensionsNotifier, passwordHasher);
 
     AnchorAlreadyExistsException e =
         assertThrows(
@@ -100,6 +103,7 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
@@ -137,6 +141,7 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
@@ -171,6 +176,7 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();
@@ -204,6 +210,7 @@ class CreateUserTest {
 
     AccessControl accessControl = mock();
     when(accessControl.isUserCreateable()).thenReturn(true);
+    when(accessControl.isAllowedAssignRoleToUser(any())).thenReturn(true);
     IdGenerator idGenerator = mock();
     when(idGenerator.generate()).thenReturn("123");
     ExtensionsNotifier extensionsNotifier = mock();

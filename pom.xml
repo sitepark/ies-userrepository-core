@@ -66,6 +66,12 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>com.sitepark.ies</groupId>
+			<artifactId>ies-shared-kernel</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
 			<groupId>jakarta.inject</groupId>
 			<artifactId>jakarta.inject-api</artifactId>
 			<version>2.0.1</version>
@@ -98,11 +104,11 @@
 		</dependency>
 
 		<!--
-			hard decision, see:
-			https://stackoverflow.com/questions/4963300/which-notnull-java-annotation-should-i-use
-			https://www.beyondjava.net/getting-rid-of-the-nullpointerexception-in-2020#what_about_jsr305
-			https://github.com/spotbugs/spotbugs/issues/471#issuecomment-338806092
-		-->
+      hard decision, see:
+      https://stackoverflow.com/questions/4963300/which-notnull-java-annotation-should-i-use
+      https://www.beyondjava.net/getting-rid-of-the-nullpointerexception-in-2020#what_about_jsr305
+      https://github.com/spotbugs/spotbugs/issues/471#issuecomment-338806092
+    -->
 		<dependency>
 			<groupId>org.eclipse.jdt</groupId>
 			<artifactId>org.eclipse.jdt.annotation</artifactId>
@@ -117,16 +123,16 @@
 		</dependency>
 
 		<!--
-			Wirklich dependencies zu thirdparty im core?
-			Oder lieber "Java Util Logging" mit "Log4j JDK Logging Adapter"
-			https://logging.apache.org/log4j/2.x/log4j-jul/index.html
+      Wirklich dependencies zu thirdparty im core?
+      Oder lieber "Java Util Logging" mit "Log4j JDK Logging Adapter"
+      https://logging.apache.org/log4j/2.x/log4j-jul/index.html
 
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.14.0</version>
-		</dependency>
-		-->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.14.0</version>
+    </dependency>
+    -->
 
 		<!-- Test-Dependencies -->
 		<dependency>
@@ -389,7 +395,7 @@
 				<!-- https://spotbugs.readthedocs.io/en/latest/maven.html -->
 				<dependencies>
 					<!-- overwrite dependency on spotbugs if you want to specify the version of
-					spotbugs -->
+          spotbugs -->
 					<dependency>
 						<groupId>com.github.spotbugs</groupId>
 						<artifactId>spotbugs</artifactId>

@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.entity.query.Query;
 import com.sitepark.ies.userrepository.core.domain.exception.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;

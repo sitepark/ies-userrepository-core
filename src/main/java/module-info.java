@@ -1,6 +1,5 @@
 /**
- * This module contains the essential business logic
- * and data structures, of the user repository.
+ * This module contains the essential business logic and data structures, of the user repository.
  */
 module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.domain.entity;
@@ -11,6 +10,7 @@ module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.domain.entity.query.filter;
   exports com.sitepark.ies.userrepository.core.domain.entity.query.limit;
   exports com.sitepark.ies.userrepository.core.domain.exception;
+  exports com.sitepark.ies.userrepository.core.domain.value.permission;
   exports com.sitepark.ies.userrepository.core.port;
   exports com.sitepark.ies.userrepository.core.usecase;
 
@@ -22,6 +22,8 @@ module com.sitepark.ies.userrepository.core {
   requires com.fasterxml.jackson.datatype.jdk8;
   requires com.fasterxml.jackson.datatype.jsr310;
   requires org.eclipse.jdt.annotation;
+  requires com.sitepark.ies.sharedkernel;
+  requires jsr305;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
   opens com.sitepark.ies.userrepository.core.domain.entity.role;
@@ -30,4 +32,5 @@ module com.sitepark.ies.userrepository.core {
   opens com.sitepark.ies.userrepository.core.domain.entity.query.filter;
   opens com.sitepark.ies.userrepository.core.domain.entity.query.limit;
   opens com.sitepark.ies.userrepository.core.domain.entity.identity;
+  opens com.sitepark.ies.userrepository.core.domain.value.permission;
 }
