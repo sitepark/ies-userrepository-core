@@ -10,7 +10,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import com.sitepark.ies.userrepository.core.domain.value.Permission;
+import com.sitepark.ies.sharedkernel.security.PermissionPayload;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -106,7 +106,7 @@ class PrivilegeTest {
 
   @Test
   void testPermission() {
-    Permission permission = mock();
+    PermissionPayload permission = mock();
     Privilege privilege = Privilege.builder().name("privilegerole").permission(permission).build();
     assertSame(permission, privilege.permission(), "unexpected permission");
   }

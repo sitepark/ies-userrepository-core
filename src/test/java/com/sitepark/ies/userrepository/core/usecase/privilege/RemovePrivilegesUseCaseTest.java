@@ -11,10 +11,10 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
+import com.sitepark.ies.sharedkernel.security.PermissionPayload;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
-import com.sitepark.ies.userrepository.core.domain.value.Permission;
 import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -97,7 +97,7 @@ class RemovePrivilegesUseCaseTest {
                 Privilege.builder()
                     .id("2")
                     .name("test")
-                    .permission(new Permission("test", null))
+                    .permission(new PermissionPayload("test", null))
                     .build()));
     this.usecase.removePrivileges(
         RemovePrivilegesRequest.builder().identifiers(b -> b.id("2")).build());
@@ -123,7 +123,7 @@ class RemovePrivilegesUseCaseTest {
                 Privilege.builder()
                     .id("2")
                     .name("test")
-                    .permission(new Permission("test", null))
+                    .permission(new PermissionPayload("test", null))
                     .build()));
     when(this.auditLogService.serialize(any())).thenReturn("serialized");
     this.usecase.removePrivileges(
