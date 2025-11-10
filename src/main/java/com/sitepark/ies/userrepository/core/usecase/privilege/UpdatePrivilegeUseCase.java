@@ -11,9 +11,9 @@ import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.exception.PrivilegeNotFoundException;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesRequest;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesUseCase;
@@ -65,8 +65,6 @@ public final class UpdatePrivilegeUseCase {
       this.validateAnchor(request.privilege());
       newPrivilege = request.privilege();
     }
-
-    this.repository.validatePermission(newPrivilege.permission());
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("update privilege: {}", request.privilege());

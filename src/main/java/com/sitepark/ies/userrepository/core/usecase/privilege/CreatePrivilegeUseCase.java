@@ -7,10 +7,10 @@ import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
@@ -58,8 +58,6 @@ public final class CreatePrivilegeUseCase {
     this.checkAccessControl(request.privilege(), request.roleIdentifiers());
 
     this.validateAnchor(request.privilege());
-
-    this.privilegeRepository.validatePermission(request.privilege().permission());
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("create privilege: {}", request.privilege());

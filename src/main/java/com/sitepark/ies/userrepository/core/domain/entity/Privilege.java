@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import com.sitepark.ies.sharedkernel.security.PermissionPayload;
+import com.sitepark.ies.sharedkernel.security.Permission;
 import java.util.*;
 import javax.annotation.concurrent.Immutable;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ public final class Privilege {
 
   @Nullable private final String description;
 
-  @Nullable private final PermissionPayload permission;
+  @Nullable private final Permission permission;
 
   private Privilege(Builder builder) {
     this.id = builder.id;
@@ -62,7 +62,7 @@ public final class Privilege {
   }
 
   @JsonProperty
-  public PermissionPayload permission() {
+  public Permission permission() {
     return this.permission;
   }
 
@@ -111,7 +111,7 @@ public final class Privilege {
     private Anchor anchor;
     private String name;
     private String description;
-    private PermissionPayload permission;
+    private Permission permission;
 
     private Builder() {}
 
@@ -162,7 +162,7 @@ public final class Privilege {
       return this;
     }
 
-    public Builder permission(PermissionPayload permission) {
+    public Builder permission(Permission permission) {
       this.permission = permission;
       return this;
     }

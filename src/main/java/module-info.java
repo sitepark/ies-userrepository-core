@@ -6,6 +6,7 @@ module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.api;
   exports com.sitepark.ies.userrepository.core.domain.entity;
   exports com.sitepark.ies.userrepository.core.domain.value.identity;
+  exports com.sitepark.ies.userrepository.core.domain.value.permission;
   exports com.sitepark.ies.userrepository.core.domain.value;
   exports com.sitepark.ies.userrepository.core.domain.exception;
   exports com.sitepark.ies.userrepository.core.domain.service;
@@ -31,6 +32,7 @@ module com.sitepark.ies.userrepository.core {
   requires jsr305;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
+  opens com.sitepark.ies.userrepository.core.domain.value.permission;
   opens com.sitepark.ies.userrepository.core.domain.value.identity;
   opens com.sitepark.ies.userrepository.core.domain.value;
   opens com.sitepark.ies.userrepository.core.usecase.query;

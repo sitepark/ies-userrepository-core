@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,10 +13,9 @@ import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.sharedkernel.security.PermissionPayload;
+import com.sitepark.ies.sharedkernel.security.Permission;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.exception.InvalidPermissionException;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesRequest;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesUseCase;
@@ -74,11 +72,7 @@ class UpdatePrivilegeUseCaseTest {
   void testAssesDeniedForPrivilege() {
     when(this.accessControl.isPrivilegeWritable()).thenReturn(false);
     Privilege privilege =
-        Privilege.builder()
-            .id("1")
-            .name("testPrivilege")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().id("1").name("testPrivilege").permission(new TestPermission()).build();
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -95,7 +89,7 @@ class UpdatePrivilegeUseCaseTest {
         Privilege.builder()
             .anchor("anchor")
             .name("testPrivilege")
-            .permission(new PermissionPayload("test", null))
+            .permission(new TestPermission())
             .build();
     assertThrows(
         AnchorNotFoundException.class,
@@ -114,7 +108,7 @@ class UpdatePrivilegeUseCaseTest {
             .id("1")
             .anchor("anchor")
             .name("testPrivilege")
-            .permission(new PermissionPayload("test", null))
+            .permission(new TestPermission())
             .build();
     assertThrows(
         AnchorAlreadyExistsException.class,
@@ -128,37 +122,13 @@ class UpdatePrivilegeUseCaseTest {
   void testIdAndAnchorMissing() {
     when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
     Privilege privilege =
-        Privilege.builder()
-            .name("testPrivilege")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().name("testPrivilege").permission(new TestPermission()).build();
     assertThrows(
         IllegalArgumentException.class,
         () ->
             this.usecase.updatePrivilege(
                 UpdatePrivilegeRequest.builder().privilege(privilege).build()),
         "Expected IllegalArgumentException for privilege without ID or anchor");
-  }
-
-  @Test
-  void testInvalidPermission() {
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
-    doThrow(new InvalidPermissionException(("Invalid permission")))
-        .when(this.repository)
-        .validatePermission(any());
-
-    Privilege privilege =
-        Privilege.builder()
-            .id("1")
-            .name("testPrivilege")
-            .permission(new PermissionPayload("test", null))
-            .build();
-    assertThrows(
-        InvalidPermissionException.class,
-        () ->
-            this.usecase.updatePrivilege(
-                UpdatePrivilegeRequest.builder().privilege(privilege).build()),
-        "Expected InvalidPermissionException for invalid permission");
   }
 
   @Test
@@ -169,29 +139,19 @@ class UpdatePrivilegeUseCaseTest {
     PatchDocument patch = mock();
     when(this.patchService.createPatch(any(), any())).thenReturn(patch);
 
+    Permission a = new TestPermission();
+    Permission b = new TestPermission();
+
     Privilege oldPrivilege =
-        Privilege.builder()
-            .anchor("anchor")
-            .name("testPrivilegeOld")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().anchor("anchor").name("testPrivilegeOld").permission(a).build();
     when(this.repository.get(any())).thenReturn(Optional.of(oldPrivilege));
 
     Privilege newPrivilege =
-        Privilege.builder()
-            .anchor("anchor")
-            .name("testPrivilegeNew")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().anchor("anchor").name("testPrivilegeNew").permission(b).build();
     this.usecase.updatePrivilege(UpdatePrivilegeRequest.builder().privilege(newPrivilege).build());
 
     Privilege expected =
-        Privilege.builder()
-            .id("2")
-            .anchor("anchor")
-            .name("testPrivilegeNew")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().id("2").anchor("anchor").name("testPrivilegeNew").permission(b).build();
 
     verify(this.repository).update(expected);
   }
@@ -208,16 +168,12 @@ class UpdatePrivilegeUseCaseTest {
         Privilege.builder()
             .anchor("anchor")
             .name("testPrivilege")
-            .permission(new PermissionPayload("test", null))
+            .permission(new TestPermission())
             .build();
     when(this.repository.get(any())).thenReturn(Optional.of(oldPrivilege));
 
     Privilege newPrivilege =
-        Privilege.builder()
-            .id("3")
-            .name("testPrivilege")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().id("3").name("testPrivilege").permission(new TestPermission()).build();
     this.usecase.updatePrivilege(
         UpdatePrivilegeRequest.builder()
             .privilege(newPrivilege)

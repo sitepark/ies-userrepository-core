@@ -8,9 +8,8 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.sharedkernel.security.PermissionPayload;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,7 @@ class UpsertPrivilegeUseCaseTest {
             .id("1")
             .anchor("anchor")
             .name("test")
-            .permission(new PermissionPayload("test", null))
+            .permission(new TestPermission())
             .build();
     assertThrows(
         AccessDeniedException.class,
@@ -71,7 +70,7 @@ class UpsertPrivilegeUseCaseTest {
             .id("1")
             .anchor("anchor")
             .name("test")
-            .permission(new PermissionPayload("test", null))
+            .permission(new TestPermission())
             .build();
     assertThrows(
         AccessDeniedException.class,
@@ -87,8 +86,7 @@ class UpsertPrivilegeUseCaseTest {
     when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
     when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
 
-    Privilege privilege =
-        Privilege.builder().name("test").permission(new PermissionPayload("test", null)).build();
+    Privilege privilege = Privilege.builder().name("test").permission(new TestPermission()).build();
 
     this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
@@ -103,11 +101,7 @@ class UpsertPrivilegeUseCaseTest {
     when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
 
     Privilege privilege =
-        Privilege.builder()
-            .id("1")
-            .name("test")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().id("1").name("test").permission(new TestPermission()).build();
 
     this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
@@ -122,11 +116,7 @@ class UpsertPrivilegeUseCaseTest {
     when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
 
     Privilege privilege =
-        Privilege.builder()
-            .anchor("anchor")
-            .name("test")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().anchor("anchor").name("test").permission(new TestPermission()).build();
 
     this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
@@ -142,11 +132,7 @@ class UpsertPrivilegeUseCaseTest {
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("1"));
 
     Privilege privilege =
-        Privilege.builder()
-            .anchor("anchor")
-            .name("test")
-            .permission(new PermissionPayload("test", null))
-            .build();
+        Privilege.builder().anchor("anchor").name("test").permission(new TestPermission()).build();
 
     this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
@@ -168,7 +154,7 @@ class UpsertPrivilegeUseCaseTest {
             .id("1")
             .anchor("anchor")
             .name("test")
-            .permission(new PermissionPayload("test", null))
+            .permission(new TestPermission())
             .build();
 
     assertThrows(

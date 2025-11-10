@@ -11,11 +11,10 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.sharedkernel.security.PermissionPayload;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import java.io.IOException;
@@ -94,11 +93,7 @@ class RemovePrivilegesUseCaseTest {
     when(this.repository.get(any()))
         .thenReturn(
             Optional.of(
-                Privilege.builder()
-                    .id("2")
-                    .name("test")
-                    .permission(new PermissionPayload("test", null))
-                    .build()));
+                Privilege.builder().id("2").name("test").permission(new TestPermission()).build()));
     this.usecase.removePrivileges(
         RemovePrivilegesRequest.builder().identifiers(b -> b.id("2")).build());
 
@@ -120,11 +115,7 @@ class RemovePrivilegesUseCaseTest {
     when(this.repository.get(any()))
         .thenReturn(
             Optional.of(
-                Privilege.builder()
-                    .id("2")
-                    .name("test")
-                    .permission(new PermissionPayload("test", null))
-                    .build()));
+                Privilege.builder().id("2").name("test").permission(new TestPermission()).build()));
     when(this.auditLogService.serialize(any())).thenReturn("serialized");
     this.usecase.removePrivileges(
         RemovePrivilegesRequest.builder().identifiers(b -> b.id("2")).build());

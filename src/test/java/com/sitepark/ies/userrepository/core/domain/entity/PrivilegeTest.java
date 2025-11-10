@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,7 +9,8 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
-import com.sitepark.ies.sharedkernel.security.PermissionPayload;
+import com.sitepark.ies.sharedkernel.security.Permission;
+import com.sitepark.ies.userrepository.core.usecase.privilege.TestPermission;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -106,7 +106,7 @@ class PrivilegeTest {
 
   @Test
   void testPermission() {
-    PermissionPayload permission = mock();
+    Permission permission = new TestPermission();
     Privilege privilege = Privilege.builder().name("privilegerole").permission(permission).build();
     assertSame(permission, privilege.permission(), "unexpected permission");
   }

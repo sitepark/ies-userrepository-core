@@ -8,9 +8,9 @@ import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
@@ -67,8 +67,6 @@ public final class RestorePrivilegeUseCase {
     }
 
     this.validateAnchor(privilege);
-
-    this.repository.validatePermission(privilege.permission());
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("restore privilege: {}", privilege);

@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,10 +9,8 @@ import static org.mockito.Mockito.when;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.sharedkernel.security.PermissionPayload;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.exception.InvalidPermissionException;
-import com.sitepark.ies.userrepository.core.port.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesRequest;
@@ -84,10 +81,7 @@ class CreatePrivilegeUseCaseTest {
             this.usecase.createPrivilege(
                 CreatePrivilegeRequest.builder()
                     .privilege(
-                        Privilege.builder()
-                            .name("name")
-                            .permission(new PermissionPayload("type", null))
-                            .build())
+                        Privilege.builder().name("name").permission(new TestPermission()).build())
                     .build()),
         "Expected AccessDeniedException for privilege creation");
   }
@@ -103,10 +97,7 @@ class CreatePrivilegeUseCaseTest {
             this.usecase.createPrivilege(
                 CreatePrivilegeRequest.builder()
                     .privilege(
-                        Privilege.builder()
-                            .name("name")
-                            .permission(new PermissionPayload("type", null))
-                            .build())
+                        Privilege.builder().name("name").permission(new TestPermission()).build())
                     .roleIdentifiers(b -> b.id("1"))
                     .build()),
         "Expected IllegalArgumentException for privilege with ID");
@@ -126,30 +117,7 @@ class CreatePrivilegeUseCaseTest {
                         Privilege.builder()
                             .name("name")
                             .anchor("anchor")
-                            .permission(new PermissionPayload("type", null))
-                            .build())
-                    .build()),
-        "Expected IllegalArgumentException for privilege with ID");
-  }
-
-  @Test
-  void testWithInvalidPermission() {
-
-    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
-    doThrow(new InvalidPermissionException("Invalid permission"))
-        .when(this.privilegeRepository)
-        .validatePermission(any());
-
-    assertThrows(
-        InvalidPermissionException.class,
-        () ->
-            this.usecase.createPrivilege(
-                CreatePrivilegeRequest.builder()
-                    .privilege(
-                        Privilege.builder()
-                            .name("name")
-                            .anchor("anchor")
-                            .permission(new PermissionPayload("type", null))
+                            .permission(new TestPermission())
                             .build())
                     .build()),
         "Expected IllegalArgumentException for privilege with ID");
@@ -169,7 +137,7 @@ class CreatePrivilegeUseCaseTest {
                     Privilege.builder()
                         .name("name")
                         .anchor("anchor")
-                        .permission(new PermissionPayload("type", null))
+                        .permission(new TestPermission())
                         .build())
                 .build());
 
@@ -190,7 +158,7 @@ class CreatePrivilegeUseCaseTest {
                 Privilege.builder()
                     .name("name")
                     .anchor("anchor")
-                    .permission(new PermissionPayload("type", null))
+                    .permission(new TestPermission())
                     .build())
             .roleIdentifiers(b -> b.id("1"))
             .build());
