@@ -205,19 +205,19 @@ class UserTest {
   }
 
   @Test
-  void testGetNameOnlyLastname() {
+  void testToDisplayNameOnlyLastname() {
     User user = this.createBuilderWithRequiredValues().lastName("Pan").build();
     assertEquals("Pan", user.getName(), "unexpected name");
   }
 
   @Test
-  void testGetNameOnlyFirstname() {
+  void testToDisplayNameOnlyFirstname() {
     User user = this.createBuilderWithRequiredValues().firstName("Peter").build();
     assertEquals("Peter", user.getName(), "unexpected name");
   }
 
   @Test
-  void testGetNameFirstnameAndLastName() {
+  void testToDisplayNameFirstnameAndLastName() {
     User user = this.createBuilderWithRequiredValues().lastName("Pan").firstName("Peter").build();
     assertEquals("Pan, Peter", user.getName(), "unexpected name");
   }
