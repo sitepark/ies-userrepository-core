@@ -13,6 +13,7 @@ module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.domain.value.permission;
   exports com.sitepark.ies.userrepository.core.port;
   exports com.sitepark.ies.userrepository.core.usecase;
+  exports com.sitepark.ies.userrepository.core.usecase.user;
 
   requires org.apache.logging.log4j;
   requires com.github.spotbugs.annotations;
