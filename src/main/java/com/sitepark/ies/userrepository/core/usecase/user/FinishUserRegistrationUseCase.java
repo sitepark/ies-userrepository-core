@@ -1,6 +1,5 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.email.Email;
 import com.sitepark.ies.sharedkernel.email.EmailAddress;
 import com.sitepark.ies.sharedkernel.email.EmailMessageTypeIdentifier;
@@ -11,17 +10,11 @@ import com.sitepark.ies.sharedkernel.email.TemplateEmailMessage;
 import com.sitepark.ies.sharedkernel.security.CodeVerificationChallenge;
 import com.sitepark.ies.sharedkernel.security.CodeVerificationFailedException;
 import com.sitepark.ies.sharedkernel.security.CodeVerificationService;
-import com.sitepark.ies.userrepository.core.domain.entity.GenderType;
-import com.sitepark.ies.userrepository.core.domain.entity.Password;
-import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
 import com.sitepark.ies.userrepository.core.domain.exception.FinishUserRegistrationException;
-import com.sitepark.ies.userrepository.core.usecase.CreateUser;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import jakarta.inject.Inject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class FinishUserRegistrationUseCase {
@@ -31,17 +24,17 @@ public final class FinishUserRegistrationUseCase {
 
   private final CodeVerificationService codeVerificationService;
 
-  private final CreateUser createUser;
+  private final CreateUserUseCase createUserUseCase;
 
   private final EmailService emailService;
 
   @Inject
   FinishUserRegistrationUseCase(
       CodeVerificationService codeVerificationService,
-      CreateUser createUser,
+      CreateUserUseCase createUserUseCase,
       EmailService emailService) {
     this.codeVerificationService = codeVerificationService;
-    this.createUser = createUser;
+    this.createUserUseCase = createUserUseCase;
     this.emailService = emailService;
   }
 
@@ -55,8 +48,6 @@ public final class FinishUserRegistrationUseCase {
       throw new CodeVerificationFailedException("Payload is not UserRegistrationPayload");
     }
 
-    List<Role> roles = request.roleIdentifiers().stream().map(this::toRole).toList();
-
     User user =
         User.builder()
             .login(email)
@@ -64,25 +55,19 @@ public final class FinishUserRegistrationUseCase {
             .firstName(request.firstName())
             .lastName(request.lastName())
             .gender(request.gender() != null ? request.gender() : GenderType.UNKNOWN)
-            .roles(roles)
-            .password(Password.builder().clearText(request.password()).build())
             .build();
 
-    String id = this.createUser.createUser(user);
+    CreateUserRequest createUserRequest =
+        CreateUserRequest.builder()
+            .user(user)
+            .roleIdentifiers(configurer -> configurer.identifiers(request.roleIdentifiers()))
+            .build();
 
-    User userForEmail = user.toBuilder().password(null).build();
-    this.sendSuccessEmail(request, userForEmail);
+    String id = this.createUserUseCase.createUser(createUserRequest);
+
+    this.sendSuccessEmail(request, user);
 
     return new FinishUserRegistrationResult(email, id);
-  }
-
-  @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  private Role toRole(Identifier identifier) {
-    if (identifier.getId() != null) {
-      return Ref.ofId(identifier.getId());
-    } else {
-      return Ref.ofAnchor(identifier.getAnchor().getName());
-    }
   }
 
   private void sendSuccessEmail(FinishUserRegistrationRequest request, User user) {
@@ -93,9 +78,7 @@ public final class FinishUserRegistrationUseCase {
         Email.builder()
             .from(request.emailParameters().from())
             .replyTo(configurer -> configurer.set(request.emailParameters().replyTo()))
-            .to(
-                configurer ->
-                    configurer.set(EmailAddress.builder().address(user.getEmail().get()).build()))
+            .to(configurer -> configurer.set(EmailAddress.builder().address(user.email()).build()))
             .message(message)
             .build();
     try {

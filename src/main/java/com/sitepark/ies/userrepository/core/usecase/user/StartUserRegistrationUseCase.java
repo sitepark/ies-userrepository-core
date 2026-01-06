@@ -116,11 +116,11 @@ public final class StartUserRegistrationUseCase {
     data.put(
         "user",
         com.sitepark.ies.sharedkernel.security.User.builder()
-            .id(user.getId().orElse(""))
-            .email(user.getEmail().orElse(""))
-            .firstName(user.getFirstName().orElse(""))
-            .lastName(user.getLastName().orElse(""))
-            .username(user.getLogin())
+            .id(user.id())
+            .email(user.email())
+            .firstName(user.firstName())
+            .lastName(user.lastName())
+            .username(user.login())
             .build());
 
     return TemplateEmailMessage.builder()

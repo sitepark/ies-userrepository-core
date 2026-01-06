@@ -172,6 +172,7 @@ class StartUserRegistrationUseCaseTest {
         User.builder()
             .id("123")
             .login("test@example.com")
+            .email("test@example.com")
             .firstName("Max")
             .lastName("Mustermann")
             .build();
@@ -204,6 +205,7 @@ class StartUserRegistrationUseCaseTest {
         User.builder()
             .id("123")
             .login("test@example.com")
+            .email("test@example.com")
             .firstName("Max")
             .lastName("Mustermann")
             .build();
@@ -235,6 +237,7 @@ class StartUserRegistrationUseCaseTest {
         User.builder()
             .id("123")
             .login("test@example.com")
+            .email("test@example.com")
             .firstName("Max")
             .lastName("Mustermann")
             .build();
@@ -266,6 +269,7 @@ class StartUserRegistrationUseCaseTest {
         User.builder()
             .id("123")
             .login("test@example.com")
+            .email("test@example.com")
             .firstName("Max")
             .lastName("Mustermann")
             .build();
@@ -294,6 +298,7 @@ class StartUserRegistrationUseCaseTest {
         User.builder()
             .id("123")
             .login("test@example.com")
+            .email("test@example.com")
             .firstName("Max")
             .lastName("Mustermann")
             .build();
@@ -370,6 +375,7 @@ class StartUserRegistrationUseCaseTest {
         User.builder()
             .id("123")
             .login("test@example.com")
+            .email("test@example.com")
             .firstName("Max")
             .lastName("Mustermann")
             .build();

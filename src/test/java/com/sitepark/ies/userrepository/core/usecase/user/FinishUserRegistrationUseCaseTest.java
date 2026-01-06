@@ -21,11 +21,8 @@ import com.sitepark.ies.sharedkernel.security.CodeVerificationChallenge;
 import com.sitepark.ies.sharedkernel.security.CodeVerificationFailedException;
 import com.sitepark.ies.sharedkernel.security.CodeVerificationPayload;
 import com.sitepark.ies.sharedkernel.security.CodeVerificationService;
-import com.sitepark.ies.userrepository.core.domain.entity.GenderType;
-import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
 import com.sitepark.ies.userrepository.core.domain.exception.FinishUserRegistrationException;
-import com.sitepark.ies.userrepository.core.usecase.CreateUser;
+import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,8 +33,10 @@ class FinishUserRegistrationUseCaseTest {
 
   private static final ExternalEmailParameters EMAIL_PARAMETERS = createTestEmailParameters();
 
+  private static final String TEST_EMAIL_ADDRESS = "test@example.com";
+
   private CodeVerificationService codeVerificationService;
-  private CreateUser createUser;
+  private CreateUserUseCase createUserUseCase;
   private EmailService emailService;
 
   private FinishUserRegistrationUseCase useCase;
@@ -45,22 +44,22 @@ class FinishUserRegistrationUseCaseTest {
   @BeforeEach
   void setUp() {
     this.codeVerificationService = mock();
-    this.createUser = mock();
+    this.createUserUseCase = mock();
     this.emailService = mock();
 
     this.useCase =
         new FinishUserRegistrationUseCase(
-            this.codeVerificationService, this.createUser, this.emailService);
+            this.codeVerificationService, this.createUserUseCase, this.emailService);
   }
 
   @Test
   void testReturnsResultWithEmailFromPayload() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -85,11 +84,11 @@ class FinishUserRegistrationUseCaseTest {
   @Test
   void testReturnsResultWithUserIdFromCreateUser() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("789");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("789");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -116,7 +115,7 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -142,7 +141,7 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -158,23 +157,22 @@ class FinishUserRegistrationUseCaseTest {
 
     this.useCase.finishUserRegistration(request);
 
-    verify(this.createUser)
+    verify(this.createUserUseCase)
         .createUser(
             argThat(
-                user ->
-                    user.getLogin().equals("test@example.com")
-                        && user.getEmail().isPresent()
-                        && user.getEmail().get().equals("test@example.com")));
+                creatUserRequest ->
+                    TEST_EMAIL_ADDRESS.equals(creatUserRequest.user().login())
+                        && TEST_EMAIL_ADDRESS.equals(creatUserRequest.user().email())));
   }
 
   @Test
   void testCreatesUserWithFirstNameFromRequest() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -190,21 +188,19 @@ class FinishUserRegistrationUseCaseTest {
 
     this.useCase.finishUserRegistration(request);
 
-    verify(this.createUser)
+    verify(this.createUserUseCase)
         .createUser(
-            argThat(
-                user ->
-                    user.getFirstName().isPresent() && user.getFirstName().get().equals("Erika")));
+            argThat(creatUserRequest -> "Erika".equals(creatUserRequest.user().firstName())));
   }
 
   @Test
   void testCreatesUserWithLastNameFromRequest() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -220,21 +216,19 @@ class FinishUserRegistrationUseCaseTest {
 
     this.useCase.finishUserRegistration(request);
 
-    verify(this.createUser)
+    verify(this.createUserUseCase)
         .createUser(
-            argThat(
-                user ->
-                    user.getLastName().isPresent() && user.getLastName().get().equals("Schmidt")));
+            argThat(createUserRequest -> "Schmidt".equals(createUserRequest.user().lastName())));
   }
 
   @Test
   void testCreatesUserWithGenderFromRequest() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -250,18 +244,20 @@ class FinishUserRegistrationUseCaseTest {
 
     this.useCase.finishUserRegistration(request);
 
-    verify(this.createUser)
-        .createUser(argThat(user -> user.getGender().equals(GenderType.DIVERSE)));
+    verify(this.createUserUseCase)
+        .createUser(
+            argThat(
+                createUserRequest -> createUserRequest.user().gender().equals(GenderType.DIVERSE)));
   }
 
   @Test
   void testCreatesUserWithDefaultGenderWhenNotProvided() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -277,49 +273,20 @@ class FinishUserRegistrationUseCaseTest {
 
     this.useCase.finishUserRegistration(request);
 
-    verify(this.createUser)
-        .createUser(argThat(user -> user.getGender().equals(GenderType.UNKNOWN)));
-  }
-
-  @Test
-  void testCreatesUserWithPasswordFromRequest() {
-
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
-    when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
-        .thenReturn(challenge);
-
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
-
-    // Using EMAIL_PARAMETERS constant
-    FinishUserRegistrationRequest request =
-        new FinishUserRegistrationRequest(
-            "challenge-123",
-            123456,
-            "Max",
-            "Mustermann",
-            GenderType.MALE,
-            "myPassword123",
-            List.of(),
-            EMAIL_PARAMETERS);
-
-    this.useCase.finishUserRegistration(request);
-
-    verify(this.createUser)
+    verify(this.createUserUseCase)
         .createUser(
             argThat(
-                user ->
-                    user.getPassword().isPresent()
-                        && user.getPassword().get().getClearText().equals("myPassword123")));
+                createUserRequest -> createUserRequest.user().gender().equals(GenderType.UNKNOWN)));
   }
 
   @Test
   void testCreatesUserWithRoleFromIdIdentifier() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     Identifier roleId = Identifier.ofId("999");
@@ -336,24 +303,22 @@ class FinishUserRegistrationUseCaseTest {
 
     this.useCase.finishUserRegistration(request);
 
-    verify(this.createUser)
+    verify(this.createUserUseCase)
         .createUser(
             argThat(
-                user ->
-                    !user.getRoles().isEmpty()
-                        && user.getRoles().getFirst() instanceof Ref
-                        && ((Ref) user.getRoles().getFirst()).getId().isPresent()
-                        && ((Ref) user.getRoles().getFirst()).getId().get().equals("999")));
+                createUserRequest ->
+                    !createUserRequest.roleIdentifiers().isEmpty()
+                        && "999".equals(createUserRequest.roleIdentifiers().getFirst().getId())));
   }
 
   @Test
   void testCreatesUserWithRoleFromAnchorIdentifier() {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     Identifier roleAnchor = Identifier.ofAnchor(Anchor.ofString("admin.role"));
@@ -370,28 +335,28 @@ class FinishUserRegistrationUseCaseTest {
 
     this.useCase.finishUserRegistration(request);
 
-    verify(this.createUser)
+    verify(this.createUserUseCase)
         .createUser(
             argThat(
-                user ->
-                    !user.getRoles().isEmpty()
-                        && user.getRoles().getFirst() instanceof Ref
-                        && ((Ref) user.getRoles().getFirst()).getAnchor().isPresent()
-                        && ((Ref) user.getRoles().getFirst())
-                            .getAnchor()
-                            .get()
-                            .getName()
-                            .equals("admin.role")));
+                createUserRequest ->
+                    !createUserRequest.roleIdentifiers().isEmpty()
+                        && "admin.role"
+                            .equals(
+                                createUserRequest
+                                    .roleIdentifiers()
+                                    .getFirst()
+                                    .getAnchor()
+                                    .getName())));
   }
 
   @Test
   void testSendsConfirmationEmail() throws EmailSendException {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -447,11 +412,11 @@ class FinishUserRegistrationUseCaseTest {
   @Test
   void testThrowsFinishUserRegistrationExceptionWhenEmailSendFails() throws EmailSendException {
 
-    CodeVerificationChallenge challenge = createTestChallenge("test@example.com");
+    CodeVerificationChallenge challenge = createTestChallenge(TEST_EMAIL_ADDRESS);
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUser.createUser(any(User.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
 
     doThrow(new EmailSendException("SMTP connection failed"))
         .when(this.emailService)

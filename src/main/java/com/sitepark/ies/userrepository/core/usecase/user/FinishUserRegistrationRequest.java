@@ -2,7 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.email.ExternalEmailParameters;
-import com.sitepark.ies.userrepository.core.domain.entity.GenderType;
+import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import java.util.List;
 
 public record FinishUserRegistrationRequest(
