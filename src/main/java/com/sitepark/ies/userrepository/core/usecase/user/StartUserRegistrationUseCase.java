@@ -102,7 +102,7 @@ public final class StartUserRegistrationUseCase {
     data.put("expiresAt", formatExpiresAt(challenge.expiresAt()));
 
     return TemplateEmailMessage.builder()
-        .messageType(USER_REGISTRATION_EMAIL_ALREADY_EXISTS)
+        .messageType(USER_REGISTRATION_SEND_VERIFICATION_CODE)
         .theme(parameters.theme())
         .lang(parameters.lang())
         .data(configurer -> configurer.putAll(data))
@@ -124,7 +124,7 @@ public final class StartUserRegistrationUseCase {
             .build());
 
     return TemplateEmailMessage.builder()
-        .messageType(USER_REGISTRATION_SEND_VERIFICATION_CODE)
+        .messageType(USER_REGISTRATION_EMAIL_ALREADY_EXISTS)
         .theme(parameters.theme())
         .lang(parameters.lang())
         .data(configurer -> configurer.putAll(data))
