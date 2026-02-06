@@ -31,7 +31,6 @@ module com.sitepark.ies.userrepository.core {
   requires com.fasterxml.jackson.databind;
   requires jdk.jfr;
   requires jsr305;
-  requires com.sitepark.ies.userrepository.core;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;
   opens com.sitepark.ies.userrepository.core.domain.value.permission;
