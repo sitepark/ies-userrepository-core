@@ -1,22 +1,16 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import com.sitepark.ies.userrepository.core.usecase.audit.UserSnapshot;
 import jakarta.inject.Inject;
-import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -32,7 +26,6 @@ public final class CreateUserUseCase {
   private final AssignRolesToUsersUseCase assignRolesToUsersUseCase;
   private final AccessControl accessControl;
   private final ExtensionsNotifier extensionsNotifier;
-  private final AuditLogService auditLogService;
   private final Clock clock;
 
   @Inject
@@ -42,7 +35,6 @@ public final class CreateUserUseCase {
       AssignRolesToUsersUseCase assignRolesToUsersUseCase,
       AccessControl accessControl,
       ExtensionsNotifier extensionsNotifier,
-      AuditLogService auditLogService,
       Clock clock) {
 
     this.userRepository = userRepository;
@@ -50,11 +42,10 @@ public final class CreateUserUseCase {
     this.assignRolesToUsersUseCase = assignRolesToUsersUseCase;
     this.accessControl = accessControl;
     this.extensionsNotifier = extensionsNotifier;
-    this.auditLogService = auditLogService;
     this.clock = clock;
   }
 
-  public String createUser(CreateUserRequest request) {
+  public CreateUserResult createUser(CreateUserRequest request) {
 
     this.validateUser(request.user());
 
@@ -68,28 +59,29 @@ public final class CreateUserUseCase {
       LOGGER.info("create user: {}", request.user());
     }
 
+    Instant timestamp = Instant.now(this.clock);
+
     String id = this.userRepository.create(request.user());
 
     List<String> roleIds =
         IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
 
-    CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(
-            new UserSnapshot(request.user().toBuilder().id(id).build(), roleIds),
-            request.auditParentId());
-    this.auditLogService.createAuditLog(createAuditLogRequest);
+    User createdUser = request.user().toBuilder().id(id).build();
+    UserSnapshot snapshot = new UserSnapshot(createdUser, roleIds);
 
+    AssignRolesToUsersResult roleAssignmentResult = null;
     if (!roleIds.isEmpty()) {
-      this.assignRolesToUsersUseCase.assignRolesToUsers(
-          AssignRolesToUsersRequest.builder()
-              .userIdentifiers(b -> b.id(id))
-              .roleIdentifiers(b -> b.ids(roleIds))
-              .build());
+      roleAssignmentResult =
+          this.assignRolesToUsersUseCase.assignRolesToUsers(
+              AssignRolesToUsersRequest.builder()
+                  .userIdentifiers(b -> b.id(id))
+                  .roleIdentifiers(b -> b.ids(roleIds))
+                  .build());
     }
 
-    this.extensionsNotifier.notifyCreated(request.user().toBuilder().id(id).build());
+    this.extensionsNotifier.notifyCreated(createdUser);
 
-    return id;
+    return new CreateUserResult(id, snapshot, roleAssignmentResult, timestamp);
   }
 
   private void validateUser(User user) {
@@ -123,27 +115,5 @@ public final class CreateUserUseCase {
         owner -> {
           throw new LoginAlreadyExistsException(user.login(), owner);
         });
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      UserSnapshot snapshot, String auditLogParentId) {
-
-    String forwardData;
-    try {
-      forwardData = this.auditLogService.serialize(snapshot);
-    } catch (IOException e) {
-      throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.USER.name(), snapshot.user().id(), snapshot.user().toDisplayName(), e);
-    }
-
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.USER.name(),
-        snapshot.user().id(),
-        snapshot.user().toDisplayName(),
-        AuditLogAction.CREATE.name(),
-        null,
-        forwardData,
-        Instant.now(this.clock),
-        auditLogParentId);
   }
 }

@@ -34,12 +34,14 @@ public final class UpsertUserUseCase {
 
     User userResolved = this.toUserWithId(request.user());
     if (userResolved.id() == null) {
-      return this.createUserUseCase.createUser(
-          CreateUserRequest.builder()
-              .user(userResolved)
-              .roleIdentifiers(r -> r.identifiers(request.roleIdentifiers()))
-              .auditParentId(request.auditParentId())
-              .build());
+      return this.createUserUseCase
+          .createUser(
+              CreateUserRequest.builder()
+                  .user(userResolved)
+                  .roleIdentifiers(r -> r.identifiers(request.roleIdentifiers()))
+                  .auditParentId(request.auditParentId())
+                  .build())
+          .userId();
     } else {
       return this.updateUserUseCase
           .updateUser(

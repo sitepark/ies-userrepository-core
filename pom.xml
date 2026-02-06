@@ -395,6 +395,16 @@
 				</configuration>
 				<executions>
 					<execution>
+						<id>spotless-apply</id>
+						<goals>
+							<goal>apply</goal>
+						</goals>
+						<phase>process-sources</phase>
+						<configuration>
+							<skip>${spotless.apply.skip}</skip>
+						</configuration>
+					</execution>
+					<execution>
 						<?m2e ignore?>
 						<id>spotless-check</id>
 						<goals>

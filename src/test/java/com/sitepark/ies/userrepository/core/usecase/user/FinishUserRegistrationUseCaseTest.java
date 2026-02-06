@@ -59,7 +59,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -88,7 +89,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("789");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("789", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -115,7 +117,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -141,7 +144,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -172,7 +176,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -200,7 +205,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -228,7 +234,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -257,7 +264,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -286,7 +294,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     Identifier roleId = Identifier.ofId("999");
@@ -318,7 +327,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     Identifier roleAnchor = Identifier.ofAnchor(Anchor.ofString("admin.role"));
@@ -356,7 +366,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     // Using EMAIL_PARAMETERS constant
     FinishUserRegistrationRequest request =
@@ -416,7 +427,8 @@ class FinishUserRegistrationUseCaseTest {
     when(this.codeVerificationService.finishChallenge("challenge-123", 123456))
         .thenReturn(challenge);
 
-    when(this.createUserUseCase.createUser(any(CreateUserRequest.class))).thenReturn("456");
+    when(this.createUserUseCase.createUser(any(CreateUserRequest.class)))
+        .thenReturn(new CreateUserResult("456", null, null, null));
 
     doThrow(new EmailSendException("SMTP connection failed"))
         .when(this.emailService)

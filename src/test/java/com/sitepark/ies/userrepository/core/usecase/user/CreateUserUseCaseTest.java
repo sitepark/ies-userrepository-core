@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
@@ -41,7 +40,6 @@ class CreateUserUseCaseTest {
     this.accessControl = mock();
     ExtensionsNotifier extensionsNotifier = mock();
 
-    AuditLogService auditLogService = mock();
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
@@ -52,7 +50,6 @@ class CreateUserUseCaseTest {
             this.assignRolesToUsersUseCase,
             this.accessControl,
             extensionsNotifier,
-            auditLogService,
             fixedClock);
   }
 
@@ -93,22 +90,54 @@ class CreateUserUseCaseTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testCreateWithRoles() {
+  void testCreateWithRolesReturnsUserId() {
 
     when(this.accessControl.isUserCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
     when(this.userRepository.create(any())).thenReturn("123");
+    when(this.assignRolesToUsersUseCase.assignRolesToUsers(any()))
+        .thenReturn(AssignRolesToUsersResult.skipped());
 
     User user = User.builder().login("test").lastName("Test").build();
 
-    String id =
+    CreateUserResult result =
         this.userCase.createUser(
             CreateUserRequest.builder().user(user).roleIdentifiers(r -> r.id("333")).build());
 
-    assertEquals("123", id, "unexpected id");
+    assertEquals("123", result.userId(), "Result should contain correct user ID");
+  }
+
+  @Test
+  void testCreateWithRolesCallsRepository() {
+
+    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
+    when(this.userRepository.create(any())).thenReturn("123");
+    when(this.assignRolesToUsersUseCase.assignRolesToUsers(any()))
+        .thenReturn(AssignRolesToUsersResult.skipped());
+
+    User user = User.builder().login("test").lastName("Test").build();
+
+    this.userCase.createUser(
+        CreateUserRequest.builder().user(user).roleIdentifiers(r -> r.id("333")).build());
 
     verify(this.userRepository).create(eq(user));
+  }
+
+  @Test
+  void testCreateWithRolesCallsAssignRoles() {
+
+    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
+    when(this.userRepository.create(any())).thenReturn("123");
+    when(this.assignRolesToUsersUseCase.assignRolesToUsers(any()))
+        .thenReturn(AssignRolesToUsersResult.skipped());
+
+    User user = User.builder().login("test").lastName("Test").build();
+
+    this.userCase.createUser(
+        CreateUserRequest.builder().user(user).roleIdentifiers(r -> r.id("333")).build());
+
     verify(this.assignRolesToUsersUseCase)
         .assignRolesToUsers(
             AssignRolesToUsersRequest.builder()
@@ -133,21 +162,69 @@ class CreateUserUseCaseTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testCreateWithExistsLogin() {
+  void testCreateWithExistsLoginThrowsException() {
 
     when(this.accessControl.isUserCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
 
     User user = User.builder().login("test").lastName("Test").build();
 
-    LoginAlreadyExistsException e =
-        assertThrows(
-            LoginAlreadyExistsException.class,
-            () -> this.userCase.createUser(CreateUserRequest.builder().user(user).build()));
+    assertThrows(
+        LoginAlreadyExistsException.class,
+        () -> this.userCase.createUser(CreateUserRequest.builder().user(user).build()));
+  }
 
-    assertEquals("test", e.getLogin(), "unexpected login");
-    assertEquals("345", e.getOwner(), "unexpected owner");
-    assertNotNull(e.getMessage(), "message is null");
+  @Test
+  void testCreateWithExistsLoginExceptionContainsLogin() {
+
+    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
+
+    User user = User.builder().login("test").lastName("Test").build();
+
+    LoginAlreadyExistsException e = null;
+    try {
+      this.userCase.createUser(CreateUserRequest.builder().user(user).build());
+    } catch (LoginAlreadyExistsException caught) {
+      e = caught;
+    }
+
+    assertEquals("test", e.getLogin(), "Exception should contain the conflicting login");
+  }
+
+  @Test
+  void testCreateWithExistsLoginExceptionContainsOwner() {
+
+    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
+
+    User user = User.builder().login("test").lastName("Test").build();
+
+    LoginAlreadyExistsException e = null;
+    try {
+      this.userCase.createUser(CreateUserRequest.builder().user(user).build());
+    } catch (LoginAlreadyExistsException caught) {
+      e = caught;
+    }
+
+    assertEquals("345", e.getOwner(), "Exception should contain the owner of existing login");
+  }
+
+  @Test
+  void testCreateWithExistsLoginExceptionHasMessage() {
+
+    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
+
+    User user = User.builder().login("test").lastName("Test").build();
+
+    LoginAlreadyExistsException e = null;
+    try {
+      this.userCase.createUser(CreateUserRequest.builder().user(user).build());
+    } catch (LoginAlreadyExistsException caught) {
+      e = caught;
+    }
+
+    assertNotNull(e.getMessage(), "Exception should have a message");
   }
 }

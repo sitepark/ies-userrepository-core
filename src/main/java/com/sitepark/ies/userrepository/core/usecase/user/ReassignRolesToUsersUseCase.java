@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public final class AssignRolesToUsersUseCase {
+public final class ReassignRolesToUsersUseCase {
 
   private static final Logger LOGGER = LogManager.getLogger();
   private final UserRepository userRepository;
@@ -25,7 +25,7 @@ public final class AssignRolesToUsersUseCase {
   private final Clock clock;
 
   @Inject
-  AssignRolesToUsersUseCase(
+  ReassignRolesToUsersUseCase(
       UserRepository userRepository,
       RoleRepository roleRepository,
       RoleAssigner roleAssigner,
@@ -39,10 +39,10 @@ public final class AssignRolesToUsersUseCase {
     this.clock = clock;
   }
 
-  public AssignRolesToUsersResult assignRolesToUsers(AssignRolesToUsersRequest request) {
+  public ReassignRolesToUsersResult reassignRolesToUsers(AssignRolesToUsersRequest request) {
 
     if (request.isEmpty()) {
-      return AssignRolesToUsersResult.skipped();
+      return ReassignRolesToUsersResult.skipped();
     }
 
     List<String> userIds =
@@ -59,31 +59,64 @@ public final class AssignRolesToUsersUseCase {
       LOGGER.info("assign roles to users({}) -> roles({})", userIds, roleIds);
     }
 
-    UserRoleAssignment effectiveAssignments = effectiveAssignments(userIds, roleIds);
+    return this.reassignRolesToUsers(userIds, roleIds);
+  }
 
-    if (effectiveAssignments.isEmpty()) {
+  private ReassignRolesToUsersResult reassignRolesToUsers(
+      List<String> userIds, List<String> roleIds) {
+    UserRoleAssignment assignments = this.roleAssigner.getRolesAssignByUsers(userIds);
+    UserRoleAssignment effectiveUnassignment = effectiveUnassignment(userIds, roleIds, assignments);
+    UserRoleAssignment effectiveAssignments = effectiveAssignments(userIds, roleIds, assignments);
+
+    if (effectiveAssignments.isEmpty() && effectiveUnassignment.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("no effective assignments found, skipping");
+        LOGGER.info("no effective reassignments found, skipping");
       }
-      return AssignRolesToUsersResult.skipped();
+      return ReassignRolesToUsersResult.skipped();
     }
 
-    this.roleAssigner.assignRolesToUsers(userIds, roleIds);
+    for (String userId : effectiveUnassignment.userIds()) {
+      this.roleAssigner.unassignRolesFromUsers(
+          List.of(userId), effectiveUnassignment.roleIds(userId));
+    }
+
+    for (String userId : effectiveAssignments.userIds()) {
+      this.roleAssigner.assignRolesToUsers(List.of(userId), effectiveAssignments.roleIds(userId));
+    }
 
     Instant timestamp = Instant.now(this.clock);
 
-    return AssignRolesToUsersResult.assigned(effectiveAssignments, timestamp);
+    return ReassignRolesToUsersResult.reassigned(
+        effectiveAssignments, effectiveUnassignment, timestamp);
   }
 
-  private UserRoleAssignment effectiveAssignments(List<String> userIds, List<String> rolesIds) {
-
-    UserRoleAssignment assignments = this.roleAssigner.getRolesAssignByUsers(userIds);
+  private UserRoleAssignment effectiveAssignments(
+      List<String> userIds, List<String> rolesIds, UserRoleAssignment assignments) {
 
     UserRoleAssignment.Builder builder = UserRoleAssignment.builder();
 
     for (String userId : userIds) {
+      List<String> assignedRoles = assignments.roleIds(userId);
       List<String> effectiveRoleIds =
-          rolesIds.stream().filter(Predicate.not(assignments.roleIds(userId)::contains)).toList();
+          rolesIds.stream().filter(Predicate.not(assignedRoles::contains)).toList();
+      if (!effectiveRoleIds.isEmpty()) {
+        builder.assignments(userId, effectiveRoleIds);
+      }
+    }
+
+    return builder.build();
+  }
+
+  private UserRoleAssignment effectiveUnassignment(
+      List<String> userIds, List<String> roleIds, UserRoleAssignment assignments) {
+
+    UserRoleAssignment.Builder builder = UserRoleAssignment.builder();
+
+    for (String userId : userIds) {
+
+      List<String> assignedRoles = assignments.roleIds(userId);
+      List<String> effectiveRoleIds =
+          assignedRoles.stream().filter(Predicate.not(roleIds::contains)).toList();
       if (!effectiveRoleIds.isEmpty()) {
         builder.assignments(userId, effectiveRoleIds);
       }

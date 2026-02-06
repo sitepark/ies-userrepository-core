@@ -1,16 +1,9 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import com.sitepark.ies.userrepository.core.usecase.audit.UserSnapshot;
@@ -28,8 +21,6 @@ public final class RestoreUserUseCase {
   private final UserRepository repository;
   private final RoleAssigner roleAssigner;
   private final AccessControl accessControl;
-  private final AuditLogService auditLogService;
-  private final ObjectMapper objectMapper;
   private final Clock clock;
 
   @Inject
@@ -37,22 +28,17 @@ public final class RestoreUserUseCase {
       UserRepository repository,
       RoleAssigner roleAssigner,
       AccessControl accessControl,
-      AuditLogService auditLogService,
-      ObjectMapper objectMapper,
       Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
     this.accessControl = accessControl;
-    this.auditLogService = auditLogService;
-    this.objectMapper = objectMapper;
     this.clock = clock;
   }
 
-  public void restoreUser(RestoreUserRequest request) {
+  public RestoreUserResult restoreUser(RestoreUserRequest request) {
 
     User user = request.data().user();
     List<String> roleIds = request.data().roleIds();
-    String auditBatchId = request.auditParentId();
 
     this.validateUser(user);
 
@@ -62,7 +48,7 @@ public final class RestoreUserUseCase {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("Skip restore, user with ID {} already exists.", user.id());
       }
-      return;
+      return RestoreUserResult.skipped(user.id(), "User with ID " + user.id() + " already exists");
     }
 
     this.validateAnchor(user);
@@ -71,12 +57,9 @@ public final class RestoreUserUseCase {
       LOGGER.info("user role: {}", user);
     }
 
-    Instant now = Instant.now(this.clock);
+    Instant timestamp = Instant.now(this.clock);
 
-    UserSnapshot restoreData = new UserSnapshot(user, roleIds);
-
-    CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(restoreData, now, auditBatchId);
+    UserSnapshot snapshot = new UserSnapshot(user, roleIds);
 
     this.repository.restore(user);
     if (!roleIds.isEmpty()) {
@@ -85,7 +68,7 @@ public final class RestoreUserUseCase {
       this.roleAssigner.assignRolesToUsers(List.of(userId), roleIds);
     }
 
-    this.auditLogService.createAuditLog(createAuditLogRequest);
+    return RestoreUserResult.restored(user.id(), snapshot, timestamp);
   }
 
   private void validateUser(User user) {
@@ -110,29 +93,6 @@ public final class RestoreUserUseCase {
           owner -> {
             throw new AnchorAlreadyExistsException(user.anchor(), owner);
           });
-    }
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      UserSnapshot data, Instant now, String auditLogParentId) {
-    String json = serializeUser(data);
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.USER.name(),
-        data.user().id(),
-        data.user().toDisplayName(),
-        AuditLogAction.RESTORE.name(),
-        null,
-        json,
-        now,
-        auditLogParentId);
-  }
-
-  private String serializeUser(UserSnapshot data) {
-    try {
-      return this.objectMapper.writeValueAsString(data);
-    } catch (JsonProcessingException e) {
-      throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.USER.name(), data.user().id(), data.user().toDisplayName(), e);
     }
   }
 }

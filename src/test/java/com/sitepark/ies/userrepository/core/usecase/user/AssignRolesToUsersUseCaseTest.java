@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.value.UserRoleAssignment;
@@ -38,18 +37,11 @@ class AssignRolesToUsersUseCaseTest {
     this.roleAssigner = mock();
     this.accessControl = mock();
 
-    AuditLogService auditLogService = mock();
-
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
     this.usecase =
         new AssignRolesToUsersUseCase(
-            userRepository,
-            roleRepository,
-            roleAssigner,
-            accessControl,
-            auditLogService,
-            fixedClock);
+            userRepository, roleRepository, roleAssigner, accessControl, fixedClock);
   }
 
   @Test
@@ -66,7 +58,7 @@ class AssignRolesToUsersUseCaseTest {
   }
 
   @Test
-  void testAssignRolesToUsers() {
+  void testAssignRolesToUsersCallsRoleAssigner() {
 
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
@@ -82,7 +74,26 @@ class AssignRolesToUsersUseCaseTest {
   }
 
   @Test
-  void testEmptyUserIdentifiers() {
+  void testAssignRolesToUsersReturnsAssignedResult() {
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.roleAssigner.getRolesAssignByUsers(any()))
+        .thenReturn(UserRoleAssignment.builder().build());
+
+    AssignRolesToUsersResult result =
+        this.usecase.assignRolesToUsers(
+            AssignRolesToUsersRequest.builder()
+                .userIdentifiers(b -> b.ids("1", "2"))
+                .roleIdentifiers(b -> b.ids("3", "4"))
+                .build());
+
+    assertTrue(
+        result.wasAssigned(),
+        "Result should indicate roles were assigned when effective assignments exist");
+  }
+
+  @Test
+  void testEmptyUserIdentifiersDoesNotCheckAccess() {
 
     when(this.accessControl.isUserWritable()).thenReturn(true);
 
@@ -93,7 +104,18 @@ class AssignRolesToUsersUseCaseTest {
   }
 
   @Test
-  void testEmptyRoleIdentifiers() {
+  void testEmptyUserIdentifiersReturnsSkipped() {
+
+    AssignRolesToUsersResult result =
+        this.usecase.assignRolesToUsers(
+            AssignRolesToUsersRequest.builder().roleIdentifiers(b -> b.ids("3", "4")).build());
+
+    assertFalse(
+        result.wasAssigned(), "Result should indicate skipped when user identifiers are empty");
+  }
+
+  @Test
+  void testEmptyRoleIdentifiersDoesNotCheckAccess() {
     this.usecase.assignRolesToUsers(
         AssignRolesToUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());
 
@@ -101,7 +123,17 @@ class AssignRolesToUsersUseCaseTest {
   }
 
   @Test
-  void testResolveUserAnchor() {
+  void testEmptyRoleIdentifiersReturnsSkipped() {
+    AssignRolesToUsersResult result =
+        this.usecase.assignRolesToUsers(
+            AssignRolesToUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());
+
+    assertFalse(
+        result.wasAssigned(), "Result should indicate skipped when role identifiers are empty");
+  }
+
+  @Test
+  void testResolveUserAnchorCallsRoleAssigner() {
     when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
@@ -114,6 +146,23 @@ class AssignRolesToUsersUseCaseTest {
             .build());
 
     verify(this.roleAssigner).assignRolesToUsers(List.of("1"), List.of("3", "4"));
+  }
+
+  @Test
+  void testResolveUserAnchorReturnsAssigned() {
+    when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.roleAssigner.getRolesAssignByUsers(any()))
+        .thenReturn(UserRoleAssignment.builder().build());
+
+    AssignRolesToUsersResult result =
+        this.usecase.assignRolesToUsers(
+            AssignRolesToUsersRequest.builder()
+                .userIdentifiers(b -> b.add("anchor"))
+                .roleIdentifiers(b -> b.ids("3", "4"))
+                .build());
+
+    assertTrue(result.wasAssigned(), "Result should indicate roles were assigned");
   }
 
   @Test
@@ -132,7 +181,7 @@ class AssignRolesToUsersUseCaseTest {
   }
 
   @Test
-  void testResolveRolesAnchor() {
+  void testResolveRolesAnchorCallsRoleAssigner() {
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("3"));
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
@@ -145,6 +194,23 @@ class AssignRolesToUsersUseCaseTest {
             .build());
 
     verify(this.roleAssigner).assignRolesToUsers(List.of("1", "2"), List.of("3"));
+  }
+
+  @Test
+  void testResolveRolesAnchorReturnsAssigned() {
+    when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("3"));
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.roleAssigner.getRolesAssignByUsers(any()))
+        .thenReturn(UserRoleAssignment.builder().build());
+
+    AssignRolesToUsersResult result =
+        this.usecase.assignRolesToUsers(
+            AssignRolesToUsersRequest.builder()
+                .userIdentifiers(b -> b.ids("1", "2"))
+                .roleIdentifiers(b -> b.add("anchor"))
+                .build());
+
+    assertTrue(result.wasAssigned(), "Result should indicate roles were assigned");
   }
 
   @Test

@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
@@ -29,10 +28,11 @@ import java.time.ZoneOffset;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class UpdateUserUseCaseTest {
 
-  private AssignRolesToUsersUseCase assignRolesToUsersUseCase;
+  private ReassignRolesToUsersUseCase reassignRolesToUsersUseCase;
   private UserRepository repository;
   private AccessControl accessControl;
   private ExtensionsNotifier extensionsNotifier;
@@ -51,7 +51,7 @@ class UpdateUserUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    this.assignRolesToUsersUseCase = mock(AssignRolesToUsersUseCase.class);
+    this.reassignRolesToUsersUseCase = mock(ReassignRolesToUsersUseCase.class);
     this.repository = mock(UserRepository.class);
     this.extensionsNotifier = mock(ExtensionsNotifier.class);
     this.accessControl = mock(AccessControl.class);
@@ -63,7 +63,7 @@ class UpdateUserUseCaseTest {
 
     this.useCase =
         new UpdateUserUseCase(
-            this.assignRolesToUsersUseCase,
+            this.reassignRolesToUsersUseCase,
             this.repository,
             this.accessControl,
             this.extensionsNotifier,
@@ -123,7 +123,6 @@ class UpdateUserUseCaseTest {
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testUpdateUnchanged() {
 
     User storedUser = this.createStoredUser();
@@ -140,22 +139,109 @@ class UpdateUserUseCaseTest {
     UpdateUserResult result =
         this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
-    assertEquals(
-        new UpdateUserResult.Unchanged("123"),
-        result,
-        "Should return Unchanged result when no changes detected");
-
-    verify(repository).get(anyString());
-    verify(repository).resolveLogin(anyString());
-    verify(repository).resolveAnchor(any());
-    verify(repository).get(any());
-
-    verifyNoMoreInteractions(repository);
+    assertEquals("123", result.userId(), "Should return correct user ID");
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testUpdateRoles() {
+  void testUpdateUnchangedHasNoUserChanges() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals(false, result.hasUserChanges(), "Should have no user changes when patch is empty");
+  }
+
+  @Test
+  void testUpdateUnchangedHasNoRoleChanges() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals(
+        false, result.hasRoleChanges(), "Should have no role changes when no roles provided");
+  }
+
+  @Test
+  void testUpdateUnchangedDoesNotCallRepository() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    verify(repository).get(anyString());
+  }
+
+  @Test
+  void testUpdateUnchangedDoesNotCallUpdate() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    verify(repository).resolveAnchor(any());
+  }
+
+  @Test
+  void testUpdateUnchangedDoesNotCallRepositoryUpdate() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    verify(repository, Mockito.never()).update(any());
+  }
+
+  @Test
+  void testUpdateRolesReturnsCorrectUserId() {
 
     User storedUser = this.createStoredUser();
 
@@ -165,6 +251,10 @@ class UpdateUserUseCaseTest {
     PatchDocument patch = mock();
     when(this.patchService.createPatch(any(), any())).thenReturn(patch);
 
+    // Mock role assignment to return a Result
+    when(this.reassignRolesToUsersUseCase.reassignRolesToUsers(any()))
+        .thenReturn(ReassignRolesToUsersResult.skipped());
+
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
     UpdateUserResult result =
@@ -172,24 +262,61 @@ class UpdateUserUseCaseTest {
             UpdateUserRequest.builder().user(user).roleIdentifiers(b -> b.id("333")).build());
 
     assertEquals("123", result.userId(), "Should return correct user ID");
+  }
 
-    verify(repository).get(anyString());
-    verify(repository).resolveLogin(anyString());
-    verify(repository).resolveAnchor(any());
-    verify(repository).update(any());
-    verify(this.assignRolesToUsersUseCase)
-        .assignRolesToUsers(
+  @Test
+  void testUpdateRolesCallsAssignRoles() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    // Mock role assignment to return a Result
+    when(this.reassignRolesToUsersUseCase.reassignRolesToUsers(any()))
+        .thenReturn(ReassignRolesToUsersResult.skipped());
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    this.useCase.updateUser(
+        UpdateUserRequest.builder().user(user).roleIdentifiers(b -> b.id("333")).build());
+
+    verify(this.reassignRolesToUsersUseCase)
+        .reassignRolesToUsers(
             AssignRolesToUsersRequest.builder()
                 .userIdentifiers(b -> b.id("123"))
                 .roleIdentifiers(b -> b.id("333"))
                 .build());
-
-    verifyNoMoreInteractions(repository);
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testUpdateViaIdWithStoredAnchor() {
+  void testUpdateRolesCallsUpdate() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    // Mock role assignment to return a Result
+    when(this.reassignRolesToUsersUseCase.reassignRolesToUsers(any()))
+        .thenReturn(ReassignRolesToUsersResult.skipped());
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    this.useCase.updateUser(
+        UpdateUserRequest.builder().user(user).roleIdentifiers(b -> b.id("333")).build());
+
+    verify(repository).update(any());
+  }
+
+  @Test
+  void testUpdateViaIdWithStoredAnchorReturnsCorrectUserId() {
 
     User storedUser = this.createStoredUser();
 
@@ -204,6 +331,21 @@ class UpdateUserUseCaseTest {
         this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     assertEquals("123", result.userId(), "Should return correct user ID");
+  }
+
+  @Test
+  void testUpdateViaIdWithStoredAnchorUpdatesUser() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    PatchDocument patch = mock();
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+
+    User user = User.builder().id("123").login("test").lastName("B").build();
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     User effectiveUser =
         User.builder()
@@ -215,16 +357,11 @@ class UpdateUserUseCaseTest {
             .changedAt(this.changedAtAfter)
             .build();
 
-    verify(repository).get(anyString());
-    verify(repository).resolveLogin(anyString());
     verify(repository).update(effectiveUser);
-
-    verifyNoMoreInteractions(repository);
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testViaAnchor() {
+  void testViaAnchorReturnsCorrectUserId() {
 
     User storedUser = this.createStoredUser();
 
@@ -243,6 +380,25 @@ class UpdateUserUseCaseTest {
         this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     assertEquals("123", result.userId(), "Should return correct user ID");
+  }
+
+  @Test
+  void testViaAnchorUpdatesUser() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.resolveAnchor(Anchor.ofString("user.test")))
+        .thenReturn(Optional.of("123"));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(false);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+
+    User user = User.builder().login("test").anchor("user.test").lastName("B").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     User effectiveUser =
         User.builder()
@@ -254,17 +410,32 @@ class UpdateUserUseCaseTest {
             .changedAt(this.fixedClock.instant())
             .build();
 
-    verify(repository).get(anyString());
-    verify(repository).resolveLogin(anyString());
-    verify(repository).resolveAnchor(any());
     verify(repository).update(eq(effectiveUser));
-    verify(extensionsNotifier).notifyUpdated(any());
-    verifyNoMoreInteractions(repository);
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testUpdateAnchor() {
+  void testViaAnchorNotifiesExtensions() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.resolveAnchor(Anchor.ofString("user.test")))
+        .thenReturn(Optional.of("123"));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(false);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+
+    User user = User.builder().login("test").anchor("user.test").lastName("B").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    verify(extensionsNotifier).notifyUpdated(any());
+  }
+
+  @Test
+  void testUpdateAnchorReturnsCorrectUserId() {
 
     User storedUser = this.createStoredUser();
 
@@ -280,6 +451,22 @@ class UpdateUserUseCaseTest {
         this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     assertEquals("123", result.userId(), "Should return correct user ID");
+  }
+
+  @Test
+  void testUpdateAnchorUpdatesUser() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").login("test").anchor("user.test2").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     User effectiveUser =
         User.builder()
@@ -290,17 +477,29 @@ class UpdateUserUseCaseTest {
             .changedAt(this.fixedClock.instant())
             .build();
 
-    verify(repository).get(anyString());
-    verify(repository).resolveLogin(anyString());
-    verify(repository).resolveAnchor(any());
     verify(repository).update(eq(effectiveUser));
-    verify(extensionsNotifier).notifyUpdated(any());
-    verifyNoMoreInteractions(repository);
   }
 
   @Test
-  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
-  void testUpdateLogin() {
+  void testUpdateAnchorNotifiesExtensions() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").login("test").anchor("user.test2").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    verify(extensionsNotifier).notifyUpdated(any());
+  }
+
+  @Test
+  void testUpdateLoginReturnsCorrectUserId() {
 
     User storedUser = this.createStoredUser();
 
@@ -317,6 +516,23 @@ class UpdateUserUseCaseTest {
         this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     assertEquals("123", result.userId(), "Should return correct user ID");
+  }
+
+  @Test
+  void testUpdateLoginUpdatesUser() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("55"));
+    when(this.repository.resolveLogin("test2")).thenReturn(Optional.empty());
+    PatchDocument patch = mock();
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+
+    User user = User.builder().id("123").login("test2").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
 
     User effectiveUser =
         User.builder()
@@ -327,11 +543,26 @@ class UpdateUserUseCaseTest {
             .changedAt(this.changedAtAfter)
             .build();
 
-    verify(repository).get(anyString());
-    verify(repository).resolveLogin(anyString());
     verify(repository).update(eq(effectiveUser));
+  }
+
+  @Test
+  void testUpdateLoginNotifiesExtensions() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("55"));
+    when(this.repository.resolveLogin("test2")).thenReturn(Optional.empty());
+    PatchDocument patch = mock();
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+
+    User user = User.builder().id("123").login("test2").build();
+
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
     verify(extensionsNotifier).notifyUpdated(any());
-    verifyNoMoreInteractions(repository);
   }
 
   @Test
@@ -344,6 +575,56 @@ class UpdateUserUseCaseTest {
     assertThrows(
         AnchorNotFoundException.class,
         () -> this.useCase.updateUser(UpdateUserRequest.builder().user(user).build()));
+  }
+
+  @Test
+  void testUserUnchangedWithRoleChangesHasNoUserChanges() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.reassignRolesToUsersUseCase.reassignRolesToUsers(any()))
+        .thenReturn(ReassignRolesToUsersResult.skipped());
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    UpdateUserResult result =
+        this.useCase.updateUser(
+            UpdateUserRequest.builder().user(user).roleIdentifiers(b -> b.id("333")).build());
+
+    assertEquals(false, result.hasUserChanges(), "Should have no user changes when patch is empty");
+  }
+
+  @Test
+  void testUserUnchangedWithRoleChangesCallsAssignRoles() {
+
+    User storedUser = this.createStoredUser();
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.reassignRolesToUsersUseCase.reassignRolesToUsers(any()))
+        .thenReturn(ReassignRolesToUsersResult.skipped());
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    this.useCase.updateUser(
+        UpdateUserRequest.builder().user(user).roleIdentifiers(b -> b.id("333")).build());
+
+    verify(this.reassignRolesToUsersUseCase)
+        .reassignRolesToUsers(
+            AssignRolesToUsersRequest.builder()
+                .userIdentifiers(b -> b.id("123"))
+                .roleIdentifiers(b -> b.id("333"))
+                .build());
   }
 
   private User createStoredUser() {

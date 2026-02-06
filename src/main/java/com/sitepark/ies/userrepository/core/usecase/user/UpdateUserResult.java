@@ -1,102 +1,71 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
-import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Result of a user update operation.
  *
- * <p>This sealed interface represents two possible outcomes:
+ * <p>Contains results for both user data changes and role assignment changes. Each aspect is
+ * represented independently, allowing for:
  *
  * <ul>
- *   <li>{@link Unchanged} - The user data was identical to stored data, no update performed
- *   <li>{@link Updated} - The user was successfully updated with changes
+ *   <li>User unchanged, roles unchanged
+ *   <li>User unchanged, roles changed
+ *   <li>User changed, roles unchanged
+ *   <li>User changed, roles changed
  * </ul>
- *
- * <p>The {@link Updated} variant contains patch information that can be used for audit logging or
- * other purposes.
  */
-public sealed interface UpdateUserResult {
+public record UpdateUserResult(
+    @NotNull String userId,
+    @NotNull Instant timestamp,
+    @NotNull UserUpdateResult userResult,
+    @NotNull ReassignRolesToUsersResult roleReassignmentResult) {
 
   /**
-   * Gets the user ID.
+   * Checks if the user data was changed.
    *
-   * @return the user ID
+   * @return true if user was updated, false if unchanged
    */
-  @NotNull
-  String userId();
-
-  /**
-   * Result when no changes were detected and no update was performed.
-   *
-   * @param userId the user ID
-   */
-  record Unchanged(@NotNull String userId) implements UpdateUserResult {}
-
-  /**
-   * Result when the user was successfully updated.
-   *
-   * @param userId the user ID
-   * @param displayName the display name of the user
-   * @param patch the forward patch (old state to new state)
-   * @param revertPatch the revert patch (new state to old state)
-   * @param timestamp the timestamp when the update occurred
-   */
-  record Updated(
-      @NotNull String userId,
-      @NotNull String displayName,
-      @NotNull PatchDocument patch,
-      @NotNull PatchDocument revertPatch,
-      @NotNull Instant timestamp)
-      implements UpdateUserResult {}
-
-  /**
-   * Factory method for unchanged result.
-   *
-   * @param userId the user ID
-   * @return unchanged result
-   */
-  static UpdateUserResult unchanged(@NotNull String userId) {
-    return new Unchanged(userId);
+  public boolean hasUserChanges() {
+    return userResult instanceof UserUpdateResult.Updated;
   }
 
   /**
-   * Factory method for updated result.
+   * Checks if roles were assigned.
    *
-   * @param userId the user ID
-   * @param displayName the display name of the user
-   * @param patch the forward patch
-   * @param revertPatch the revert patch
-   * @param timestamp the update timestamp
-   * @return updated result
+   * @return true if roles were assigned, false if skipped
    */
-  static UpdateUserResult updated(
-      @NotNull String userId,
-      @NotNull String displayName,
-      @NotNull PatchDocument patch,
-      @NotNull PatchDocument revertPatch,
-      @NotNull Instant timestamp) {
-    return new Updated(userId, displayName, patch, revertPatch, timestamp);
+  public boolean hasRoleChanges() {
+    return roleReassignmentResult.wasReassigned();
   }
 
   /**
-   * Checks if this result represents an update (not unchanged).
+   * Checks if any changes were made (user or roles).
    *
-   * @return true if the user was updated, false if unchanged
+   * @return true if user or roles changed
    */
-  default boolean wasUpdated() {
-    return this instanceof Updated;
+  public boolean hasAnyChanges() {
+    return hasUserChanges() || hasRoleChanges();
   }
 
   /**
-   * Gets the Updated result if this is an update, or null if unchanged.
+   * Gets the user update details if user was changed.
    *
-   * @return the Updated record or null
+   * @return the Updated result or null if unchanged
    */
-  @Nullable
-  default Updated asUpdated() {
-    return this instanceof Updated updated ? updated : null;
+  public UserUpdateResult.Updated getUserUpdate() {
+    return userResult instanceof UserUpdateResult.Updated updated ? updated : null;
+  }
+
+  /**
+   * Gets the role assignment details if roles were assigned.
+   *
+   * @return the Assigned result or null if skipped
+   */
+  public ReassignRolesToUsersResult.Reassigned getRoleReassignment() {
+    return roleReassignmentResult instanceof ReassignRolesToUsersResult.Reassigned reassigned
+        ? reassigned
+        : null;
   }
 }

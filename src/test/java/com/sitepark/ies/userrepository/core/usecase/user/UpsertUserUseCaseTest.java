@@ -11,6 +11,7 @@ import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,6 +67,8 @@ class UpsertUserUseCaseTest {
 
     when(this.accessControl.isUserCreatable()).thenReturn(true);
     when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.createUserUseCase.createUser(any()))
+        .thenReturn(new CreateUserResult("123", null, null, null));
 
     User user = User.builder().login("test").lastName("test").build();
 
@@ -80,7 +83,12 @@ class UpsertUserUseCaseTest {
     when(this.accessControl.isUserCreatable()).thenReturn(true);
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.updateUserUseCase.updateUser(any()))
-        .thenReturn(UpdateUserResult.updated("1", null, null, null, null));
+        .thenReturn(
+            new UpdateUserResult(
+                "1",
+                Instant.now(),
+                UserUpdateResult.unchanged(),
+                ReassignRolesToUsersResult.skipped()));
 
     User user = User.builder().id("1").login("test").lastName("test").build();
 
@@ -94,6 +102,8 @@ class UpsertUserUseCaseTest {
 
     when(this.accessControl.isUserCreatable()).thenReturn(true);
     when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.createUserUseCase.createUser(any()))
+        .thenReturn(new CreateUserResult("123", null, null, null));
 
     User user = User.builder().anchor("anchor").login("test").lastName("test").build();
 
@@ -109,7 +119,12 @@ class UpsertUserUseCaseTest {
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("1"));
     when(this.updateUserUseCase.updateUser(any()))
-        .thenReturn(UpdateUserResult.updated("1", null, null, null, null));
+        .thenReturn(
+            new UpdateUserResult(
+                "1",
+                Instant.now(),
+                UserUpdateResult.unchanged(),
+                ReassignRolesToUsersResult.skipped()));
 
     User user = User.builder().anchor("anchor").login("test").lastName("test").build();
 

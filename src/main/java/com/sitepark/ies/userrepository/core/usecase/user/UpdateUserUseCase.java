@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 public final class UpdateUserUseCase {
 
   private static final Logger LOGGER = LogManager.getLogger();
-  private final AssignRolesToUsersUseCase assignRolesToUsersUseCase;
+  private final ReassignRolesToUsersUseCase reassignRolesToUsersUseCase;
   private final UserRepository userRepository;
   private final AccessControl accessControl;
   private final ExtensionsNotifier extensionsNotifier;
@@ -31,13 +31,13 @@ public final class UpdateUserUseCase {
 
   @Inject
   UpdateUserUseCase(
-      AssignRolesToUsersUseCase assignRolesToUsersUseCase,
+      ReassignRolesToUsersUseCase reassignRolesToUsersUseCase,
       UserRepository userRepository,
       AccessControl accessControl,
       ExtensionsNotifier extensionsNotifier,
       PatchServiceFactory patchServiceFactory,
       Clock clock) {
-    this.assignRolesToUsersUseCase = assignRolesToUsersUseCase;
+    this.reassignRolesToUsersUseCase = reassignRolesToUsersUseCase;
     this.userRepository = userRepository;
     this.accessControl = accessControl;
     this.extensionsNotifier = extensionsNotifier;
@@ -76,30 +76,41 @@ public final class UpdateUserUseCase {
     User joinedUser = this.joinForUpdate(oldUser, newUser);
 
     PatchDocument patch = this.patchService.createPatch(oldUser, joinedUser);
+
+    // Determine user update result
+    UserUpdateResult userUpdateResult;
+    User userForUpdate;
     if (patch.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Skip update, user with ID {} is unchanged.", joinedUser.id());
+        LOGGER.info("Skip user update, user with ID {} is unchanged.", joinedUser.id());
       }
-      return UpdateUserResult.unchanged(joinedUser.id());
+      userUpdateResult = UserUpdateResult.unchanged();
+      userForUpdate = joinedUser;
+    } else {
+      userForUpdate = joinedUser.toBuilder().changedAt(timestamp).build();
+      this.userRepository.update(userForUpdate);
+      this.extensionsNotifier.notifyUpdated(userForUpdate);
+
+      PatchDocument revertPatch = this.patchService.createPatch(joinedUser, oldUser);
+      userUpdateResult =
+          UserUpdateResult.updated(userForUpdate.toDisplayName(), patch, revertPatch);
     }
 
-    User userForUpdate = joinedUser.toBuilder().changedAt(timestamp).build();
-    this.userRepository.update(userForUpdate);
-
+    // Handle role assignments independently
+    ReassignRolesToUsersResult roleReassignmentResult;
     if (!request.roleIdentifiers().isEmpty()) {
-      this.assignRolesToUsersUseCase.assignRolesToUsers(
-          AssignRolesToUsersRequest.builder()
-              .userIdentifiers(b -> b.id(userForUpdate.id()))
-              .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
-              .build());
+      roleReassignmentResult =
+          this.reassignRolesToUsersUseCase.reassignRolesToUsers(
+              AssignRolesToUsersRequest.builder()
+                  .userIdentifiers(b -> b.id(userForUpdate.id()))
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
+                  .build());
+    } else {
+      roleReassignmentResult = ReassignRolesToUsersResult.skipped();
     }
 
-    this.extensionsNotifier.notifyUpdated(userForUpdate);
-
-    PatchDocument revertPatch = this.patchService.createPatch(joinedUser, oldUser);
-
-    return UpdateUserResult.updated(
-        userForUpdate.id(), userForUpdate.toDisplayName(), patch, revertPatch, timestamp);
+    return new UpdateUserResult(
+        userForUpdate.id(), timestamp, userUpdateResult, roleReassignmentResult);
   }
 
   private User toUserWithId(User user) {

@@ -12,8 +12,6 @@ public interface RoleAssigner {
 
   void assignRolesToUsers(List<String> userIds, List<String> roleIds);
 
-  void reassignRolesToUsers(List<String> userIds, List<String> roleIds);
-
   void unassignRolesFromUsers(List<String> userIds, List<String> roleIds);
 
   void unassignAllRolesFromUsers(List<String> userIds);
@@ -46,7 +44,7 @@ public interface RoleAssigner {
 
   RolePrivilegeAssignment getPrivilegesAssignByRoles(List<String> roleIds);
 
-  RoleUserAssignment getUsersAssignByRoles(List<String> privilegeIds);
+  RoleUserAssignment getUsersAssignByRoles(List<String> rolesIds);
 
-  UserRoleAssignment getRolesAssignByUsers(List<String> roleIds);
+  UserRoleAssignment getRolesAssignByUsers(List<String> userIds);
 }

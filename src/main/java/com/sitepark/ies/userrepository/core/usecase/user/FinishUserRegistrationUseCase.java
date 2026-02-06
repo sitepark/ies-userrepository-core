@@ -63,11 +63,11 @@ public final class FinishUserRegistrationUseCase {
             .roleIdentifiers(configurer -> configurer.identifiers(request.roleIdentifiers()))
             .build();
 
-    String id = this.createUserUseCase.createUser(createUserRequest);
+    CreateUserResult result = this.createUserUseCase.createUser(createUserRequest);
 
     this.sendSuccessEmail(request, user);
 
-    return new FinishUserRegistrationResult(email, id);
+    return new FinishUserRegistrationResult(email, result.userId());
   }
 
   private void sendSuccessEmail(FinishUserRegistrationRequest request, User user) {

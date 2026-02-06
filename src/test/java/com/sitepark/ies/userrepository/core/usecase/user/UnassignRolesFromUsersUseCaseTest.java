@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.value.UserRoleAssignment;
@@ -37,19 +36,13 @@ class UnassignRolesFromUsersUseCaseTest {
     this.roleRepository = mock();
     this.roleAssigner = mock();
     this.accessControl = mock();
-    AuditLogService auditLogService = mock();
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
     this.usecase =
         new UnassignRolesFromUsersUseCase(
-            userRepository,
-            roleRepository,
-            roleAssigner,
-            accessControl,
-            auditLogService,
-            fixedClock);
+            userRepository, roleRepository, roleAssigner, accessControl, fixedClock);
   }
 
   @Test
@@ -66,7 +59,7 @@ class UnassignRolesFromUsersUseCaseTest {
   }
 
   @Test
-  void testAssignRolesToUsers() {
+  void testUnassignRolesToUsersCallsRoleAssigner() {
 
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
@@ -86,7 +79,30 @@ class UnassignRolesFromUsersUseCaseTest {
   }
 
   @Test
-  void testEmptyUsersIdentifiers() {
+  void testUnassignRolesToUsersReturnsUnassignedResult() {
+
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.roleAssigner.getRolesAssignByUsers(any()))
+        .thenReturn(
+            UserRoleAssignment.builder()
+                .assignments("1", List.of("3", "4"))
+                .assignments("2", List.of("3", "4"))
+                .build());
+
+    UnassignRolesFromUsersResult result =
+        this.usecase.unassignRolesFromUsers(
+            UnassignRolesFromUsersRequest.builder()
+                .userIdentifiers(b -> b.ids("1", "2"))
+                .roleIdentifiers(b -> b.ids("3", "4"))
+                .build());
+
+    assertTrue(
+        result.wasUnassigned(),
+        "Result should indicate roles were unassigned when effective unassignments exist");
+  }
+
+  @Test
+  void testEmptyUsersIdentifiersDoesNotCheckAccess() {
 
     when(this.accessControl.isUserWritable()).thenReturn(true);
 
@@ -97,7 +113,18 @@ class UnassignRolesFromUsersUseCaseTest {
   }
 
   @Test
-  void testEmptyRolesIdentifiers() {
+  void testEmptyUsersIdentifiersReturnsSkipped() {
+
+    UnassignRolesFromUsersResult result =
+        this.usecase.unassignRolesFromUsers(
+            UnassignRolesFromUsersRequest.builder().roleIdentifiers(b -> b.ids("3", "4")).build());
+
+    assertFalse(
+        result.wasUnassigned(), "Result should indicate skipped when user identifiers are empty");
+  }
+
+  @Test
+  void testEmptyRolesIdentifiersDoesNotCheckAccess() {
     this.usecase.unassignRolesFromUsers(
         UnassignRolesFromUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());
 
@@ -105,7 +132,17 @@ class UnassignRolesFromUsersUseCaseTest {
   }
 
   @Test
-  void testResolveUserAnchor() {
+  void testEmptyRolesIdentifiersReturnsSkipped() {
+    UnassignRolesFromUsersResult result =
+        this.usecase.unassignRolesFromUsers(
+            UnassignRolesFromUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());
+
+    assertFalse(
+        result.wasUnassigned(), "Result should indicate skipped when role identifiers are empty");
+  }
+
+  @Test
+  void testResolveUserAnchorCallsRoleAssigner() {
     when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
@@ -118,6 +155,23 @@ class UnassignRolesFromUsersUseCaseTest {
             .build());
 
     verify(this.roleAssigner).unassignRolesFromUsers(List.of("1"), List.of("3", "4"));
+  }
+
+  @Test
+  void testResolveUserAnchorReturnsUnassigned() {
+    when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.roleAssigner.getRolesAssignByUsers(any()))
+        .thenReturn(UserRoleAssignment.builder().assignments("1", List.of("3", "4")).build());
+
+    UnassignRolesFromUsersResult result =
+        this.usecase.unassignRolesFromUsers(
+            UnassignRolesFromUsersRequest.builder()
+                .userIdentifiers(b -> b.add("anchor"))
+                .roleIdentifiers(b -> b.ids("3", "4"))
+                .build());
+
+    assertTrue(result.wasUnassigned(), "Result should indicate roles were unassigned");
   }
 
   @Test
@@ -136,7 +190,7 @@ class UnassignRolesFromUsersUseCaseTest {
   }
 
   @Test
-  void testResolveRoleAnchor() {
+  void testResolveRoleAnchorCallsRoleAssigner() {
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("3"));
     when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
@@ -153,6 +207,27 @@ class UnassignRolesFromUsersUseCaseTest {
             .build());
 
     verify(this.roleAssigner).unassignRolesFromUsers(List.of("1", "2"), List.of("3"));
+  }
+
+  @Test
+  void testResolveRoleAnchorReturnsUnassigned() {
+    when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("3"));
+    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.roleAssigner.getRolesAssignByUsers(any()))
+        .thenReturn(
+            UserRoleAssignment.builder()
+                .assignments("1", List.of("3"))
+                .assignments("2", List.of("3"))
+                .build());
+
+    UnassignRolesFromUsersResult result =
+        this.usecase.unassignRolesFromUsers(
+            UnassignRolesFromUsersRequest.builder()
+                .userIdentifiers(b -> b.ids("1", "2"))
+                .roleIdentifiers(b -> b.add("anchor"))
+                .build());
+
+    assertTrue(result.wasUnassigned(), "Result should indicate roles were unassigned");
   }
 
   @Test
