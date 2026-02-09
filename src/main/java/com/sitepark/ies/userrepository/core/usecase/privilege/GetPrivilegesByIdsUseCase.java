@@ -2,7 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -11,17 +11,19 @@ public final class GetPrivilegesByIdsUseCase {
 
   private final PrivilegeRepository repository;
 
-  private final AccessControl accessControl;
+  private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
 
   @Inject
-  GetPrivilegesByIdsUseCase(PrivilegeRepository repository, AccessControl accessControl) {
+  GetPrivilegesByIdsUseCase(
+      PrivilegeRepository repository,
+      PrivilegeEntityAuthorizationService privilegeAuthorizationService) {
     this.repository = repository;
-    this.accessControl = accessControl;
+    this.privilegeAuthorizationService = privilegeAuthorizationService;
   }
 
   public List<Privilege> getPrivilegesByIds(List<String> ids) {
 
-    if (!this.accessControl.isPrivilegeReadable()) {
+    if (!this.privilegeAuthorizationService.isReadable(ids)) {
       throw new AccessDeniedException("Not allowed to read privileges");
     }
 

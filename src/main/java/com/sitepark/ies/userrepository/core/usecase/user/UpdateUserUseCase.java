@@ -9,7 +9,7 @@ import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
@@ -24,7 +24,7 @@ public final class UpdateUserUseCase {
   private static final Logger LOGGER = LogManager.getLogger();
   private final ReassignRolesToUsersUseCase reassignRolesToUsersUseCase;
   private final UserRepository userRepository;
-  private final AccessControl accessControl;
+  private final UserEntityAuthorizationService userEntityAuthorizationService;
   private final ExtensionsNotifier extensionsNotifier;
   private final PatchService<User> patchService;
   private final Clock clock;
@@ -33,21 +33,19 @@ public final class UpdateUserUseCase {
   UpdateUserUseCase(
       ReassignRolesToUsersUseCase reassignRolesToUsersUseCase,
       UserRepository userRepository,
-      AccessControl accessControl,
+      UserEntityAuthorizationService userEntityAuthorizationService,
       ExtensionsNotifier extensionsNotifier,
       PatchServiceFactory patchServiceFactory,
       Clock clock) {
     this.reassignRolesToUsersUseCase = reassignRolesToUsersUseCase;
     this.userRepository = userRepository;
-    this.accessControl = accessControl;
+    this.userEntityAuthorizationService = userEntityAuthorizationService;
     this.extensionsNotifier = extensionsNotifier;
     this.patchService = patchServiceFactory.createPatchService(User.class);
     this.clock = clock;
   }
 
   public UpdateUserResult updateUser(UpdateUserRequest request) {
-
-    this.checkAccessControl(request.user());
 
     User newUser;
     if (request.user().id() == null) {
@@ -57,6 +55,7 @@ public final class UpdateUserUseCase {
       newUser = request.user();
     }
 
+    this.checkAuthorization(newUser);
     this.validateLogin(newUser);
 
     if (LOGGER.isInfoEnabled()) {
@@ -139,8 +138,8 @@ public final class UpdateUserUseCase {
     }
   }
 
-  private void checkAccessControl(User user) {
-    if (!this.accessControl.isUserWritable()) {
+  private void checkAuthorization(User user) {
+    if (!this.userEntityAuthorizationService.isWritable(user.id())) {
       throw new AccessDeniedException("Not allowed to update user " + user);
     }
   }

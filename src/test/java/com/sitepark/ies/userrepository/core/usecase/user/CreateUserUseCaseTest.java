@@ -15,7 +15,7 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -29,7 +29,7 @@ class CreateUserUseCaseTest {
 
   private UserRepository userRepository;
   private AssignRolesToUsersUseCase assignRolesToUsersUseCase;
-  private AccessControl accessControl;
+  private UserEntityAuthorizationService userEntityAuthorizationService;
   private CreateUserUseCase userCase;
 
   @BeforeEach
@@ -37,7 +37,7 @@ class CreateUserUseCaseTest {
     this.userRepository = mock();
     RoleRepository roleRepository = mock();
     this.assignRolesToUsersUseCase = mock();
-    this.accessControl = mock();
+    this.userEntityAuthorizationService = mock();
     ExtensionsNotifier extensionsNotifier = mock();
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
@@ -48,7 +48,7 @@ class CreateUserUseCaseTest {
             this.userRepository,
             roleRepository,
             this.assignRolesToUsersUseCase,
-            this.accessControl,
+            this.userEntityAuthorizationService,
             extensionsNotifier,
             fixedClock);
   }
@@ -56,7 +56,7 @@ class CreateUserUseCaseTest {
   @Test
   void testAccessDeniedCreate() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(false);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(false);
 
     User user = User.builder().login("test").lastName("Test").build();
 
@@ -78,7 +78,7 @@ class CreateUserUseCaseTest {
   @Test
   void testAnchorAlreadyExists() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveAnchor(Anchor.ofString("test.user")))
         .thenReturn(Optional.of("123"));
 
@@ -92,7 +92,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithRolesReturnsUserId() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
     when(this.userRepository.create(any())).thenReturn("123");
     when(this.assignRolesToUsersUseCase.assignRolesToUsers(any()))
@@ -110,7 +110,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithRolesCallsRepository() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
     when(this.userRepository.create(any())).thenReturn("123");
     when(this.assignRolesToUsersUseCase.assignRolesToUsers(any()))
@@ -127,7 +127,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithRolesCallsAssignRoles() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
     when(this.userRepository.create(any())).thenReturn("123");
     when(this.assignRolesToUsersUseCase.assignRolesToUsers(any()))
@@ -149,7 +149,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithAnchor() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.empty());
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.empty());
     when(this.userRepository.create(any())).thenReturn("123");
@@ -164,7 +164,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithExistsLoginThrowsException() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
 
     User user = User.builder().login("test").lastName("Test").build();
@@ -177,7 +177,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithExistsLoginExceptionContainsLogin() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
 
     User user = User.builder().login("test").lastName("Test").build();
@@ -195,7 +195,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithExistsLoginExceptionContainsOwner() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
 
     User user = User.builder().login("test").lastName("Test").build();
@@ -213,7 +213,7 @@ class CreateUserUseCaseTest {
   @Test
   void testCreateWithExistsLoginExceptionHasMessage() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.userRepository.resolveLogin(anyString())).thenReturn(Optional.of("345"));
 
     User user = User.builder().login("test").lastName("Test").build();

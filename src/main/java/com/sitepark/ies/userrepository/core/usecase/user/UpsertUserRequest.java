@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = UpsertUserRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
@@ -21,12 +20,9 @@ public final class UpsertUserRequest {
 
   @NotNull private final List<Identifier> roleIdentifiers;
 
-  @Nullable private final String auditParentId;
-
   private UpsertUserRequest(Builder builder) {
     this.user = builder.user;
     this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
-    this.auditParentId = builder.auditParentId;
   }
 
   public static Builder builder() {
@@ -43,26 +39,20 @@ public final class UpsertUserRequest {
     return this.roleIdentifiers;
   }
 
-  @Nullable
-  public String auditParentId() {
-    return this.auditParentId;
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.user, this.roleIdentifiers, this.auditParentId);
+    return Objects.hash(this.user, this.roleIdentifiers);
   }
 
   @Override
   public boolean equals(Object o) {
     return (o instanceof UpsertUserRequest that)
         && Objects.equals(this.user, that.user)
-        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
-        && Objects.equals(this.auditParentId, that.auditParentId);
+        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers);
   }
 
   @Override
@@ -72,9 +62,6 @@ public final class UpsertUserRequest {
         + user
         + ", roleIdentifiers="
         + roleIdentifiers
-        + ", auditParentId='"
-        + auditParentId
-        + '\''
         + '}';
   }
 
@@ -83,14 +70,12 @@ public final class UpsertUserRequest {
 
     private User user;
     private final Set<Identifier> roleIdentifiers = new TreeSet<>();
-    private String auditParentId;
 
     private Builder() {}
 
     private Builder(UpsertUserRequest request) {
       this.user = request.user;
       this.roleIdentifiers.addAll(request.roleIdentifiers);
-      this.auditParentId = request.auditParentId;
     }
 
     public Builder user(User user) {

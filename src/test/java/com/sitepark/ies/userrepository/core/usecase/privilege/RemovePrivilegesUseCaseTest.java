@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -12,7 +13,7 @@ import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.Test;
 class RemovePrivilegesUseCaseTest {
 
   private PrivilegeRepository repository;
-  private AccessControl accessControl;
+  private PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private AuditLogService auditLogService;
 
   private RemovePrivilegesUseCase usecase;
@@ -39,25 +40,25 @@ class RemovePrivilegesUseCaseTest {
   void setUp() {
     this.repository = mock();
     RoleAssigner roleAssigner = mock();
-    this.accessControl = mock();
+    this.privilegeAuthorizationService = mock();
     this.auditLogService = mock();
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     this.fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
     this.usecase =
         new RemovePrivilegesUseCase(
-            repository, roleAssigner, accessControl, auditLogService, fixedClock);
+            repository, roleAssigner, privilegeAuthorizationService, auditLogService, fixedClock);
   }
 
   @Test
   void testEmptyIdentifiers() {
     this.usecase.removePrivileges(RemovePrivilegesRequest.builder().build());
-    verify(this.accessControl, never()).isPrivilegeRemovable();
+    verify(this.privilegeAuthorizationService, never()).isRemovable(anyList());
   }
 
   @Test
   void testAccessDenied() {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(false);
+    when(this.privilegeAuthorizationService.isRemovable(anyList())).thenReturn(false);
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -68,7 +69,7 @@ class RemovePrivilegesUseCaseTest {
 
   @Test
   void testAnchorNotFound() {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isRemovable(anyList())).thenReturn(true);
 
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.empty());
     assertThrows(
@@ -81,7 +82,7 @@ class RemovePrivilegesUseCaseTest {
 
   @Test
   void testIdNotFound() {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isRemovable(anyList())).thenReturn(true);
     when(this.repository.get(any())).thenReturn(Optional.empty());
 
     verify(this.repository, never()).remove(any());
@@ -89,7 +90,7 @@ class RemovePrivilegesUseCaseTest {
 
   @Test
   void testRemove() {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isRemovable(anyList())).thenReturn(true);
     when(this.repository.get(any()))
         .thenReturn(
             Optional.of(
@@ -102,7 +103,7 @@ class RemovePrivilegesUseCaseTest {
 
   @Test
   void testRemoveId1() {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isRemovable(anyList())).thenReturn(true);
     this.usecase.removePrivileges(
         RemovePrivilegesRequest.builder().identifiers(b -> b.id("1")).build());
 
@@ -111,7 +112,7 @@ class RemovePrivilegesUseCaseTest {
 
   @Test
   void testAuditLog() throws IOException {
-    when(this.accessControl.isPrivilegeRemovable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isRemovable(anyList())).thenReturn(true);
     when(this.repository.get(any()))
         .thenReturn(
             Optional.of(

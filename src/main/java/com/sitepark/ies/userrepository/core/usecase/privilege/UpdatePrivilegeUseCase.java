@@ -4,14 +4,13 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.exception.PrivilegeNotFoundException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -20,7 +19,6 @@ import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRoles
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +29,7 @@ public final class UpdatePrivilegeUseCase {
 
   private final AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
   private final PrivilegeRepository repository;
-  private final AccessControl accessControl;
+  private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private final AuditLogService auditLogService;
   private final PatchService<Privilege> patchService;
   private final Clock clock;
@@ -40,23 +38,19 @@ public final class UpdatePrivilegeUseCase {
   UpdatePrivilegeUseCase(
       AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase,
       PrivilegeRepository repository,
-      AccessControl accessControl,
+      PrivilegeEntityAuthorizationService privilegeAuthorizationService,
       AuditLogService auditLogService,
       PatchServiceFactory patchServiceFactory,
       Clock clock) {
     this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
     this.repository = repository;
-    this.accessControl = accessControl;
+    this.privilegeAuthorizationService = privilegeAuthorizationService;
     this.auditLogService = auditLogService;
     this.patchService = patchServiceFactory.createPatchService(Privilege.class);
     this.clock = clock;
   }
 
   public String updatePrivilege(UpdatePrivilegeRequest request) {
-
-    this.validatePrivilege(request.privilege());
-
-    this.checkAccessControl(request.privilege(), request.roleIdentifiers());
 
     Privilege newPrivilege;
     if (request.privilege().id() == null) {
@@ -65,6 +59,9 @@ public final class UpdatePrivilegeUseCase {
       this.validateAnchor(request.privilege());
       newPrivilege = request.privilege();
     }
+
+    this.validatePrivilege(newPrivilege);
+    this.checkAuthorization(newPrivilege);
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("update privilege: {}", request.privilege());
@@ -121,14 +118,9 @@ public final class UpdatePrivilegeUseCase {
     }
   }
 
-  private void checkAccessControl(Privilege privilege, List<Identifier> roleIdentities) {
-    if (!this.accessControl.isPrivilegeWritable()) {
+  private void checkAuthorization(Privilege privilege) {
+    if (!this.privilegeAuthorizationService.isWritable(privilege.id())) {
       throw new AccessDeniedException("Not allowed to update privilege " + privilege);
-    }
-
-    if (!roleIdentities.isEmpty() && !this.accessControl.isRoleWritable()) {
-      throw new AccessDeniedException(
-          "Not allowed to update role to add privilege " + privilege + " -> " + roleIdentities);
     }
   }
 

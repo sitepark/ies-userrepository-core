@@ -10,7 +10,7 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesRequest;
@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class CreatePrivilegeUseCaseTest {
   private PrivilegeRepository privilegeRepository;
   private AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
-  private AccessControl accessControl;
+  private PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private CreatePrivilegeUseCase usecase;
 
   @BeforeEach
@@ -32,7 +32,7 @@ class CreatePrivilegeUseCaseTest {
     this.privilegeRepository = mock();
     RoleRepository roleRepository = mock();
     this.assignPrivilegesToRolesUseCase = mock();
-    this.accessControl = mock();
+    this.privilegeAuthorizationService = mock();
     AuditLogService auditLogService = mock();
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
@@ -42,7 +42,7 @@ class CreatePrivilegeUseCaseTest {
             privilegeRepository,
             roleRepository,
             assignPrivilegesToRolesUseCase,
-            accessControl,
+            privilegeAuthorizationService,
             auditLogService,
             fixedClock);
   }
@@ -74,7 +74,7 @@ class CreatePrivilegeUseCaseTest {
   @Test
   void testPermissionNotCreatable() {
 
-    when(this.accessControl.isPrivilegeCreatable()).thenReturn(false);
+    when(this.privilegeAuthorizationService.isCreatable()).thenReturn(false);
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -89,8 +89,7 @@ class CreatePrivilegeUseCaseTest {
   @Test
   void testRoleNotWritable() {
 
-    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
-    when(this.accessControl.isRoleWritable()).thenReturn(false);
+    when(this.privilegeAuthorizationService.isCreatable()).thenReturn(false);
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -106,7 +105,7 @@ class CreatePrivilegeUseCaseTest {
   @Test
   void testWithExistsAnchor() {
 
-    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isCreatable()).thenReturn(true);
     when(this.privilegeRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
     assertThrows(
         AnchorAlreadyExistsException.class,
@@ -127,7 +126,7 @@ class CreatePrivilegeUseCaseTest {
   @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testCreate() {
 
-    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isCreatable()).thenReturn(true);
     when(this.privilegeRepository.create(any())).thenReturn("456");
 
     String id =
@@ -148,8 +147,7 @@ class CreatePrivilegeUseCaseTest {
   @Test
   void testWithAssignPrivilegesToRoles() {
 
-    when(this.accessControl.isPrivilegeCreatable()).thenReturn(true);
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isCreatable()).thenReturn(true);
     when(this.privilegeRepository.create(any())).thenReturn("456");
 
     this.usecase.createPrivilege(

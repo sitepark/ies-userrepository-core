@@ -1,36 +1,27 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import jakarta.inject.Inject;
 
 public final class UpsertRoleUseCase {
 
-  private final AccessControl accessControl;
   private final RoleRepository repository;
   private final CreateRoleUseCase createRoleUseCase;
   private final UpdateRoleUseCase updateRoleUseCase;
 
   @Inject
   UpsertRoleUseCase(
-      AccessControl accessControl,
       RoleRepository repository,
       CreateRoleUseCase createRoleUseCase,
       UpdateRoleUseCase updateRoleUseCase) {
-    this.accessControl = accessControl;
     this.repository = repository;
     this.createRoleUseCase = createRoleUseCase;
     this.updateRoleUseCase = updateRoleUseCase;
   }
 
   public String upsertRole(UpsertRoleRequest request) {
-
-    if (!this.accessControl.isRoleCreatable() || !this.accessControl.isRoleWritable()) {
-      throw new AccessDeniedException("Not allowed to upsert role " + request.role());
-    }
 
     Role roleResolved = this.toRoleWithId(request.role());
     if (roleResolved.id() == null) {

@@ -8,43 +8,41 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class GetPrivilegesByIdsUseCaseTest {
 
+  private PrivilegeRepository repository;
+  private PrivilegeEntityAuthorizationService privilegeEntityAuthorizationService;
+  private GetPrivilegesByIdsUseCase usecase;
+
+  @BeforeEach
+  void setUp() {
+    this.repository = mock();
+    this.privilegeEntityAuthorizationService = mock();
+    this.usecase = new GetPrivilegesByIdsUseCase(repository, privilegeEntityAuthorizationService);
+  }
+
   @Test
   void testAccessDenied() {
 
-    PrivilegeRepository privilegeRepository = mock();
-    AccessControl accessControl = mock();
-    when(accessControl.isPrivilegeReadable()).thenReturn(false);
+    when(privilegeEntityAuthorizationService.isReadable(anyList())).thenReturn(false);
 
-    GetPrivilegesByIdsUseCase getPrivilegesByIds =
-        new GetPrivilegesByIdsUseCase(privilegeRepository, accessControl);
-
-    assertThrows(
-        AccessDeniedException.class, () -> getPrivilegesByIds.getPrivilegesByIds(List.of("123")));
+    assertThrows(AccessDeniedException.class, () -> usecase.getPrivilegesByIds(List.of("123")));
   }
 
   @Test
   void testGet() {
 
     Privilege privilege = Privilege.builder().id("123").name("test").build();
-
-    PrivilegeRepository privilegeRepository = mock();
-    when(privilegeRepository.getByIds(anyList())).thenReturn(List.of(privilege));
-    AccessControl accessControl = mock();
-    when(accessControl.isPrivilegeReadable()).thenReturn(true);
-
-    GetPrivilegesByIdsUseCase getPrivilegesByIds =
-        new GetPrivilegesByIdsUseCase(privilegeRepository, accessControl);
+    when(repository.getByIds(anyList())).thenReturn(List.of(privilege));
+    when(privilegeEntityAuthorizationService.isReadable(anyList())).thenReturn(true);
 
     assertEquals(
-        List.of(privilege),
-        getPrivilegesByIds.getPrivilegesByIds(List.of("123")),
-        "Unexpected result");
+        List.of(privilege), usecase.getPrivilegesByIds(List.of("123")), "Unexpected result");
   }
 }

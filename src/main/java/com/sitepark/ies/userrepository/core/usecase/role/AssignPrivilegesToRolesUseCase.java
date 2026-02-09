@@ -5,8 +5,8 @@ import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
@@ -28,7 +28,7 @@ public final class AssignPrivilegesToRolesUseCase {
   private final RoleRepository roleRepository;
   private final PrivilegeRepository privilegeRepository;
   private final RoleAssigner roleAssigner;
-  private final AccessControl accessControl;
+  private final RoleEntityAuthorizationService roleEntityAuthorizationService;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
@@ -37,13 +37,13 @@ public final class AssignPrivilegesToRolesUseCase {
       RoleRepository roleRepository,
       PrivilegeRepository privilegeRepository,
       RoleAssigner roleAssigner,
-      AccessControl accessControl,
+      RoleEntityAuthorizationService roleEntityAuthorizationService,
       AuditLogService auditLogService,
       Clock clock) {
     this.roleRepository = roleRepository;
     this.privilegeRepository = privilegeRepository;
     this.roleAssigner = roleAssigner;
-    this.accessControl = accessControl;
+    this.roleEntityAuthorizationService = roleEntityAuthorizationService;
     this.auditLogService = auditLogService;
     this.clock = clock;
   }
@@ -60,7 +60,7 @@ public final class AssignPrivilegesToRolesUseCase {
     List<String> privilegeIds =
         IdentifierResolver.create(this.privilegeRepository).resolve(request.privilegeIdentifiers());
 
-    if (!this.accessControl.isRoleWritable()) {
+    if (!this.roleEntityAuthorizationService.isWritable(roleIds)) {
       throw new AccessDeniedException("Not allowed to update roles to add privileges");
     }
 

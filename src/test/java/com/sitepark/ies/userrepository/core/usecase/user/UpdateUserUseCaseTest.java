@@ -18,7 +18,7 @@ import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.time.Clock;
@@ -34,7 +34,7 @@ class UpdateUserUseCaseTest {
 
   private ReassignRolesToUsersUseCase reassignRolesToUsersUseCase;
   private UserRepository repository;
-  private AccessControl accessControl;
+  private UserEntityAuthorizationService userEntityAuthorizationService;
   private ExtensionsNotifier extensionsNotifier;
   private PatchService<User> patchService;
   private Clock fixedClock;
@@ -54,7 +54,7 @@ class UpdateUserUseCaseTest {
     this.reassignRolesToUsersUseCase = mock(ReassignRolesToUsersUseCase.class);
     this.repository = mock(UserRepository.class);
     this.extensionsNotifier = mock(ExtensionsNotifier.class);
-    this.accessControl = mock(AccessControl.class);
+    this.userEntityAuthorizationService = mock(UserEntityAuthorizationService.class);
     PatchServiceFactory patchServiceFactory = mock();
     this.patchService = mock();
     when(patchServiceFactory.createPatchService(User.class)).thenReturn(this.patchService);
@@ -65,7 +65,7 @@ class UpdateUserUseCaseTest {
         new UpdateUserUseCase(
             this.reassignRolesToUsersUseCase,
             this.repository,
-            this.accessControl,
+            this.userEntityAuthorizationService,
             this.extensionsNotifier,
             patchServiceFactory,
             this.fixedClock);
@@ -74,7 +74,7 @@ class UpdateUserUseCaseTest {
   @Test
   void testAccessDeniedUpdate() {
 
-    when(this.accessControl.isUserWritable()).thenReturn(false);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(false);
 
     User user = User.builder().id("123").login("test").build();
 
@@ -86,7 +86,7 @@ class UpdateUserUseCaseTest {
   @Test
   void testWithoutAnchorAndId() {
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     User user = User.builder().login("test").build();
 
     assertThrows(
@@ -97,7 +97,7 @@ class UpdateUserUseCaseTest {
   @Test
   void testUpdateUserNotFound() {
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
     assertThrows(
@@ -110,7 +110,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.resolveLogin("test2")).thenReturn(Optional.of("55"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
@@ -127,7 +127,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -147,7 +147,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -167,7 +167,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -188,7 +188,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -207,7 +207,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -226,7 +226,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -245,7 +245,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -269,7 +269,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -297,7 +297,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -320,7 +320,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     PatchDocument patch = mock();
     when(this.patchService.createPatch(any(), any())).thenReturn(patch);
@@ -338,7 +338,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     PatchDocument patch = mock();
     when(this.patchService.createPatch(any(), any())).thenReturn(patch);
@@ -365,7 +365,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.resolveAnchor(Anchor.ofString("user.test")))
         .thenReturn(Optional.of("123"));
@@ -387,7 +387,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.resolveAnchor(Anchor.ofString("user.test")))
         .thenReturn(Optional.of("123"));
@@ -418,7 +418,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.resolveAnchor(Anchor.ofString("user.test")))
         .thenReturn(Optional.of("123"));
@@ -439,7 +439,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -458,7 +458,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -485,7 +485,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -503,7 +503,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("55"));
     when(this.repository.resolveLogin("test2")).thenReturn(Optional.empty());
     PatchDocument patch = mock();
@@ -523,7 +523,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("55"));
     when(this.repository.resolveLogin("test2")).thenReturn(Optional.empty());
     PatchDocument patch = mock();
@@ -551,7 +551,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("55"));
     when(this.repository.resolveLogin("test2")).thenReturn(Optional.empty());
     PatchDocument patch = mock();
@@ -568,7 +568,7 @@ class UpdateUserUseCaseTest {
   @Test
   void testUpdateAnchorNotFound() {
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(Anchor.ofString("user.test"))).thenReturn(Optional.empty());
     User user = User.builder().login("test").anchor("user.test2").build();
 
@@ -582,7 +582,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();
@@ -605,7 +605,7 @@ class UpdateUserUseCaseTest {
 
     User storedUser = this.createStoredUser();
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
     when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
     PatchDocument patch = mock();

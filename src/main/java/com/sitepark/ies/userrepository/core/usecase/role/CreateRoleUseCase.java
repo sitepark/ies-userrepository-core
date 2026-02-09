@@ -6,8 +6,8 @@ import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -27,7 +27,7 @@ public final class CreateRoleUseCase {
   private final RoleRepository roleRepository;
   private final PrivilegeRepository privilegeRepository;
   private final AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
-  private final AccessControl accessControl;
+  private final RoleEntityAuthorizationService roleEntityAuthorizationService;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
@@ -38,13 +38,13 @@ public final class CreateRoleUseCase {
       RoleRepository roleRepository,
       PrivilegeRepository privilegeRepository,
       AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase,
-      AccessControl accessControl,
+      RoleEntityAuthorizationService roleEntityAuthorizationService,
       AuditLogService auditLogService,
       Clock clock) {
     this.roleRepository = roleRepository;
     this.privilegeRepository = privilegeRepository;
     this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
-    this.accessControl = accessControl;
+    this.roleEntityAuthorizationService = roleEntityAuthorizationService;
     this.auditLogService = auditLogService;
     this.clock = clock;
   }
@@ -93,7 +93,7 @@ public final class CreateRoleUseCase {
   }
 
   private void checkAccessControl(Role role) {
-    if (!this.accessControl.isRoleCreatable()) {
+    if (!this.roleEntityAuthorizationService.isCreatable()) {
       throw new AccessDeniedException("Not allowed to create role " + role);
     }
   }

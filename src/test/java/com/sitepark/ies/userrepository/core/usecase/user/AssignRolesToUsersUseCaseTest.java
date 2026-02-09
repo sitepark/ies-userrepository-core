@@ -2,6 +2,8 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -9,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.UserRoleAssignment;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
@@ -26,7 +28,7 @@ class AssignRolesToUsersUseCaseTest {
   private UserRepository userRepository;
   private RoleRepository roleRepository;
   private RoleAssigner roleAssigner;
-  private AccessControl accessControl;
+  private UserEntityAuthorizationService userEntityAuthorizationService;
 
   private AssignRolesToUsersUseCase usecase;
 
@@ -35,18 +37,22 @@ class AssignRolesToUsersUseCaseTest {
     this.userRepository = mock();
     this.roleRepository = mock();
     this.roleAssigner = mock();
-    this.accessControl = mock();
+    this.userEntityAuthorizationService = mock();
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
     this.usecase =
         new AssignRolesToUsersUseCase(
-            userRepository, roleRepository, roleAssigner, accessControl, fixedClock);
+            userRepository,
+            roleRepository,
+            roleAssigner,
+            userEntityAuthorizationService,
+            fixedClock);
   }
 
   @Test
   void testRoleNotWritable() {
-    when(this.accessControl.isUserWritable()).thenReturn(false);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(false);
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -60,7 +66,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testAssignRolesToUsersCallsRoleAssigner() {
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
         .thenReturn(UserRoleAssignment.builder().build());
 
@@ -76,7 +82,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testAssignRolesToUsersReturnsAssignedResult() {
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
         .thenReturn(UserRoleAssignment.builder().build());
 
@@ -95,12 +101,12 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testEmptyUserIdentifiersDoesNotCheckAccess() {
 
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     this.usecase.assignRolesToUsers(
         AssignRolesToUsersRequest.builder().roleIdentifiers(b -> b.ids("3", "4")).build());
 
-    verify(this.accessControl, never()).isUserWritable();
+    verify(this.userEntityAuthorizationService, never()).isWritable(anyString());
   }
 
   @Test
@@ -119,7 +125,7 @@ class AssignRolesToUsersUseCaseTest {
     this.usecase.assignRolesToUsers(
         AssignRolesToUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());
 
-    verify(this.accessControl, never()).isUserWritable();
+    verify(this.userEntityAuthorizationService, never()).isWritable(anyString());
   }
 
   @Test
@@ -135,7 +141,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testResolveUserAnchorCallsRoleAssigner() {
     when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
         .thenReturn(UserRoleAssignment.builder().build());
 
@@ -151,7 +157,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testResolveUserAnchorReturnsAssigned() {
     when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
         .thenReturn(UserRoleAssignment.builder().build());
 
@@ -168,7 +174,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testResolveUserAnchorNotFound() {
     when(this.userRepository.resolveAnchor(any())).thenReturn(Optional.empty());
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     assertThrows(
         AnchorNotFoundException.class,
@@ -183,7 +189,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testResolveRolesAnchorCallsRoleAssigner() {
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("3"));
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
         .thenReturn(UserRoleAssignment.builder().build());
 
@@ -199,7 +205,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testResolveRolesAnchorReturnsAssigned() {
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("3"));
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getRolesAssignByUsers(any()))
         .thenReturn(UserRoleAssignment.builder().build());
 
@@ -216,7 +222,7 @@ class AssignRolesToUsersUseCaseTest {
   @Test
   void testResolveRoleAnchorNotFound() {
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.empty());
-    when(this.accessControl.isUserWritable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     assertThrows(
         AnchorNotFoundException.class,

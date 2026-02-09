@@ -4,11 +4,10 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -31,7 +30,7 @@ public final class CreatePrivilegeUseCase {
   private final PrivilegeRepository privilegeRepository;
   private final RoleRepository roleRepository;
   private final AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
-  private final AccessControl accessControl;
+  private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
@@ -40,13 +39,13 @@ public final class CreatePrivilegeUseCase {
       PrivilegeRepository privilegeRepository,
       RoleRepository roleRepository,
       AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase,
-      AccessControl accessControl,
+      PrivilegeEntityAuthorizationService privilegeAuthorizationService,
       AuditLogService auditLogService,
       Clock clock) {
     this.privilegeRepository = privilegeRepository;
     this.roleRepository = roleRepository;
     this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
-    this.accessControl = accessControl;
+    this.privilegeAuthorizationService = privilegeAuthorizationService;
     this.auditLogService = auditLogService;
     this.clock = clock;
   }
@@ -55,7 +54,7 @@ public final class CreatePrivilegeUseCase {
 
     this.validatePrivilege(request.privilege());
 
-    this.checkAccessControl(request.privilege(), request.roleIdentifiers());
+    this.checkAuthorization(request.privilege());
 
     this.validateAnchor(request.privilege());
 
@@ -97,14 +96,9 @@ public final class CreatePrivilegeUseCase {
     }
   }
 
-  private void checkAccessControl(Privilege privilege, List<Identifier> roleIdentifiers) {
-    if (!this.accessControl.isPrivilegeCreatable()) {
+  private void checkAuthorization(Privilege privilege) {
+    if (!this.privilegeAuthorizationService.isCreatable()) {
       throw new AccessDeniedException("Not allowed to create privilege " + privilege);
-    }
-
-    if (!roleIdentifiers.isEmpty() && !this.accessControl.isRoleWritable()) {
-      throw new AccessDeniedException(
-          "Not allowed to update role to add privilege " + privilege + " -> " + roleIdentifiers);
     }
   }
 

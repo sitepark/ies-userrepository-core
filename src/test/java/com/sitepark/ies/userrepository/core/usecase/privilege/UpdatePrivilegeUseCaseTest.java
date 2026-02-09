@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,7 +16,7 @@ import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.sharedkernel.security.Permission;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesRequest;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesUseCase;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.Test;
 class UpdatePrivilegeUseCaseTest {
   private AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
   private PrivilegeRepository repository;
-  private AccessControl accessControl;
+  private PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private PatchService<Privilege> patchService;
 
   private UpdatePrivilegeUseCase usecase;
@@ -37,7 +38,7 @@ class UpdatePrivilegeUseCaseTest {
   void setUp() {
     this.assignPrivilegesToRolesUseCase = mock();
     this.repository = mock();
-    this.accessControl = mock();
+    this.privilegeAuthorizationService = mock();
     PatchServiceFactory patchServiceFactory = mock();
     this.patchService = mock();
 
@@ -51,7 +52,7 @@ class UpdatePrivilegeUseCaseTest {
         new UpdatePrivilegeUseCase(
             this.assignPrivilegesToRolesUseCase,
             this.repository,
-            this.accessControl,
+            this.privilegeAuthorizationService,
             auditLogService,
             patchServiceFactory,
             fixedClock);
@@ -70,7 +71,7 @@ class UpdatePrivilegeUseCaseTest {
 
   @Test
   void testAssesDeniedForPrivilege() {
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(false);
+    when(this.privilegeAuthorizationService.isWritable(anyString())).thenReturn(false);
     Privilege privilege =
         Privilege.builder().id("1").name("testPrivilege").permission(new TestPermission()).build();
     assertThrows(
@@ -83,7 +84,7 @@ class UpdatePrivilegeUseCaseTest {
 
   @Test
   void testAnchorNotFound() {
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.empty());
     Privilege privilege =
         Privilege.builder()
@@ -101,7 +102,7 @@ class UpdatePrivilegeUseCaseTest {
 
   @Test
   void testExistsAnchor() {
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("2"));
     Privilege privilege =
         Privilege.builder()
@@ -120,7 +121,7 @@ class UpdatePrivilegeUseCaseTest {
 
   @Test
   void testIdAndAnchorMissing() {
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isWritable(anyString())).thenReturn(true);
     Privilege privilege =
         Privilege.builder().name("testPrivilege").permission(new TestPermission()).build();
     assertThrows(
@@ -133,7 +134,7 @@ class UpdatePrivilegeUseCaseTest {
 
   @Test
   void testUpdate() {
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("2"));
 
     PatchDocument patch = mock();
@@ -158,8 +159,7 @@ class UpdatePrivilegeUseCaseTest {
 
   @Test
   void testAssignPrivilegesToRoles() {
-    when(this.accessControl.isPrivilegeWritable()).thenReturn(true);
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.privilegeAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     PatchDocument patch = mock();
     when(this.patchService.createPatch(any(), any())).thenReturn(patch);

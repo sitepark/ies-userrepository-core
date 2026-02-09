@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,7 +12,7 @@ import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -26,7 +27,7 @@ import org.junit.jupiter.api.Test;
 class RemoveRolesUseCaseTest {
 
   private RoleRepository repository;
-  private AccessControl accessControl;
+  private RoleEntityAuthorizationService roleEntityAuthorizationService;
   private AuditLogService auditLogService;
   private final Clock fixedClock =
       Clock.fixed(Instant.parse("2025-06-30T10:00:00Z"), ZoneId.of("UTC"));
@@ -35,17 +36,17 @@ class RemoveRolesUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    this.repository = mock(RoleRepository.class);
+    this.repository = mock();
     RoleAssigner roleAssigner = mock();
 
-    this.accessControl = mock(AccessControl.class);
-    this.auditLogService = mock(AuditLogService.class);
+    this.roleEntityAuthorizationService = mock();
+    this.auditLogService = mock();
 
     this.useCase =
         new RemoveRolesUseCase(
             this.repository,
             roleAssigner,
-            this.accessControl,
+            this.roleEntityAuthorizationService,
             this.auditLogService,
             this.fixedClock);
   }
@@ -54,12 +55,12 @@ class RemoveRolesUseCaseTest {
   void testNoIdentifiers() {
     this.useCase.removeRoles(RemoveRolesRequest.builder().build());
     org.mockito.Mockito.verifyNoInteractions(
-        this.repository, this.accessControl, this.auditLogService);
+        this.repository, this.roleEntityAuthorizationService, this.auditLogService);
   }
 
   @Test
   void testAccessDenied() {
-    when(this.accessControl.isRoleRemovable()).thenReturn(false);
+    when(this.roleEntityAuthorizationService.isRemovable(anyList())).thenReturn(false);
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -70,7 +71,7 @@ class RemoveRolesUseCaseTest {
   @Test
   void testRemoveWithId() {
     Role role = Role.builder().id("2").name("test").build();
-    when(this.accessControl.isRoleRemovable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isRemovable(anyList())).thenReturn(true);
     when(this.repository.get(any())).thenReturn(Optional.of(role));
 
     this.useCase.removeRoles(RemoveRolesRequest.builder().identifiers(b -> b.id("2")).build());
@@ -80,7 +81,7 @@ class RemoveRolesUseCaseTest {
 
   @Test
   void testRemoveWithAnchorNotFound() {
-    when(this.accessControl.isRoleRemovable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isRemovable(anyList())).thenReturn(true);
 
     assertThrows(
         AnchorNotFoundException.class,
@@ -92,7 +93,7 @@ class RemoveRolesUseCaseTest {
   @Test
   void testRemoveWithAnchor() {
     Role role = Role.builder().id("2").name("test").build();
-    when(this.accessControl.isRoleRemovable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isRemovable(anyList())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("2"));
     when(this.repository.get(any())).thenReturn(Optional.of(role));
 
@@ -105,7 +106,7 @@ class RemoveRolesUseCaseTest {
   @Test
   void testAudit() {
     Role role = Role.builder().id("2").name("test").build();
-    when(this.accessControl.isRoleRemovable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isRemovable(anyList())).thenReturn(true);
     when(this.repository.get(any())).thenReturn(Optional.of(role));
 
     this.useCase.removeRoles(RemoveRolesRequest.builder().identifiers(b -> b.id("2")).build());

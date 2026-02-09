@@ -23,7 +23,7 @@ public final class Role {
 
   @Nullable private final Anchor anchor;
 
-  @Nullable private final String name;
+  private final String name;
 
   @Nullable private final String description;
 

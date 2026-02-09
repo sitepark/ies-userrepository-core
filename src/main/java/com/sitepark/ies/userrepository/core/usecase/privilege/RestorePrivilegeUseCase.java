@@ -8,7 +8,7 @@ import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -21,14 +21,13 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 public final class RestorePrivilegeUseCase {
 
   private static final Logger LOGGER = LogManager.getLogger();
   private final PrivilegeRepository repository;
   private final RoleAssigner roleAssigner;
-  private final AccessControl accessControl;
+  private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private final AuditLogService auditLogService;
   private final ObjectMapper objectMapper;
   private final Clock clock;
@@ -37,13 +36,13 @@ public final class RestorePrivilegeUseCase {
   RestorePrivilegeUseCase(
       PrivilegeRepository repository,
       RoleAssigner roleAssigner,
-      AccessControl accessControl,
+      PrivilegeEntityAuthorizationService privilegeAuthorizationService,
       AuditLogService auditLogService,
       ObjectMapper objectMapper,
       Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
-    this.accessControl = accessControl;
+    this.privilegeAuthorizationService = privilegeAuthorizationService;
     this.auditLogService = auditLogService;
     this.objectMapper = objectMapper;
     this.clock = clock;
@@ -57,7 +56,7 @@ public final class RestorePrivilegeUseCase {
 
     this.validatePrivilege(privilege);
 
-    this.checkAccessControl(privilege, roleIds);
+    this.checkAuthorization(privilege);
 
     if (this.repository.get(privilege.id()).isPresent()) {
       if (LOGGER.isInfoEnabled()) {
@@ -101,14 +100,9 @@ public final class RestorePrivilegeUseCase {
     }
   }
 
-  private void checkAccessControl(Privilege privilege, @Nullable List<String> roleIds) {
-    if (!this.accessControl.isPrivilegeCreatable()) {
+  private void checkAuthorization(Privilege privilege) {
+    if (!this.privilegeAuthorizationService.isCreatable()) {
       throw new AccessDeniedException("Not allowed to create privilege " + privilege);
-    }
-
-    if (roleIds != null && !roleIds.isEmpty() && !this.accessControl.isRoleWritable()) {
-      throw new AccessDeniedException(
-          "Not allowed to update role to create privilege " + privilege + " -> " + roleIds);
     }
   }
 

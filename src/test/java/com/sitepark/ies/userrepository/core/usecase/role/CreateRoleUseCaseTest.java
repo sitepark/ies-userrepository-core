@@ -10,7 +10,7 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import java.time.Clock;
@@ -23,7 +23,7 @@ class CreateRoleUseCaseTest {
 
   private RoleRepository roleRepository;
   private AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
-  private AccessControl accessControl;
+  private RoleEntityAuthorizationService roleEntityAuthorizationService;
   private CreateRoleUseCase userCase;
 
   @BeforeEach
@@ -31,7 +31,7 @@ class CreateRoleUseCaseTest {
     this.roleRepository = mock();
     PrivilegeRepository privilegeRepository = mock();
     this.assignPrivilegesToRolesUseCase = mock();
-    this.accessControl = mock();
+    this.roleEntityAuthorizationService = mock();
     AuditLogService auditLogService = mock();
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
@@ -41,7 +41,7 @@ class CreateRoleUseCaseTest {
             this.roleRepository,
             privilegeRepository,
             this.assignPrivilegesToRolesUseCase,
-            this.accessControl,
+            this.roleEntityAuthorizationService,
             auditLogService,
             fixedClock);
   }
@@ -58,7 +58,7 @@ class CreateRoleUseCaseTest {
   @Test
   void testCheckAccessControlRoleCreatable() {
 
-    when(this.accessControl.isRoleCreatable()).thenReturn(false);
+    when(this.roleEntityAuthorizationService.isCreatable()).thenReturn(false);
 
     Role role = Role.builder().name("test").build();
     assertThrows(
@@ -69,7 +69,7 @@ class CreateRoleUseCaseTest {
 
   @Test
   void testValidateAnchor() {
-    when(this.accessControl.isRoleCreatable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("111"));
     Role role = Role.builder().name("test").anchor("test").build();
     assertThrows(
@@ -80,8 +80,7 @@ class CreateRoleUseCaseTest {
 
   @Test
   void testCreate() {
-    when(this.accessControl.isRoleCreatable()).thenReturn(true);
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.roleRepository.create(any())).thenReturn("12");
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.empty());
 
@@ -94,8 +93,7 @@ class CreateRoleUseCaseTest {
 
   @Test
   void testReassignPrivilegesToRoles() {
-    when(this.accessControl.isRoleCreatable()).thenReturn(true);
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isCreatable()).thenReturn(true);
     when(this.roleRepository.create(any())).thenReturn("12");
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.empty());
 

@@ -1,8 +1,8 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.UserRoleAssignment;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
@@ -21,7 +21,7 @@ public final class ReassignRolesToUsersUseCase {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final RoleAssigner roleAssigner;
-  private final AccessControl accessControl;
+  private final UserEntityAuthorizationService userEntityAuthorizationService;
   private final Clock clock;
 
   @Inject
@@ -29,13 +29,13 @@ public final class ReassignRolesToUsersUseCase {
       UserRepository userRepository,
       RoleRepository roleRepository,
       RoleAssigner roleAssigner,
-      AccessControl accessControl,
+      UserEntityAuthorizationService userEntityAuthorizationService,
       Clock clock) {
 
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
     this.roleAssigner = roleAssigner;
-    this.accessControl = accessControl;
+    this.userEntityAuthorizationService = userEntityAuthorizationService;
     this.clock = clock;
   }
 
@@ -51,7 +51,7 @@ public final class ReassignRolesToUsersUseCase {
     List<String> roleIds =
         IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
 
-    if (!this.accessControl.isUserWritable()) {
+    if (!this.userEntityAuthorizationService.isWritable(userIds)) {
       throw new AccessDeniedException("Not allowed to update users to add roles");
     }
 

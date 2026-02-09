@@ -2,6 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,7 +15,7 @@ import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import java.time.Clock;
 import java.time.OffsetDateTime;
@@ -26,16 +27,16 @@ class UpdateRoleUseCaseTest {
 
   private AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
   private RoleRepository repository;
-  private AccessControl accessControl;
+  private RoleEntityAuthorizationService roleEntityAuthorizationService;
   private PatchService<Role> patchService;
 
   private UpdateRoleUseCase useCase;
 
   @BeforeEach
   void setUp() {
-    this.assignPrivilegesToRolesUseCase = mock(AssignPrivilegesToRolesUseCase.class);
-    this.repository = mock(RoleRepository.class);
-    this.accessControl = mock(AccessControl.class);
+    this.assignPrivilegesToRolesUseCase = mock();
+    this.repository = mock();
+    this.roleEntityAuthorizationService = mock();
     PatchServiceFactory patchServiceFactory = mock();
     this.patchService = mock();
     when(patchServiceFactory.createPatchService(Role.class)).thenReturn(this.patchService);
@@ -48,7 +49,7 @@ class UpdateRoleUseCaseTest {
         new UpdateRoleUseCase(
             this.assignPrivilegesToRolesUseCase,
             this.repository,
-            this.accessControl,
+            this.roleEntityAuthorizationService,
             auditLogService,
             patchServiceFactory,
             fixedClock);
@@ -57,7 +58,7 @@ class UpdateRoleUseCaseTest {
   @Test
   void testAccessDenied() {
 
-    when(this.accessControl.isRoleWritable()).thenReturn(false);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(false);
 
     Role role = Role.builder().id("1").name("test").build();
 
@@ -68,7 +69,7 @@ class UpdateRoleUseCaseTest {
 
   @Test
   void testNoIdNoAnchor() {
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     Role role = Role.builder().name("test").build();
 
     assertThrows(
@@ -78,7 +79,8 @@ class UpdateRoleUseCaseTest {
 
   @Test
   void testAnchorNotFound() {
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     Role role = Role.builder().anchor("test").name("test").build();
 
     assertThrows(
@@ -88,7 +90,7 @@ class UpdateRoleUseCaseTest {
 
   @Test
   void testAnchorAlreadyExists() {
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("2"));
     Role role = Role.builder().id("1").anchor("test").name("test").build();
 
@@ -99,7 +101,7 @@ class UpdateRoleUseCaseTest {
 
   @Test
   void testUpdateWithAnchor() {
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("1"));
     when(this.repository.get(any()))
         .thenReturn(Optional.of(Role.builder().anchor("test").name("test1").build()));
@@ -115,7 +117,7 @@ class UpdateRoleUseCaseTest {
 
   @Test
   void testUpdateReturnId() {
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("1"));
     when(this.repository.get(any()))
         .thenReturn(Optional.of(Role.builder().anchor("test").name("test1").build()));
@@ -129,7 +131,7 @@ class UpdateRoleUseCaseTest {
 
   @Test
   void testUpdateWithPrivilegeIds() {
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("1"));
     when(this.repository.get(any()))
         .thenReturn(Optional.of(Role.builder().anchor("test").name("test1").build()));

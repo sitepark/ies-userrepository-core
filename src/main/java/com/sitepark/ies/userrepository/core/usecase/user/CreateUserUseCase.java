@@ -4,8 +4,8 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.LoginAlreadyExistsException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.ExtensionsNotifier;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -24,7 +24,7 @@ public final class CreateUserUseCase {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final AssignRolesToUsersUseCase assignRolesToUsersUseCase;
-  private final AccessControl accessControl;
+  private final UserEntityAuthorizationService userEntityAuthorizationService;
   private final ExtensionsNotifier extensionsNotifier;
   private final Clock clock;
 
@@ -33,14 +33,14 @@ public final class CreateUserUseCase {
       UserRepository userRepository,
       RoleRepository roleRepository,
       AssignRolesToUsersUseCase assignRolesToUsersUseCase,
-      AccessControl accessControl,
+      UserEntityAuthorizationService userEntityAuthorizationService,
       ExtensionsNotifier extensionsNotifier,
       Clock clock) {
 
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
     this.assignRolesToUsersUseCase = assignRolesToUsersUseCase;
-    this.accessControl = accessControl;
+    this.userEntityAuthorizationService = userEntityAuthorizationService;
     this.extensionsNotifier = extensionsNotifier;
     this.clock = clock;
   }
@@ -94,7 +94,7 @@ public final class CreateUserUseCase {
   }
 
   private void checkAccessControl(User user) {
-    if (!this.accessControl.isUserCreatable()) {
+    if (!this.userEntityAuthorizationService.isCreatable()) {
       throw new AccessDeniedException("Not allowed to create user " + user);
     }
   }

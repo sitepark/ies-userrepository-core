@@ -2,12 +2,13 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -18,11 +19,11 @@ class GetAllPrivilegesUseCaseTest {
   void testAccessDenied() {
 
     PrivilegeRepository privilegeRepository = mock();
-    AccessControl accessControl = mock();
-    when(accessControl.isPrivilegeReadable()).thenReturn(false);
+    PrivilegeEntityAuthorizationService privilegeAuthorizationService = mock();
+    when(privilegeAuthorizationService.isReadable(anyList())).thenReturn(false);
 
     GetAllPrivilegesUseCase getAllPrivileges =
-        new GetAllPrivilegesUseCase(privilegeRepository, accessControl);
+        new GetAllPrivilegesUseCase(privilegeRepository, privilegeAuthorizationService);
 
     assertThrows(AccessDeniedException.class, getAllPrivileges::getAllPrivileges);
   }
@@ -34,11 +35,11 @@ class GetAllPrivilegesUseCaseTest {
 
     PrivilegeRepository privilegeRepository = mock();
     when(privilegeRepository.getAll()).thenReturn(List.of(privilege));
-    AccessControl accessControl = mock();
-    when(accessControl.isPrivilegeReadable()).thenReturn(true);
+    PrivilegeEntityAuthorizationService privilegeAuthorizationService = mock();
+    when(privilegeAuthorizationService.isReadable(anyList())).thenReturn(true);
 
     GetAllPrivilegesUseCase getAllPrivileges =
-        new GetAllPrivilegesUseCase(privilegeRepository, accessControl);
+        new GetAllPrivilegesUseCase(privilegeRepository, privilegeAuthorizationService);
 
     assertEquals(List.of(privilege), getAllPrivileges.getAllPrivileges(), "Unexpected result");
   }

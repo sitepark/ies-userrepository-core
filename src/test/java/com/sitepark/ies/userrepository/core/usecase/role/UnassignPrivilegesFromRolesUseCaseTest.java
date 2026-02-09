@@ -2,6 +2,8 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -10,7 +12,7 @@ import static org.mockito.Mockito.when;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -27,8 +29,7 @@ class UnassignPrivilegesFromRolesUseCaseTest {
   private RoleRepository roleRepository;
   private PrivilegeRepository privilegeRepository;
   private RoleAssigner roleAssigner;
-  private AccessControl accessControl;
-
+  private RoleEntityAuthorizationService roleEntityAuthorizationService;
   private UnassignPrivilegesFromRolesUseCase usecase;
 
   @BeforeEach
@@ -36,7 +37,7 @@ class UnassignPrivilegesFromRolesUseCaseTest {
     this.roleRepository = mock();
     this.privilegeRepository = mock();
     this.roleAssigner = mock();
-    this.accessControl = mock();
+    this.roleEntityAuthorizationService = mock();
     AuditLogService auditLogService = mock();
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
@@ -47,14 +48,14 @@ class UnassignPrivilegesFromRolesUseCaseTest {
             roleRepository,
             privilegeRepository,
             roleAssigner,
-            accessControl,
+            roleEntityAuthorizationService,
             auditLogService,
             fixedClock);
   }
 
   @Test
   void testRoleNotWritable() {
-    when(this.accessControl.isRoleWritable()).thenReturn(false);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(false);
     assertThrows(
         AccessDeniedException.class,
         () ->
@@ -68,7 +69,7 @@ class UnassignPrivilegesFromRolesUseCaseTest {
   @Test
   void testAssignPrivilegesToRoles() {
 
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
         .thenReturn(
             RolePrivilegeAssignment.builder()
@@ -88,14 +89,14 @@ class UnassignPrivilegesFromRolesUseCaseTest {
   @Test
   void testEmptyRoleIdentifiers() {
 
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     this.usecase.unassignPrivilegesFromRoles(
         UnassignPrivilegesFromRolesRequest.builder()
             .privilegeIdentifiers(b -> b.ids("3", "4"))
             .build());
 
-    verify(this.accessControl, never()).isRoleWritable();
+    verify(this.roleEntityAuthorizationService, never()).isWritable(anyString());
   }
 
   @Test
@@ -103,13 +104,13 @@ class UnassignPrivilegesFromRolesUseCaseTest {
     this.usecase.unassignPrivilegesFromRoles(
         UnassignPrivilegesFromRolesRequest.builder().roleIdentifiers(b -> b.ids("1", "2")).build());
 
-    verify(this.accessControl, never()).isRoleWritable();
+    verify(this.roleEntityAuthorizationService, never()).isWritable(anyString());
   }
 
   @Test
   void testResolveRoleAnchor() {
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.of("1"));
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
         .thenReturn(RolePrivilegeAssignment.builder().assignments("1", List.of("3", "4")).build());
 
@@ -125,7 +126,7 @@ class UnassignPrivilegesFromRolesUseCaseTest {
   @Test
   void testResolveRoleAnchorNotFound() {
     when(this.roleRepository.resolveAnchor(any())).thenReturn(Optional.empty());
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     assertThrows(
         AnchorNotFoundException.class,
@@ -140,7 +141,7 @@ class UnassignPrivilegesFromRolesUseCaseTest {
   @Test
   void testResolvePrivilegeAnchor() {
     when(this.privilegeRepository.resolveAnchor(any())).thenReturn(Optional.of("3"));
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
         .thenReturn(
             RolePrivilegeAssignment.builder().assignment("1", "3").assignment("2", "3").build());
@@ -157,7 +158,7 @@ class UnassignPrivilegesFromRolesUseCaseTest {
   @Test
   void testResolvePrivilegeAnchorNotFound() {
     when(this.privilegeRepository.resolveAnchor(any())).thenReturn(Optional.empty());
-    when(this.accessControl.isRoleWritable()).thenReturn(true);
+    when(this.roleEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     assertThrows(
         AnchorNotFoundException.class,

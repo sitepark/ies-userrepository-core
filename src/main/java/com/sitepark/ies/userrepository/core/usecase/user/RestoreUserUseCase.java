@@ -3,7 +3,7 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import com.sitepark.ies.userrepository.core.usecase.audit.UserSnapshot;
@@ -20,18 +20,18 @@ public final class RestoreUserUseCase {
   private static final Logger LOGGER = LogManager.getLogger();
   private final UserRepository repository;
   private final RoleAssigner roleAssigner;
-  private final AccessControl accessControl;
+  private final UserEntityAuthorizationService userEntityAuthorizationService;
   private final Clock clock;
 
   @Inject
   RestoreUserUseCase(
       UserRepository repository,
       RoleAssigner roleAssigner,
-      AccessControl accessControl,
+      UserEntityAuthorizationService userEntityAuthorizationService,
       Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
-    this.accessControl = accessControl;
+    this.userEntityAuthorizationService = userEntityAuthorizationService;
     this.clock = clock;
   }
 
@@ -81,7 +81,7 @@ public final class RestoreUserUseCase {
   }
 
   private void checkAccessControl(User user) {
-    if (!this.accessControl.isUserCreatable()) {
+    if (!this.userEntityAuthorizationService.isCreatable()) {
       throw new AccessDeniedException("Not allowed to create user " + user);
     }
   }

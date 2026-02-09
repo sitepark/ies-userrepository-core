@@ -3,11 +3,10 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -28,7 +27,7 @@ public final class RemovePrivilegesUseCase {
 
   private final PrivilegeRepository repository;
   private final RoleAssigner roleAssigner;
-  private final AccessControl accessControl;
+  private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
@@ -38,12 +37,12 @@ public final class RemovePrivilegesUseCase {
   RemovePrivilegesUseCase(
       PrivilegeRepository repository,
       RoleAssigner roleAssigner,
-      AccessControl accessControl,
+      PrivilegeEntityAuthorizationService privilegeAuthorizationService,
       AuditLogService auditLogService,
       Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
-    this.accessControl = accessControl;
+    this.privilegeAuthorizationService = privilegeAuthorizationService;
     this.auditLogService = auditLogService;
     this.clock = clock;
   }
@@ -54,7 +53,10 @@ public final class RemovePrivilegesUseCase {
       return;
     }
 
-    if (!this.accessControl.isPrivilegeRemovable()) {
+    IdentifierResolver identifierResolver = IdentifierResolver.create(this.repository);
+    List<String> ids = identifierResolver.resolve(request.identifiers());
+
+    if (!this.privilegeAuthorizationService.isRemovable(ids)) {
       throw new AccessDeniedException(
           "Not allowed to remove privilege with identifiers " + request.identifiers());
     }
@@ -65,10 +67,7 @@ public final class RemovePrivilegesUseCase {
             ? createBatchRemoveLog(now, request.auditParentId())
             : request.auditParentId();
 
-    IdentifierResolver identifierResolver = IdentifierResolver.create(this.repository);
-
-    for (Identifier identifier : request.identifiers()) {
-      String id = identifierResolver.resolve(identifier);
+    for (String id : ids) {
       if (BUILT_IN_PRIVILEGE_ID_FULL_ACCESS.equals(id)) {
         if (LOGGER.isWarnEnabled()) {
           LOGGER.warn("Skipping removal of built-in privilege with id 1 (FULL_ACCESS).");

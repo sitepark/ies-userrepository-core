@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -19,11 +19,11 @@ class GetRolesByPrivilegeIdsUseCaseTest {
   void testAccessDenied() {
 
     RoleRepository roleRepository = mock();
-    AccessControl accessControl = mock();
-    when(accessControl.isRoleReadable()).thenReturn(false);
+    RoleEntityAuthorizationService roleAuthorizationService = mock();
+    when(roleAuthorizationService.isReadable(anyList())).thenReturn(false);
 
     GetRolesByPrivilegeIdsUseCase getRolesByPrivileges =
-        new GetRolesByPrivilegeIdsUseCase(roleRepository, accessControl);
+        new GetRolesByPrivilegeIdsUseCase(roleRepository, roleAuthorizationService);
 
     assertThrows(
         AccessDeniedException.class,
@@ -37,11 +37,11 @@ class GetRolesByPrivilegeIdsUseCaseTest {
 
     RoleRepository roleRepository = mock();
     when(roleRepository.getByPrivilegeIds(anyList())).thenReturn(List.of(role));
-    AccessControl accessControl = mock();
-    when(accessControl.isRoleReadable()).thenReturn(true);
+    RoleEntityAuthorizationService roleAuthorizationService = mock();
+    when(roleAuthorizationService.isReadable(anyList())).thenReturn(true);
 
     GetRolesByPrivilegeIdsUseCase getRolesByPrivileges =
-        new GetRolesByPrivilegeIdsUseCase(roleRepository, accessControl);
+        new GetRolesByPrivilegeIdsUseCase(roleRepository, roleAuthorizationService);
 
     assertEquals(
         List.of(role),

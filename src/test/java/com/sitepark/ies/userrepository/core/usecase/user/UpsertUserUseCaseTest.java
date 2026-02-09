@@ -7,9 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 class UpsertUserUseCaseTest {
 
-  private AccessControl accessControl;
   private UserRepository repository;
   private CreateUserUseCase createUserUseCase;
   private UpdateUserUseCase updateUserUseCase;
@@ -26,47 +23,17 @@ class UpsertUserUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    this.accessControl = mock(AccessControl.class);
     this.repository = mock(UserRepository.class);
     this.createUserUseCase = mock(CreateUserUseCase.class);
     this.updateUserUseCase = mock(UpdateUserUseCase.class);
 
     this.useCase =
-        new UpsertUserUseCase(
-            this.accessControl, this.repository, this.createUserUseCase, this.updateUserUseCase);
-  }
-
-  @Test
-  void testAccessDeniedCreatable() {
-
-    when(this.accessControl.isUserCreatable()).thenReturn(false);
-    when(this.accessControl.isUserWritable()).thenReturn(true);
-
-    User user = User.builder().id("1").anchor("anchor").login("test").lastName("test").build();
-    assertThrows(
-        AccessDeniedException.class,
-        () -> this.useCase.upsertUser(UpsertUserRequest.builder().user(user).build()),
-        "upsert user should be denied");
-  }
-
-  @Test
-  void testAccessDeniedWritable() {
-
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
-    when(this.accessControl.isUserWritable()).thenReturn(false);
-
-    User user = User.builder().id("1").anchor("anchor").login("test").lastName("test").build();
-    assertThrows(
-        AccessDeniedException.class,
-        () -> this.useCase.upsertUser(UpsertUserRequest.builder().user(user).build()),
-        "upsert user should be denied");
+        new UpsertUserUseCase(this.repository, this.createUserUseCase, this.updateUserUseCase);
   }
 
   @Test
   void testWithoutIdAndAnchor() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
-    when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.createUserUseCase.createUser(any()))
         .thenReturn(new CreateUserResult("123", null, null, null));
 
@@ -80,8 +47,6 @@ class UpsertUserUseCaseTest {
   @Test
   void testWithId() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
-    when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.updateUserUseCase.updateUser(any()))
         .thenReturn(
             new UpdateUserResult(
@@ -100,8 +65,6 @@ class UpsertUserUseCaseTest {
   @Test
   void testWithUnknownAnchor() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
-    when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.createUserUseCase.createUser(any()))
         .thenReturn(new CreateUserResult("123", null, null, null));
 
@@ -115,8 +78,6 @@ class UpsertUserUseCaseTest {
   @Test
   void testWithKnownAnchor() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
-    when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("1"));
     when(this.updateUserUseCase.updateUser(any()))
         .thenReturn(
@@ -138,8 +99,6 @@ class UpsertUserUseCaseTest {
   @Test
   void testWithAlreadyExistsAnchor() {
 
-    when(this.accessControl.isUserCreatable()).thenReturn(true);
-    when(this.accessControl.isUserWritable()).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(java.util.Optional.of("2"));
 
     User user = User.builder().id("1").anchor("anchor").login("test").lastName("test").build();

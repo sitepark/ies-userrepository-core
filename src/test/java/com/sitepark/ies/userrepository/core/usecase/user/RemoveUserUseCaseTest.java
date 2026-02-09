@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,7 +13,7 @@ import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.time.Clock;
@@ -27,7 +28,7 @@ class RemoveUserUseCaseTest {
 
   private UserRepository repository;
   private RoleAssigner roleAssigner;
-  private AccessControl accessControl;
+  private UserEntityAuthorizationService userEntityAuthorizationService;
   private Clock fixedClock;
 
   private RemoveUserUseCase useCase;
@@ -36,17 +37,20 @@ class RemoveUserUseCaseTest {
   void setUp() {
     this.repository = mock();
     this.roleAssigner = mock();
-    this.accessControl = mock();
+    this.userEntityAuthorizationService = mock();
     this.fixedClock = Clock.fixed(Instant.parse("2025-06-30T10:00:00Z"), ZoneId.of("UTC"));
 
     this.useCase =
         new RemoveUserUseCase(
-            this.repository, this.roleAssigner, this.accessControl, this.fixedClock);
+            this.repository,
+            this.roleAssigner,
+            this.userEntityAuthorizationService,
+            this.fixedClock);
   }
 
   @Test
   void testAccessDenied() {
-    when(this.accessControl.isUserRemovable()).thenReturn(false);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(false);
 
     assertThrows(
         AccessDeniedException.class,
@@ -57,7 +61,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemoveWithIdCallsRepositoryRemove() {
     User user = User.builder().id("2").login("test").lastName("test").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of());
 
@@ -69,7 +73,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemoveWithIdReturnsRemovedResult() {
     User user = User.builder().id("2").login("test").lastName("test").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of());
 
@@ -83,7 +87,7 @@ class RemoveUserUseCaseTest {
 
   @Test
   void testRemoveWithAnchorNotFound() {
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.empty());
 
     assertThrows(
@@ -95,7 +99,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemoveWithAnchorCallsRepositoryRemove() {
     User user = User.builder().id("2").login("test").lastName("test").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("2"));
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of());
@@ -108,7 +112,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemoveWithAnchorReturnsRemovedResult() {
     User user = User.builder().id("2").login("test").lastName("test").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of("2"));
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of());
@@ -124,7 +128,7 @@ class RemoveUserUseCaseTest {
 
   @Test
   void testUserNotFound() {
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("999")).thenReturn(Optional.empty());
 
     assertThrows(
@@ -135,7 +139,7 @@ class RemoveUserUseCaseTest {
 
   @Test
   void testBuiltInAdministratorIsSkipped() {
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
 
     RemoveUserResult result = this.useCase.removeUser(RemoveUserRequest.builder().id("1").build());
 
@@ -147,7 +151,7 @@ class RemoveUserUseCaseTest {
 
   @Test
   void testBuiltInAdministratorSkippedResultContainsUserId() {
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
 
     RemoveUserResult result = this.useCase.removeUser(RemoveUserRequest.builder().id("1").build());
 
@@ -157,7 +161,7 @@ class RemoveUserUseCaseTest {
 
   @Test
   void testBuiltInAdministratorSkippedResultContainsReason() {
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
 
     RemoveUserResult result = this.useCase.removeUser(RemoveUserRequest.builder().id("1").build());
 
@@ -171,7 +175,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemovedResultContainsUserId() {
     User user = User.builder().id("2").login("test").lastName("User").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of("role1", "role2"));
 
@@ -184,7 +188,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemovedResultContainsDisplayName() {
     User user = User.builder().id("2").login("test").lastName("User").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of("role1", "role2"));
 
@@ -197,7 +201,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemovedResultContainsUserSnapshot() {
     User user = User.builder().id("2").login("test").lastName("User").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of("role1", "role2"));
 
@@ -211,7 +215,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemovedResultSnapshotContainsRoleIds() {
     User user = User.builder().id("2").login("test").lastName("User").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of("role1", "role2"));
 
@@ -227,7 +231,7 @@ class RemoveUserUseCaseTest {
   @Test
   void testRemovedResultContainsTimestamp() {
     User user = User.builder().id("2").login("test").lastName("User").build();
-    when(this.accessControl.isUserRemovable()).thenReturn(true);
+    when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("2")).thenReturn(Optional.of(user));
     when(this.roleAssigner.getRolesAssignByUser("2")).thenReturn(List.of("role1", "role2"));
 

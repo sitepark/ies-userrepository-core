@@ -1,36 +1,27 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import jakarta.inject.Inject;
 
 public final class UpsertPrivilegeUseCase {
 
-  private final AccessControl accessControl;
   private final PrivilegeRepository repository;
   private final CreatePrivilegeUseCase createPrivilegeUseCase;
   private final UpdatePrivilegeUseCase updatePrivilegeUseCase;
 
   @Inject
   UpsertPrivilegeUseCase(
-      AccessControl accessControl,
       PrivilegeRepository repository,
       CreatePrivilegeUseCase createPrivilegeUseCase,
       UpdatePrivilegeUseCase updatePrivilegeUseCase) {
-    this.accessControl = accessControl;
     this.repository = repository;
     this.createPrivilegeUseCase = createPrivilegeUseCase;
     this.updatePrivilegeUseCase = updatePrivilegeUseCase;
   }
 
   public String upsertPrivilege(UpsertPrivilegeRequest request) {
-
-    if (!this.accessControl.isPrivilegeCreatable() || !this.accessControl.isPrivilegeWritable()) {
-      throw new AccessDeniedException("Not allowed to upsert privilege " + request.privilege());
-    }
 
     Privilege privilegeResolved = this.toPrivilegeWithId(request.privilege());
     if (privilegeResolved.id() == null) {

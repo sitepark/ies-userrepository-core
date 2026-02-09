@@ -3,11 +3,10 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
 import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
-import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -26,7 +25,7 @@ public final class RemoveRolesUseCase {
   private static final Logger LOGGER = LogManager.getLogger();
   private final RoleRepository repository;
   private final RoleAssigner roleAssigner;
-  private final AccessControl accessControl;
+  private final RoleEntityAuthorizationService roleEntityAuthorizationService;
   private final AuditLogService auditLogService;
   private final Clock clock;
 
@@ -36,12 +35,12 @@ public final class RemoveRolesUseCase {
   RemoveRolesUseCase(
       RoleRepository repository,
       RoleAssigner roleAssigner,
-      AccessControl accessControl,
+      RoleEntityAuthorizationService roleEntityAuthorizationService,
       AuditLogService auditLogService,
       Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
-    this.accessControl = accessControl;
+    this.roleEntityAuthorizationService = roleEntityAuthorizationService;
     this.auditLogService = auditLogService;
     this.clock = clock;
   }
@@ -52,7 +51,10 @@ public final class RemoveRolesUseCase {
       return;
     }
 
-    if (!this.accessControl.isRoleRemovable()) {
+    IdentifierResolver identifierResolver = IdentifierResolver.create(this.repository);
+    List<String> ids = identifierResolver.resolve(request.identifiers());
+
+    if (!this.roleEntityAuthorizationService.isRemovable(ids)) {
       throw new AccessDeniedException(
           "Not allowed to remove role with identifiers " + request.identifiers());
     }
@@ -63,10 +65,7 @@ public final class RemoveRolesUseCase {
             ? createBatchRemoveLog(now, request.auditParentId())
             : request.auditParentId();
 
-    IdentifierResolver identifierResolver = IdentifierResolver.create(this.repository);
-
-    for (Identifier identifier : request.identifiers()) {
-      String id = identifierResolver.resolve(identifier);
+    for (String id : ids) {
       if (BUILT_IN_ROLE_ID_ADMINISTRATOR.equals(id)) {
         if (LOGGER.isWarnEnabled()) {
           LOGGER.warn("Skipping removal of built-in role with id 1 (Administrator).");

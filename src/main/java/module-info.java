@@ -9,7 +9,6 @@ module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.domain.value.permission;
   exports com.sitepark.ies.userrepository.core.domain.value;
   exports com.sitepark.ies.userrepository.core.domain.exception;
-  exports com.sitepark.ies.userrepository.core.domain.service;
   exports com.sitepark.ies.userrepository.core.usecase.query;
   exports com.sitepark.ies.userrepository.core.usecase.query.sort;
   exports com.sitepark.ies.userrepository.core.usecase.query.filter;
@@ -45,4 +44,6 @@ module com.sitepark.ies.userrepository.core {
   opens com.sitepark.ies.userrepository.core.usecase.user;
   opens com.sitepark.ies.userrepository.core.usecase.role;
   opens com.sitepark.ies.userrepository.core.usecase.privilege;
+
+  exports com.sitepark.ies.userrepository.core.domain.service;
 }

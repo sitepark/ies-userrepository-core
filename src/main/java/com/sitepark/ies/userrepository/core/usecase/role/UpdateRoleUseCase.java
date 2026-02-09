@@ -10,7 +10,7 @@ import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.exception.RoleNotFoundException;
-import com.sitepark.ies.userrepository.core.domain.service.AccessControl;
+import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
 import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
@@ -26,7 +26,7 @@ public final class UpdateRoleUseCase {
   private static final Logger LOGGER = LogManager.getLogger();
   private final AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
   private final RoleRepository repository;
-  private final AccessControl accessControl;
+  private final RoleEntityAuthorizationService roleEntityAuthorizationService;
   private final AuditLogService auditLogService;
   private final PatchService<Role> patchService;
   private final Clock clock;
@@ -35,14 +35,14 @@ public final class UpdateRoleUseCase {
   UpdateRoleUseCase(
       AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase,
       RoleRepository repository,
-      AccessControl accessControl,
+      RoleEntityAuthorizationService roleEntityAuthorizationService,
       AuditLogService auditLogService,
       PatchServiceFactory patchServiceFactory,
       Clock clock) {
 
     this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
     this.repository = repository;
-    this.accessControl = accessControl;
+    this.roleEntityAuthorizationService = roleEntityAuthorizationService;
     this.auditLogService = auditLogService;
     this.patchService = patchServiceFactory.createPatchService(Role.class);
     this.clock = clock;
@@ -52,8 +52,6 @@ public final class UpdateRoleUseCase {
 
     this.validateRole(request.role());
 
-    this.checkAccessControl(request.role());
-
     Role newRole;
     if (request.role().id() == null) {
       newRole = this.toRoleWithId(request.role());
@@ -61,6 +59,8 @@ public final class UpdateRoleUseCase {
       this.validateAnchor(request.role());
       newRole = request.role();
     }
+
+    this.checkAuthorization(newRole);
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("update role: {}", newRole);
@@ -110,8 +110,8 @@ public final class UpdateRoleUseCase {
     assert role.name() != null && !role.name().isBlank();
   }
 
-  private void checkAccessControl(Role role) {
-    if (!this.accessControl.isRoleWritable()) {
+  private void checkAuthorization(Role role) {
+    if (!this.roleEntityAuthorizationService.isWritable(role.id())) {
       throw new AccessDeniedException("Not allowed to update role " + role);
     }
   }

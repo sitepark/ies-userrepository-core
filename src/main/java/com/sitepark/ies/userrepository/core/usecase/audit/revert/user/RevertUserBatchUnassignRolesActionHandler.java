@@ -1,20 +1,18 @@
 package com.sitepark.ies.userrepository.core.usecase.audit.revert.user;
 
 import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.audit.RevertFailedException;
 import com.sitepark.ies.sharedkernel.audit.RevertRequest;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.usecase.audit.revert.RevertEntityActionHandler;
 import com.sitepark.ies.userrepository.core.usecase.user.AssignRolesToUsersRequest;
 import com.sitepark.ies.userrepository.core.usecase.user.AssignRolesToUsersUseCase;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.time.Clock;
-import java.time.Instant;
 import java.util.List;
 
+@SuppressFBWarnings("URF_UNREAD_FIELD")
 public class RevertUserBatchUnassignRolesActionHandler implements RevertEntityActionHandler {
 
   private final AuditLogService auditLogService;
@@ -40,8 +38,8 @@ public class RevertUserBatchUnassignRolesActionHandler implements RevertEntityAc
       return;
     }
 
-    Instant now = Instant.now(this.clock);
-    String auditLogParentId = this.createRevertBatchUnassignRolesLog(now);
+    // Instant now = Instant.now(this.clock);
+    // String auditLogParentId = this.createRevertBatchUnassignRolesLog(now);
 
     for (String childId : childIds) {
       List<String> roleIds;
@@ -55,11 +53,11 @@ public class RevertUserBatchUnassignRolesActionHandler implements RevertEntityAc
           AssignRolesToUsersRequest.builder()
               .userIdentifiers(b -> b.id(request.entityId()))
               .roleIdentifiers(b -> b.ids(roleIds))
-              .auditParentId(auditLogParentId)
               .build());
     }
   }
 
+  /*
   private String createRevertBatchUnassignRolesLog(Instant now) {
     return this.auditLogService.createAuditLog(
         new CreateAuditLogRequest(
@@ -72,4 +70,5 @@ public class RevertUserBatchUnassignRolesActionHandler implements RevertEntityAc
             now,
             null));
   }
+  */
 }
