@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
@@ -33,7 +32,6 @@ class CreatePrivilegeUseCaseTest {
     RoleRepository roleRepository = mock();
     this.assignPrivilegesToRolesUseCase = mock();
     this.privilegeAuthorizationService = mock();
-    AuditLogService auditLogService = mock();
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
@@ -43,7 +41,6 @@ class CreatePrivilegeUseCaseTest {
             roleRepository,
             assignPrivilegesToRolesUseCase,
             privilegeAuthorizationService,
-            auditLogService,
             fixedClock);
   }
 
@@ -129,7 +126,7 @@ class CreatePrivilegeUseCaseTest {
     when(this.privilegeAuthorizationService.isCreatable()).thenReturn(true);
     when(this.privilegeRepository.create(any())).thenReturn("456");
 
-    String id =
+    CreatePrivilegeResult result =
         this.usecase.createPrivilege(
             CreatePrivilegeRequest.builder()
                 .privilege(
@@ -141,7 +138,7 @@ class CreatePrivilegeUseCaseTest {
                 .build());
 
     verify(this.privilegeRepository).create(any());
-    assertEquals("456", id, "Expected ID to be returned after creation");
+    assertEquals("456", result.privilegeId(), "Expected ID to be returned after creation");
   }
 
   @Test

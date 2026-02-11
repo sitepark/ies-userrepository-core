@@ -8,30 +8,32 @@ import java.util.Objects;
 @UniquePropertyType(uniqueProperty = "privilegeidlist")
 public final class PrivilegeIdList implements Filter {
 
-  private final List<String> privilegedList;
+  @SuppressWarnings(
+      "PMD.AvoidFieldNameMatchingTypeName") // so that when deserializing it has the desired format
+  private final List<String> privilegeIdList;
 
-  PrivilegeIdList(@JsonProperty("privilegedList") String... privilegedList) {
-    Objects.requireNonNull(privilegedList, "privilegedList is null");
-    this.privilegedList = List.of(privilegedList);
+  PrivilegeIdList(@JsonProperty("privilegeIdList") String... privilegeIdList) {
+    Objects.requireNonNull(privilegeIdList, "privilegeIdList is null");
+    this.privilegeIdList = List.of(privilegeIdList);
   }
 
-  public List<String> getPrivilegedList() {
-    return List.copyOf(this.privilegedList);
+  public List<String> getPrivilegeIdList() {
+    return List.copyOf(this.privilegeIdList);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.privilegedList);
+    return Objects.hash(this.privilegeIdList);
   }
 
   @Override
   public boolean equals(Object o) {
     return (o instanceof PrivilegeIdList that)
-        && Objects.equals(this.privilegedList, that.privilegedList);
+        && Objects.equals(this.privilegeIdList, that.privilegeIdList);
   }
 
   @Override
   public String toString() {
-    return "PrivilegeIdList{" + "privilegedList=" + privilegedList + '}';
+    return "PrivilegeIdList{" + "privilegeIdList=" + privilegeIdList + '}';
   }
 }

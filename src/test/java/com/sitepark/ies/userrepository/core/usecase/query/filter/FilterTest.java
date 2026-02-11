@@ -83,7 +83,7 @@ class FilterTest {
   @Test
   void getPrivilegeIdList() {
     PrivilegeIdList filter = Filter.privilegeIdList("123");
-    assertEquals(List.of("123"), filter.getPrivilegedList(), "unexpected privilegeIdList");
+    assertEquals(List.of("123"), filter.getPrivilegeIdList(), "unexpected privilegeIdList");
   }
 
   @Test

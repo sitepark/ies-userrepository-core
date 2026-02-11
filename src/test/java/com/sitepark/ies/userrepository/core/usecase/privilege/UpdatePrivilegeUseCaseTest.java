@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
@@ -18,8 +17,6 @@ import com.sitepark.ies.sharedkernel.security.Permission;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
-import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesRequest;
-import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesUseCase;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -27,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UpdatePrivilegeUseCaseTest {
-  private AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
+  private ReassignRolesToPrivilegesUseCase reassignRolesToPrivilegesUseCase;
   private PrivilegeRepository repository;
   private PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private PatchService<Privilege> patchService;
@@ -36,7 +33,7 @@ class UpdatePrivilegeUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    this.assignPrivilegesToRolesUseCase = mock();
+    this.reassignRolesToPrivilegesUseCase = mock();
     this.repository = mock();
     this.privilegeAuthorizationService = mock();
     PatchServiceFactory patchServiceFactory = mock();
@@ -44,16 +41,14 @@ class UpdatePrivilegeUseCaseTest {
 
     when(patchServiceFactory.createPatchService(Privilege.class)).thenReturn(this.patchService);
 
-    AuditLogService auditLogService = mock();
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
     this.usecase =
         new UpdatePrivilegeUseCase(
-            this.assignPrivilegesToRolesUseCase,
+            this.reassignRolesToPrivilegesUseCase,
             this.repository,
             this.privilegeAuthorizationService,
-            auditLogService,
             patchServiceFactory,
             fixedClock);
   }
@@ -158,7 +153,7 @@ class UpdatePrivilegeUseCaseTest {
   }
 
   @Test
-  void testAssignPrivilegesToRoles() {
+  void testAssignRolesToPrivileges() {
     when(this.privilegeAuthorizationService.isWritable(anyString())).thenReturn(true);
 
     PatchDocument patch = mock();
@@ -180,9 +175,9 @@ class UpdatePrivilegeUseCaseTest {
             .roleIdentifiers(b -> b.ids("1", "2"))
             .build());
 
-    verify(this.assignPrivilegesToRolesUseCase)
-        .assignPrivilegesToRoles(
-            AssignPrivilegesToRolesRequest.builder()
+    verify(this.reassignRolesToPrivilegesUseCase)
+        .reassignRolesToPrivileges(
+            ReassignRolesToPrivilegesRequest.builder()
                 .roleIdentifiers(b -> b.ids("1", "2"))
                 .privilegeIdentifiers(b -> b.id("3"))
                 .build());

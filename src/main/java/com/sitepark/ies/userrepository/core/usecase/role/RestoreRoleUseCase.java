@@ -1,19 +1,12 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
+import com.sitepark.ies.userrepository.core.domain.value.RoleSnapshot;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
-import com.sitepark.ies.userrepository.core.usecase.audit.RoleSnapshot;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
@@ -28,8 +21,6 @@ public final class RestoreRoleUseCase {
   private final RoleRepository repository;
   private final RoleAssigner roleAssigner;
   private final RoleEntityAuthorizationService roleEntityAuthorizationService;
-  private final AuditLogService auditLogService;
-  private final ObjectMapper objectMapper;
   private final Clock clock;
 
   @Inject
@@ -37,23 +28,18 @@ public final class RestoreRoleUseCase {
       RoleRepository repository,
       RoleAssigner roleAssigner,
       RoleEntityAuthorizationService roleEntityAuthorizationService,
-      AuditLogService auditLogService,
-      ObjectMapper objectMapper,
       Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
     this.roleEntityAuthorizationService = roleEntityAuthorizationService;
-    this.auditLogService = auditLogService;
-    this.objectMapper = objectMapper;
     this.clock = clock;
   }
 
-  public void restoreRole(RestoreRoleRequest request) {
+  public RestoreRoleResult restoreRole(RestoreRoleRequest request) {
 
     Role role = request.data().role();
     List<String> userIds = request.data().userIds();
     List<String> privilegeIds = request.data().privilegesIds();
-    String auditBatchId = request.auditParentId();
 
     this.validateRole(role);
 
@@ -63,7 +49,7 @@ public final class RestoreRoleUseCase {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("Skip restore, role with ID {} already exists.", role.id());
       }
-      return;
+      return RestoreRoleResult.skipped(role.id(), "Role with ID " + role.id() + " already exists");
     }
 
     this.validateAnchor(role);
@@ -72,12 +58,9 @@ public final class RestoreRoleUseCase {
       LOGGER.info("restore role: {}", role);
     }
 
-    Instant now = Instant.now(this.clock);
+    Instant timestamp = Instant.now(this.clock);
 
-    RoleSnapshot restoreData = new RoleSnapshot(role, userIds, privilegeIds);
-
-    CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(restoreData, now, auditBatchId);
+    RoleSnapshot snapshot = new RoleSnapshot(role, userIds, privilegeIds);
 
     this.repository.restore(role);
     if (!userIds.isEmpty()) {
@@ -91,7 +74,7 @@ public final class RestoreRoleUseCase {
       this.roleAssigner.assignPrivilegesToRoles(List.of(roleId), privilegeIds);
     }
 
-    this.auditLogService.createAuditLog(createAuditLogRequest);
+    return RestoreRoleResult.restored(role.id(), snapshot, timestamp);
   }
 
   private void validateRole(Role role) {
@@ -123,29 +106,6 @@ public final class RestoreRoleUseCase {
           owner -> {
             throw new AnchorAlreadyExistsException(role.anchor(), owner);
           });
-    }
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      RoleSnapshot data, Instant now, String auditLogParentId) {
-    String json = serializeRole(data);
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.ROLE.name(),
-        data.role().id(),
-        data.role().name(),
-        AuditLogAction.RESTORE.name(),
-        null,
-        json,
-        now,
-        auditLogParentId);
-  }
-
-  private String serializeRole(RoleSnapshot data) {
-    try {
-      return this.objectMapper.writeValueAsString(data);
-    } catch (JsonProcessingException e) {
-      throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.PRIVILEGE.name(), data.role().id(), data.role().name(), e);
     }
   }
 }

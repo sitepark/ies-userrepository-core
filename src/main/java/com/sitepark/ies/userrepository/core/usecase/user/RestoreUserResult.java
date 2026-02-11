@@ -1,6 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
-import com.sitepark.ies.userrepository.core.usecase.audit.UserSnapshot;
+import com.sitepark.ies.userrepository.core.domain.value.UserSnapshot;
 import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
 

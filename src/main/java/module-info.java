@@ -16,8 +16,6 @@ module com.sitepark.ies.userrepository.core {
   exports com.sitepark.ies.userrepository.core.usecase.privilege;
   exports com.sitepark.ies.userrepository.core.usecase.role;
   exports com.sitepark.ies.userrepository.core.usecase.user;
-  exports com.sitepark.ies.userrepository.core.usecase.audit;
-  exports com.sitepark.ies.userrepository.core.usecase.audit.revert;
 
   requires jakarta.inject;
   requires com.fasterxml.jackson.datatype.jdk8;
@@ -39,8 +37,6 @@ module com.sitepark.ies.userrepository.core {
   opens com.sitepark.ies.userrepository.core.usecase.query.sort;
   opens com.sitepark.ies.userrepository.core.usecase.query.filter;
   opens com.sitepark.ies.userrepository.core.usecase.query.limit;
-  opens com.sitepark.ies.userrepository.core.usecase.audit;
-  opens com.sitepark.ies.userrepository.core.usecase.audit.revert;
   opens com.sitepark.ies.userrepository.core.usecase.user;
   opens com.sitepark.ies.userrepository.core.usecase.role;
   opens com.sitepark.ies.userrepository.core.usecase.privilege;

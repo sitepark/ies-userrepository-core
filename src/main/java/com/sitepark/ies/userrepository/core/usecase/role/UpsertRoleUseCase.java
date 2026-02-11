@@ -25,19 +25,23 @@ public final class UpsertRoleUseCase {
 
     Role roleResolved = this.toRoleWithId(request.role());
     if (roleResolved.id() == null) {
-      return this.createRoleUseCase.createRole(
-          CreateRoleRequest.builder()
-              .role(roleResolved)
-              .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
-              .auditParentId(request.auditParentId())
-              .build());
+      CreateRoleResult result =
+          this.createRoleUseCase.createRole(
+              CreateRoleRequest.builder()
+                  .role(roleResolved)
+                  .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
+                  .auditParentId(request.auditParentId())
+                  .build());
+      return result.roleId();
     } else {
-      return this.updateRoleUseCase.updateRole(
-          UpdateRoleRequest.builder()
-              .role(roleResolved)
-              .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
-              .auditParentId(request.auditParentId())
-              .build());
+      UpdateRoleResult result =
+          this.updateRoleUseCase.updateRole(
+              UpdateRoleRequest.builder()
+                  .role(roleResolved)
+                  .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
+                  .auditParentId(request.auditParentId())
+                  .build());
+      return result.roleId();
     }
   }
 

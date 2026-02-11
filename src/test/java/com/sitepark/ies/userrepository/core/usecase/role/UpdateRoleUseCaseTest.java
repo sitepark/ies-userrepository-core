@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
@@ -25,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 class UpdateRoleUseCaseTest {
 
-  private AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
+  private ReassignPrivilegesToRolesUseCase reassignPrivilegesToRolesUseCase;
   private RoleRepository repository;
   private RoleEntityAuthorizationService roleEntityAuthorizationService;
   private PatchService<Role> patchService;
@@ -34,23 +33,21 @@ class UpdateRoleUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    this.assignPrivilegesToRolesUseCase = mock();
+    this.reassignPrivilegesToRolesUseCase = mock();
     this.repository = mock();
     this.roleEntityAuthorizationService = mock();
     PatchServiceFactory patchServiceFactory = mock();
     this.patchService = mock();
     when(patchServiceFactory.createPatchService(Role.class)).thenReturn(this.patchService);
 
-    AuditLogService auditLogService = mock();
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
     this.useCase =
         new UpdateRoleUseCase(
-            this.assignPrivilegesToRolesUseCase,
+            this.reassignPrivilegesToRolesUseCase,
             this.repository,
             this.roleEntityAuthorizationService,
-            auditLogService,
             patchServiceFactory,
             fixedClock);
   }
@@ -125,8 +122,9 @@ class UpdateRoleUseCaseTest {
     when(this.patchService.createPatch(any(), any())).thenReturn(patch);
 
     Role role = Role.builder().anchor("test").name("test2").build();
-    String id = this.useCase.updateRole(UpdateRoleRequest.builder().role(role).build());
-    assertEquals("1", id, "id should be resolved from anchor");
+    UpdateRoleResult result =
+        this.useCase.updateRole(UpdateRoleRequest.builder().role(role).build());
+    assertEquals("1", result.roleId(), "id should be resolved from anchor");
   }
 
   @Test
@@ -142,8 +140,8 @@ class UpdateRoleUseCaseTest {
     this.useCase.updateRole(
         UpdateRoleRequest.builder().role(role).privilegeIdentifiers(b -> b.id("12")).build());
 
-    verify(this.assignPrivilegesToRolesUseCase)
-        .assignPrivilegesToRoles(
+    verify(this.reassignPrivilegesToRolesUseCase)
+        .reassignPrivilegesToRoles(
             AssignPrivilegesToRolesRequest.builder()
                 .roleIdentifiers(b -> b.id("1"))
                 .privilegeIdentifiers(b -> b.id("12"))

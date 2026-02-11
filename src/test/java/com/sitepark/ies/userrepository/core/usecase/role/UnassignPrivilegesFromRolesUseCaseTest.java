@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
@@ -38,7 +37,6 @@ class UnassignPrivilegesFromRolesUseCaseTest {
     this.privilegeRepository = mock();
     this.roleAssigner = mock();
     this.roleEntityAuthorizationService = mock();
-    AuditLogService auditLogService = mock();
 
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
@@ -49,7 +47,6 @@ class UnassignPrivilegesFromRolesUseCaseTest {
             privilegeRepository,
             roleAssigner,
             roleEntityAuthorizationService,
-            auditLogService,
             fixedClock);
   }
 

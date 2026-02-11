@@ -25,17 +25,21 @@ public final class UpsertPrivilegeUseCase {
 
     Privilege privilegeResolved = this.toPrivilegeWithId(request.privilege());
     if (privilegeResolved.id() == null) {
-      return this.createPrivilegeUseCase.createPrivilege(
-          CreatePrivilegeRequest.builder()
-              .privilege(privilegeResolved)
-              .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
-              .build());
+      CreatePrivilegeResult result =
+          this.createPrivilegeUseCase.createPrivilege(
+              CreatePrivilegeRequest.builder()
+                  .privilege(privilegeResolved)
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
+                  .build());
+      return result.privilegeId();
     } else {
-      return this.updatePrivilegeUseCase.updatePrivilege(
-          UpdatePrivilegeRequest.builder()
-              .privilege(privilegeResolved)
-              .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
-              .build());
+      UpdatePrivilegeResult result =
+          this.updatePrivilegeUseCase.updatePrivilege(
+              UpdatePrivilegeRequest.builder()
+                  .privilege(privilegeResolved)
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
+                  .build());
+      return result.privilegeId();
     }
   }
 

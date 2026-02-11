@@ -1,20 +1,14 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
+import com.sitepark.ies.userrepository.core.domain.value.RoleSnapshot;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
-import com.sitepark.ies.userrepository.core.usecase.audit.RoleSnapshot;
 import jakarta.inject.Inject;
-import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -28,7 +22,6 @@ public final class CreateRoleUseCase {
   private final PrivilegeRepository privilegeRepository;
   private final AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
   private final RoleEntityAuthorizationService roleEntityAuthorizationService;
-  private final AuditLogService auditLogService;
   private final Clock clock;
 
   private static final Logger LOGGER = LogManager.getLogger();
@@ -39,17 +32,15 @@ public final class CreateRoleUseCase {
       PrivilegeRepository privilegeRepository,
       AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase,
       RoleEntityAuthorizationService roleEntityAuthorizationService,
-      AuditLogService auditLogService,
       Clock clock) {
     this.roleRepository = roleRepository;
     this.privilegeRepository = privilegeRepository;
     this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
     this.roleEntityAuthorizationService = roleEntityAuthorizationService;
-    this.auditLogService = auditLogService;
     this.clock = clock;
   }
 
-  public String createRole(CreateRoleRequest request) {
+  public CreateRoleResult createRole(CreateRoleRequest request) {
 
     this.validateRole(request.role());
 
@@ -61,26 +52,27 @@ public final class CreateRoleUseCase {
       LOGGER.info("create role: {}", request.role());
     }
 
+    Instant timestamp = Instant.now(this.clock);
+
     String id = this.roleRepository.create(request.role());
 
     List<String> privilegeIds =
         IdentifierResolver.create(this.privilegeRepository).resolve(request.privilegeIdentifiers());
 
-    CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(
-            new RoleSnapshot(request.role().toBuilder().id(id).build(), List.of(), privilegeIds),
-            request.auditParentId());
-    this.auditLogService.createAuditLog(createAuditLogRequest);
+    Role createdRole = request.role().toBuilder().id(id).build();
+    RoleSnapshot snapshot = new RoleSnapshot(createdRole, List.of(), privilegeIds);
 
+    AssignPrivilegesToRolesResult privilegeAssignmentResult = null;
     if (!privilegeIds.isEmpty()) {
-      this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
-          AssignPrivilegesToRolesRequest.builder()
-              .roleIdentifiers(b -> b.id(id))
-              .privilegeIdentifiers(b -> b.ids(privilegeIds))
-              .build());
+      privilegeAssignmentResult =
+          this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
+              AssignPrivilegesToRolesRequest.builder()
+                  .roleIdentifiers(b -> b.id(id))
+                  .privilegeIdentifiers(b -> b.ids(privilegeIds))
+                  .build());
     }
 
-    return id;
+    return new CreateRoleResult(id, snapshot, privilegeAssignmentResult, timestamp);
   }
 
   private void validateRole(Role role) {
@@ -106,27 +98,5 @@ public final class CreateRoleUseCase {
             throw new AnchorAlreadyExistsException(role.anchor(), owner);
           });
     }
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      RoleSnapshot snapshot, String auditLogParentId) {
-
-    String forwardData;
-    try {
-      forwardData = this.auditLogService.serialize(snapshot);
-    } catch (IOException e) {
-      throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.ROLE.name(), snapshot.role().id(), snapshot.role().name(), e);
-    }
-
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.ROLE.name(),
-        snapshot.role().id(),
-        snapshot.role().name(),
-        AuditLogAction.CREATE.name(),
-        null,
-        forwardData,
-        Instant.now(this.clock),
-        auditLogParentId);
   }
 }

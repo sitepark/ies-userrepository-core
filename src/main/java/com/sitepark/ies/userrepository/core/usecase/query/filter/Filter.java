@@ -19,7 +19,9 @@ import javax.annotation.concurrent.Immutable;
       PrivilegeId.class,
       PrivilegeIdList.class,
       RoleId.class,
-      RoleIdList.class
+      RoleIdList.class,
+      LabelId.class,
+      LabelIdList.class
     })
 @SuppressWarnings("PMD.TooManyMethods")
 @Immutable
@@ -71,6 +73,14 @@ public interface Filter {
 
   static PrivilegeIdList privilegeIdList(String... privilegeIdList) {
     return new PrivilegeIdList(privilegeIdList);
+  }
+
+  static LabelId labelId(String roleId) {
+    return new LabelId(roleId);
+  }
+
+  static LabelIdList labelIdList(String... labelIdList) {
+    return new LabelIdList(labelIdList);
   }
 
   static Or or(Filter... filterList) {

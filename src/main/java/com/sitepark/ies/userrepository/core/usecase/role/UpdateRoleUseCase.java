@@ -2,8 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
@@ -11,8 +9,6 @@ import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.exception.RoleNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
@@ -24,31 +20,28 @@ import org.apache.logging.log4j.Logger;
 public final class UpdateRoleUseCase {
 
   private static final Logger LOGGER = LogManager.getLogger();
-  private final AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
+  private final ReassignPrivilegesToRolesUseCase reassignPrivilegesToRolesUseCase;
   private final RoleRepository repository;
   private final RoleEntityAuthorizationService roleEntityAuthorizationService;
-  private final AuditLogService auditLogService;
   private final PatchService<Role> patchService;
   private final Clock clock;
 
   @Inject
   UpdateRoleUseCase(
-      AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase,
+      ReassignPrivilegesToRolesUseCase reassignPrivilegesToRolesUseCase,
       RoleRepository repository,
       RoleEntityAuthorizationService roleEntityAuthorizationService,
-      AuditLogService auditLogService,
       PatchServiceFactory patchServiceFactory,
       Clock clock) {
 
-    this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
+    this.reassignPrivilegesToRolesUseCase = reassignPrivilegesToRolesUseCase;
     this.repository = repository;
     this.roleEntityAuthorizationService = roleEntityAuthorizationService;
-    this.auditLogService = auditLogService;
     this.patchService = patchServiceFactory.createPatchService(Role.class);
     this.clock = clock;
   }
 
-  public String updateRole(UpdateRoleRequest request) {
+  public UpdateRoleResult updateRole(UpdateRoleRequest request) {
 
     this.validateRole(request.role());
 
@@ -77,6 +70,7 @@ public final class UpdateRoleUseCase {
     Instant timestamp = Instant.now(this.clock);
 
     PatchDocument patch = this.patchService.createPatch(oldRole, newRole);
+    PatchDocument revertPatch = null;
 
     if (patch.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
@@ -84,26 +78,23 @@ public final class UpdateRoleUseCase {
       }
     } else {
       this.repository.update(newRole);
-      PatchDocument revertPatch = this.patchService.createPatch(newRole, oldRole);
-      this.auditLogService.createAuditLog(
-          this.buildCreateAuditLogRequest(
-              newRole.id(),
-              newRole.name(),
-              patch,
-              revertPatch,
-              request.auditParentId(),
-              timestamp));
+      revertPatch = this.patchService.createPatch(newRole, oldRole);
     }
 
+    ReassignPrivilegesToRolesResult privilegeReassignmentResult;
     if (!request.privilegeIdentifiers().isEmpty()) {
-      this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
-          AssignPrivilegesToRolesRequest.builder()
-              .roleIdentifiers(b -> b.id(newRole.id()))
-              .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
-              .build());
+      privilegeReassignmentResult =
+          this.reassignPrivilegesToRolesUseCase.reassignPrivilegesToRoles(
+              AssignPrivilegesToRolesRequest.builder()
+                  .roleIdentifiers(b -> b.id(newRole.id()))
+                  .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
+                  .build());
+    } else {
+      privilegeReassignmentResult = ReassignPrivilegesToRolesResult.skipped();
     }
 
-    return newRole.id();
+    return new UpdateRoleResult(
+        newRole.id(), newRole.name(), timestamp, patch, revertPatch, privilegeReassignmentResult);
   }
 
   private void validateRole(Role role) {
@@ -140,24 +131,5 @@ public final class UpdateRoleUseCase {
             }
           });
     }
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      String entityId,
-      String entityName,
-      PatchDocument patch,
-      PatchDocument revertPatch,
-      String parentId,
-      Instant timestamp) {
-
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.ROLE.name(),
-        entityId,
-        entityName,
-        AuditLogAction.UPDATE.name(),
-        revertPatch.toJson(),
-        patch.toJson(),
-        timestamp,
-        parentId);
   }
 }

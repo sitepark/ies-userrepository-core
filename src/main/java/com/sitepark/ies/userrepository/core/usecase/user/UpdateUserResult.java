@@ -54,7 +54,7 @@ public record UpdateUserResult(
    *
    * @return the Updated result or null if unchanged
    */
-  public UserUpdateResult.Updated getUserUpdate() {
+  public UserUpdateResult.Updated userUpdate() {
     return userResult instanceof UserUpdateResult.Updated updated ? updated : null;
   }
 
@@ -63,7 +63,7 @@ public record UpdateUserResult(
    *
    * @return the Assigned result or null if skipped
    */
-  public ReassignRolesToUsersResult.Reassigned getRoleReassignment() {
+  public ReassignRolesToUsersResult roleReassignmentResult() {
     return roleReassignmentResult instanceof ReassignRolesToUsersResult.Reassigned reassigned
         ? reassigned
         : null;

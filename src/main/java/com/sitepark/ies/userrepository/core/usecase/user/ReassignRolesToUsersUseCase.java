@@ -47,7 +47,6 @@ public final class ReassignRolesToUsersUseCase {
 
     List<String> userIds =
         IdentifierResolver.create(this.userRepository).resolve(request.userIdentifiers());
-
     List<String> roleIds =
         IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
 

@@ -1,22 +1,17 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
+import com.sitepark.ies.userrepository.core.domain.value.PrivilegeSnapshot;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
-import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesRequest;
+import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesResult;
 import com.sitepark.ies.userrepository.core.usecase.role.AssignPrivilegesToRolesUseCase;
 import jakarta.inject.Inject;
-import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -31,7 +26,6 @@ public final class CreatePrivilegeUseCase {
   private final RoleRepository roleRepository;
   private final AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase;
   private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
-  private final AuditLogService auditLogService;
   private final Clock clock;
 
   @Inject
@@ -40,17 +34,15 @@ public final class CreatePrivilegeUseCase {
       RoleRepository roleRepository,
       AssignPrivilegesToRolesUseCase assignPrivilegesToRolesUseCase,
       PrivilegeEntityAuthorizationService privilegeAuthorizationService,
-      AuditLogService auditLogService,
       Clock clock) {
     this.privilegeRepository = privilegeRepository;
     this.roleRepository = roleRepository;
     this.assignPrivilegesToRolesUseCase = assignPrivilegesToRolesUseCase;
     this.privilegeAuthorizationService = privilegeAuthorizationService;
-    this.auditLogService = auditLogService;
     this.clock = clock;
   }
 
-  public String createPrivilege(CreatePrivilegeRequest request) {
+  public CreatePrivilegeResult createPrivilege(CreatePrivilegeRequest request) {
 
     this.validatePrivilege(request.privilege());
 
@@ -62,26 +54,27 @@ public final class CreatePrivilegeUseCase {
       LOGGER.info("create privilege: {}", request.privilege());
     }
 
+    Instant timestamp = Instant.now(this.clock);
+
     String id = this.privilegeRepository.create(request.privilege());
 
     List<String> roleIds =
         IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
 
-    CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(
-            new PrivilegeSnapshot(request.privilege().toBuilder().id(id).build(), roleIds),
-            request.auditParentId());
-    this.auditLogService.createAuditLog(createAuditLogRequest);
+    Privilege createdPrivilege = request.privilege().toBuilder().id(id).build();
+    PrivilegeSnapshot snapshot = new PrivilegeSnapshot(createdPrivilege, roleIds);
 
+    AssignPrivilegesToRolesResult roleAssignmentResult = null;
     if (!roleIds.isEmpty()) {
-      this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
-          AssignPrivilegesToRolesRequest.builder()
-              .privilegeIdentifiers(b -> b.id(id))
-              .roleIdentifiers(b -> b.ids(roleIds))
-              .build());
+      roleAssignmentResult =
+          this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
+              AssignPrivilegesToRolesRequest.builder()
+                  .privilegeIdentifiers(b -> b.id(id))
+                  .roleIdentifiers(b -> b.ids(roleIds))
+                  .build());
     }
 
-    return id;
+    return new CreatePrivilegeResult(id, snapshot, roleAssignmentResult, timestamp);
   }
 
   private void validatePrivilege(Privilege privilege) {
@@ -110,30 +103,5 @@ public final class CreatePrivilegeUseCase {
             throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
           });
     }
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      PrivilegeSnapshot snapshot, String auditLogParentId) {
-
-    String forwardData;
-    try {
-      forwardData = this.auditLogService.serialize(snapshot);
-    } catch (IOException e) {
-      throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.PRIVILEGE.name(),
-          snapshot.privilege().id(),
-          snapshot.privilege().name(),
-          e);
-    }
-
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.PRIVILEGE.name(),
-        snapshot.privilege().id(),
-        snapshot.privilege().name(),
-        AuditLogAction.CREATE.name(),
-        null,
-        forwardData,
-        Instant.now(this.clock),
-        auditLogParentId);
   }
 }

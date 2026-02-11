@@ -1,20 +1,13 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
-import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
 import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import jakarta.inject.Inject;
-import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -28,7 +21,6 @@ public final class UnassignPrivilegesFromRolesUseCase {
   private final PrivilegeRepository privilegeRepository;
   private final RoleAssigner roleAssigner;
   private final RoleEntityAuthorizationService roleEntityAuthorizationService;
-  private final AuditLogService auditLogService;
   private final Clock clock;
 
   @Inject
@@ -37,20 +29,19 @@ public final class UnassignPrivilegesFromRolesUseCase {
       PrivilegeRepository privilegeRepository,
       RoleAssigner roleAssigner,
       RoleEntityAuthorizationService roleEntityAuthorizationService,
-      AuditLogService auditLogService,
       Clock clock) {
     this.roleRepository = roleRepository;
     this.privilegeRepository = privilegeRepository;
     this.roleAssigner = roleAssigner;
     this.roleEntityAuthorizationService = roleEntityAuthorizationService;
-    this.auditLogService = auditLogService;
     this.clock = clock;
   }
 
-  public void unassignPrivilegesFromRoles(UnassignPrivilegesFromRolesRequest request) {
+  public UnassignPrivilegesFromRolesResult unassignPrivilegesFromRoles(
+      UnassignPrivilegesFromRolesRequest request) {
 
     if (request.isEmpty()) {
-      return;
+      return UnassignPrivilegesFromRolesResult.skipped();
     }
 
     List<String> roleIds =
@@ -60,11 +51,11 @@ public final class UnassignPrivilegesFromRolesUseCase {
         IdentifierResolver.create(this.privilegeRepository).resolve(request.privilegeIdentifiers());
 
     if (!this.roleEntityAuthorizationService.isWritable(roleIds)) {
-      throw new AccessDeniedException("Not allowed to update roles to add privileges");
+      throw new AccessDeniedException("Not allowed to update roles to remove privileges");
     }
 
     if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("assign privileges to roles({}) -> privileges({})", roleIds, privilegeIds);
+      LOGGER.info("unassign privileges from roles({}) -> privileges({})", roleIds, privilegeIds);
     }
 
     RolePrivilegeAssignment effectiveUnassignments = effectiveUnassignments(roleIds, privilegeIds);
@@ -73,26 +64,14 @@ public final class UnassignPrivilegesFromRolesUseCase {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("no effective unassignments found, skipping");
       }
-      return;
+      return UnassignPrivilegesFromRolesResult.skipped();
     }
 
     this.roleAssigner.unassignPrivilegesFromRoles(roleIds, privilegeIds);
 
-    Instant now = Instant.now(this.clock);
-    String parentId =
-        effectiveUnassignments.size() > 1
-            ? createBatchAssignmentLog(now, request.auditParentId())
-            : request.auditParentId();
+    Instant timestamp = Instant.now(this.clock);
 
-    effectiveUnassignments
-        .roleIds()
-        .forEach(
-            roleId -> {
-              CreateAuditLogRequest createAuditLogRequest =
-                  buildCreateAuditLogRequest(
-                      roleId, effectiveUnassignments.privilegeIds(roleId), now, parentId);
-              this.auditLogService.createAuditLog(createAuditLogRequest);
-            });
+    return UnassignPrivilegesFromRolesResult.unassigned(effectiveUnassignments, timestamp);
   }
 
   private RolePrivilegeAssignment effectiveUnassignments(
@@ -111,42 +90,5 @@ public final class UnassignPrivilegesFromRolesUseCase {
     }
 
     return builder.build();
-  }
-
-  private String createBatchAssignmentLog(Instant now, String parentId) {
-    return this.auditLogService.createAuditLog(
-        new CreateAuditLogRequest(
-            AuditLogEntityType.ROLE.name(),
-            null,
-            null,
-            AuditLogAction.BATCH_UNASSIGN_PRIVILEGES.name(),
-            null,
-            null,
-            now,
-            parentId));
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      String roleId, List<String> privilegesIds, Instant now, String parentId) {
-
-    String roleName = this.roleRepository.get(roleId).map(Role::name).orElse(null);
-
-    String privilegesJsonArray;
-    try {
-      privilegesJsonArray = this.auditLogService.serialize(privilegesIds);
-    } catch (IOException e) {
-      throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.ROLE.name(), roleId, roleName, e);
-    }
-
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.ROLE.name(),
-        roleId,
-        roleName,
-        AuditLogAction.UNASSIGN_PRIVILEGES.name(),
-        privilegesJsonArray,
-        privilegesJsonArray,
-        now,
-        parentId);
   }
 }

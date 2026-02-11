@@ -1,19 +1,12 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogEntryFailedException;
-import com.sitepark.ies.sharedkernel.audit.CreateAuditLogRequest;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogAction;
-import com.sitepark.ies.userrepository.core.domain.value.AuditLogEntityType;
+import com.sitepark.ies.userrepository.core.domain.value.PrivilegeSnapshot;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
-import com.sitepark.ies.userrepository.core.usecase.audit.PrivilegeSnapshot;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
@@ -28,8 +21,6 @@ public final class RestorePrivilegeUseCase {
   private final PrivilegeRepository repository;
   private final RoleAssigner roleAssigner;
   private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
-  private final AuditLogService auditLogService;
-  private final ObjectMapper objectMapper;
   private final Clock clock;
 
   @Inject
@@ -37,22 +28,17 @@ public final class RestorePrivilegeUseCase {
       PrivilegeRepository repository,
       RoleAssigner roleAssigner,
       PrivilegeEntityAuthorizationService privilegeAuthorizationService,
-      AuditLogService auditLogService,
-      ObjectMapper objectMapper,
       Clock clock) {
     this.repository = repository;
     this.roleAssigner = roleAssigner;
     this.privilegeAuthorizationService = privilegeAuthorizationService;
-    this.auditLogService = auditLogService;
-    this.objectMapper = objectMapper;
     this.clock = clock;
   }
 
-  public void restorePrivilege(RestorePrivilegeRequest request) {
+  public RestorePrivilegeResult restorePrivilege(RestorePrivilegeRequest request) {
 
     Privilege privilege = request.data().privilege();
     List<String> roleIds = request.data().roleIds();
-    String auditBatchId = request.auditParentId();
 
     this.validatePrivilege(privilege);
 
@@ -62,7 +48,8 @@ public final class RestorePrivilegeUseCase {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("Skip restore, privilege with ID {} already exists.", privilege.id());
       }
-      return;
+      return RestorePrivilegeResult.skipped(
+          privilege.id(), "Privilege with ID " + privilege.id() + " already exists");
     }
 
     this.validateAnchor(privilege);
@@ -71,12 +58,9 @@ public final class RestorePrivilegeUseCase {
       LOGGER.info("restore privilege: {}", privilege);
     }
 
-    Instant now = Instant.now(this.clock);
+    Instant timestamp = Instant.now(this.clock);
 
-    PrivilegeSnapshot restoreData = new PrivilegeSnapshot(privilege, roleIds);
-
-    CreateAuditLogRequest createAuditLogRequest =
-        this.buildCreateAuditLogRequest(restoreData, now, auditBatchId);
+    PrivilegeSnapshot snapshot = new PrivilegeSnapshot(privilege, roleIds);
 
     this.repository.restore(privilege);
     if (!roleIds.isEmpty()) {
@@ -85,7 +69,7 @@ public final class RestorePrivilegeUseCase {
       this.roleAssigner.assignPrivilegesToRoles(roleIds, List.of(privilegeId));
     }
 
-    this.auditLogService.createAuditLog(createAuditLogRequest);
+    return RestorePrivilegeResult.restored(privilege.id(), snapshot, timestamp);
   }
 
   private void validatePrivilege(Privilege privilege) {
@@ -113,29 +97,6 @@ public final class RestorePrivilegeUseCase {
           owner -> {
             throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
           });
-    }
-  }
-
-  private CreateAuditLogRequest buildCreateAuditLogRequest(
-      PrivilegeSnapshot data, Instant now, String auditLogParentId) {
-    String json = serializePrivilege(data);
-    return new CreateAuditLogRequest(
-        AuditLogEntityType.PRIVILEGE.name(),
-        data.privilege().id(),
-        data.privilege().name(),
-        AuditLogAction.RESTORE.name(),
-        null,
-        json,
-        now,
-        auditLogParentId);
-  }
-
-  private String serializePrivilege(PrivilegeSnapshot data) {
-    try {
-      return this.objectMapper.writeValueAsString(data);
-    } catch (JsonProcessingException e) {
-      throw new CreateAuditLogEntryFailedException(
-          AuditLogEntityType.PRIVILEGE.name(), data.privilege().id(), data.privilege().name(), e);
     }
   }
 }

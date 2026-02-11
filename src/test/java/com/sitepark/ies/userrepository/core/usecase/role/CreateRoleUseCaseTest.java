@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
-import com.sitepark.ies.sharedkernel.audit.AuditLogService;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
@@ -32,7 +31,7 @@ class CreateRoleUseCaseTest {
     PrivilegeRepository privilegeRepository = mock();
     this.assignPrivilegesToRolesUseCase = mock();
     this.roleEntityAuthorizationService = mock();
-    AuditLogService auditLogService = mock();
+
     OffsetDateTime fixedTime = OffsetDateTime.parse("2024-06-13T12:00:00+02:00");
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
@@ -42,7 +41,6 @@ class CreateRoleUseCaseTest {
             privilegeRepository,
             this.assignPrivilegesToRolesUseCase,
             this.roleEntityAuthorizationService,
-            auditLogService,
             fixedClock);
   }
 
