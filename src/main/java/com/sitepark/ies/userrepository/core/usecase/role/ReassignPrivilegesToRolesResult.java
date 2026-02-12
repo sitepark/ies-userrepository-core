@@ -13,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
  *   <li>{@link Reassigned} - Privileges were successfully reassigned to roles
  *   <li>{@link Skipped} - The privilege reassignment was skipped (no effective changes)
  * </ul>
- *
- * <p>The {@link Reassigned} variant contains assignment and unassignment information that can be
- * used for audit logging or tracking what privileges were assigned to or removed from which roles.
  */
 public sealed interface ReassignPrivilegesToRolesResult {
 

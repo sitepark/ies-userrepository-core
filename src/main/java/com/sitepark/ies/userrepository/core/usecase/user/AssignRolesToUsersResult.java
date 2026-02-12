@@ -13,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
  *   <li>{@link Assigned} - Roles were successfully assigned to users
  *   <li>{@link Skipped} - The role assignment was skipped (no effective assignments)
  * </ul>
- *
- * <p>The {@link Assigned} variant contains assignment information that can be used for audit
- * logging or tracking what roles were assigned to which users.
  */
 public sealed interface AssignRolesToUsersResult {
 
@@ -42,9 +39,7 @@ public sealed interface AssignRolesToUsersResult {
    * @param assignments empty assignments (no effective changes)
    */
   record Skipped(@NotNull UserRoleAssignment assignments) implements AssignRolesToUsersResult {
-    /**
-     * Creates a Skipped result with empty assignments.
-     */
+    /** Creates a Skipped result with empty assignments. */
     public Skipped() {
       this(UserRoleAssignment.builder().build());
     }

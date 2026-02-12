@@ -21,7 +21,7 @@ public final class UpsertRoleUseCase {
     this.updateRoleUseCase = updateRoleUseCase;
   }
 
-  public String upsertRole(UpsertRoleRequest request) {
+  public UpsertRoleResult upsertRole(UpsertRoleRequest request) {
 
     Role roleResolved = this.toRoleWithId(request.role());
     if (roleResolved.id() == null) {
@@ -30,18 +30,16 @@ public final class UpsertRoleUseCase {
               CreateRoleRequest.builder()
                   .role(roleResolved)
                   .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
-                  .auditParentId(request.auditParentId())
                   .build());
-      return result.roleId();
+      return new UpsertRoleResult.Created(result.roleId(), result);
     } else {
       UpdateRoleResult result =
           this.updateRoleUseCase.updateRole(
               UpdateRoleRequest.builder()
                   .role(roleResolved)
                   .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
-                  .auditParentId(request.auditParentId())
                   .build());
-      return result.roleId();
+      return new UpsertRoleResult.Updated(roleResolved.id(), result);
     }
   }
 

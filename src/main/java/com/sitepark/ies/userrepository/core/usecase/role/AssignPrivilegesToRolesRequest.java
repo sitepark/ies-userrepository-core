@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = AssignPrivilegesToRolesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
@@ -21,12 +20,9 @@ public final class AssignPrivilegesToRolesRequest {
 
   @NotNull private final List<Identifier> roleIdentifiers;
 
-  @Nullable private final String auditParentId;
-
   private AssignPrivilegesToRolesRequest(Builder builder) {
     this.privilegeIdentifiers = List.copyOf(builder.privilegeIdentifiers);
     this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
-    this.auditParentId = builder.auditParentId;
   }
 
   public boolean isEmpty() {
@@ -45,25 +41,20 @@ public final class AssignPrivilegesToRolesRequest {
     return this.roleIdentifiers;
   }
 
-  public String auditParentId() {
-    return this.auditParentId;
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.privilegeIdentifiers, this.roleIdentifiers, this.auditParentId);
+    return Objects.hash(this.privilegeIdentifiers, this.roleIdentifiers);
   }
 
   @Override
   public boolean equals(Object o) {
     return (o instanceof AssignPrivilegesToRolesRequest that)
         && Objects.equals(this.privilegeIdentifiers, that.privilegeIdentifiers)
-        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
-        && Objects.equals(this.auditParentId, that.auditParentId);
+        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers);
   }
 
   @Override
@@ -73,9 +64,6 @@ public final class AssignPrivilegesToRolesRequest {
         + privilegeIdentifiers
         + ", roleIdsIdentifiers="
         + roleIdentifiers
-        + ", auditParentId='"
-        + auditParentId
-        + '\''
         + '}';
   }
 
@@ -84,14 +72,12 @@ public final class AssignPrivilegesToRolesRequest {
 
     private final Set<Identifier> privilegeIdentifiers = new TreeSet<>();
     private final Set<Identifier> roleIdentifiers = new TreeSet<>();
-    private String auditParentId;
 
     private Builder() {}
 
     private Builder(AssignPrivilegesToRolesRequest request) {
       this.privilegeIdentifiers.addAll(request.privilegeIdentifiers);
       this.roleIdentifiers.addAll(request.privilegeIdentifiers);
-      this.auditParentId = request.auditParentId;
     }
 
     public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {
@@ -107,11 +93,6 @@ public final class AssignPrivilegesToRolesRequest {
       configurer.accept(listBuilder);
       this.privilegeIdentifiers.clear();
       this.privilegeIdentifiers.addAll(listBuilder.build());
-      return this;
-    }
-
-    public Builder auditParentId(String auditParentId) {
-      this.auditParentId = auditParentId;
       return this;
     }
 

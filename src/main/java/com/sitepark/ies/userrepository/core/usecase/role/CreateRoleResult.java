@@ -17,9 +17,6 @@ import org.jetbrains.annotations.Nullable;
  *   <li>The timestamp when the creation occurred
  * </ul>
  *
- * <p>The {@code privilegeAssignmentResult} can be used by the application service layer to create
- * audit logs for privilege assignments.
- *
  * @param roleId the ID of the created role
  * @param snapshot the snapshot of the created role including privilege IDs
  * @param privilegeAssignmentResult the result of privilege assignments (null if no privileges were

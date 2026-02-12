@@ -14,9 +14,6 @@ import org.jetbrains.annotations.Nullable;
  *   <li>{@link Removed} - The user was successfully removed
  *   <li>{@link Skipped} - The user removal was skipped (e.g., built-in administrator)
  * </ul>
- *
- * <p>The {@link Removed} variant contains snapshot information that can be used for audit logging
- * or revert operations.
  */
 public sealed interface RemoveUserResult {
 

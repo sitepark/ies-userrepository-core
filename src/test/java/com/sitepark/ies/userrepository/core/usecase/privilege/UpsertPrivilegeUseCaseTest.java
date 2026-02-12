@@ -40,10 +40,11 @@ class UpsertPrivilegeUseCaseTest {
     CreatePrivilegeResult mockResult = new CreatePrivilegeResult("123", null, null, Instant.now());
     when(this.createPrivilegeUseCase.createPrivilege(any())).thenReturn(mockResult);
 
-    String result =
+    UpsertPrivilegeResult result =
         this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
-    assertEquals("123", result, "Expected privilege ID 123");
+    UpsertPrivilegeResult.Created expected = UpsertPrivilegeResult.created("123", mockResult);
+    assertEquals(expected, result, "Unexpected result for upsertPrivilege without ID and anchor");
   }
 
   @Test
@@ -70,10 +71,12 @@ class UpsertPrivilegeUseCaseTest {
         new UpdatePrivilegeResult("1", "test", Instant.now(), null, null, null);
     when(this.updatePrivilegeUseCase.updatePrivilege(any())).thenReturn(mockResult);
 
-    String result =
+    UpsertPrivilegeResult result =
         this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
-    assertEquals("1", result, "Expected privilege ID 1");
+    UpsertPrivilegeResult.Updated expected = UpsertPrivilegeResult.updated("1", mockResult);
+
+    assertEquals(expected, result, "Unexpected result for upsertPrivilege with ID");
   }
 
   @Test
@@ -101,10 +104,12 @@ class UpsertPrivilegeUseCaseTest {
     CreatePrivilegeResult mockResult = new CreatePrivilegeResult("456", null, null, Instant.now());
     when(this.createPrivilegeUseCase.createPrivilege(any())).thenReturn(mockResult);
 
-    String result =
+    UpsertPrivilegeResult result =
         this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
-    assertEquals("456", result, "Expected privilege ID 456");
+    UpsertPrivilegeResult.Created expected = UpsertPrivilegeResult.created("456", mockResult);
+
+    assertEquals(expected, result, "Unexpected result for upsertPrivilege with unknown anchor");
   }
 
   @Test
@@ -134,10 +139,12 @@ class UpsertPrivilegeUseCaseTest {
         new UpdatePrivilegeResult("1", "test", Instant.now(), null, null, null);
     when(this.updatePrivilegeUseCase.updatePrivilege(any())).thenReturn(mockResult);
 
-    String result =
+    UpsertPrivilegeResult result =
         this.useCase.upsertPrivilege(UpsertPrivilegeRequest.builder().privilege(privilege).build());
 
-    assertEquals("1", result, "Expected privilege ID 1");
+    UpsertPrivilegeResult.Updated expected = UpsertPrivilegeResult.updated("1", mockResult);
+
+    assertEquals(expected, result, "Unexpected result for upsertPrivilege with known anchor");
   }
 
   @Test

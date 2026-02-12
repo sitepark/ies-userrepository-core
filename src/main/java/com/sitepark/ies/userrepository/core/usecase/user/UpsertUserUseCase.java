@@ -3,6 +3,8 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
+import com.sitepark.ies.userrepository.core.usecase.user.UpsertUserResult.Created;
+import com.sitepark.ies.userrepository.core.usecase.user.UpsertUserResult.Updated;
 import jakarta.inject.Inject;
 
 public final class UpsertUserUseCase {
@@ -21,25 +23,25 @@ public final class UpsertUserUseCase {
     this.updateUserUseCase = updateUserUseCase;
   }
 
-  public String upsertUser(UpsertUserRequest request) {
+  public UpsertUserResult upsertUser(UpsertUserRequest request) {
 
     User userResolved = this.toUserWithId(request.user());
     if (userResolved.id() == null) {
-      return this.createUserUseCase
-          .createUser(
+      CreateUserResult result =
+          this.createUserUseCase.createUser(
               CreateUserRequest.builder()
                   .user(userResolved)
                   .roleIdentifiers(r -> r.identifiers(request.roleIdentifiers()))
-                  .build())
-          .userId();
+                  .build());
+      return new Created(result.userId(), result);
     } else {
-      return this.updateUserUseCase
-          .updateUser(
+      UpdateUserResult result =
+          this.updateUserUseCase.updateUser(
               UpdateUserRequest.builder()
                   .user(userResolved)
                   .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
-                  .build())
-          .userId();
+                  .build());
+      return new Updated(userResolved.id(), result);
     }
   }
 

@@ -13,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
  *   <li>{@link Reassigned} - Roles were successfully assigned to users
  *   <li>{@link Skipped} - The role assignment was skipped (no effective assignments)
  * </ul>
- *
- * <p>The {@link Reassigned} variant contains assignment information that can be used for audit
- * logging or tracking what roles were assigned to which users.
  */
 public sealed interface ReassignRolesToUsersResult {
 

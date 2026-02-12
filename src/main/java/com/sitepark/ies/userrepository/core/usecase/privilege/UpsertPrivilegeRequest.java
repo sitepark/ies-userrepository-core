@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = UpsertPrivilegeRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
@@ -21,12 +20,10 @@ public final class UpsertPrivilegeRequest {
 
   @NotNull private final List<Identifier> roleIdentifiers;
 
-  @Nullable private final String auditParentId;
-
   private UpsertPrivilegeRequest(Builder builder) {
+    Objects.requireNonNull(builder.privilege, "Privilege must not be null");
     this.privilege = builder.privilege;
     this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
-    this.auditParentId = builder.auditParentId;
   }
 
   public static Builder builder() {
@@ -43,26 +40,20 @@ public final class UpsertPrivilegeRequest {
     return this.roleIdentifiers;
   }
 
-  @Nullable
-  public String auditParentId() {
-    return this.auditParentId;
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.privilege, this.roleIdentifiers, this.auditParentId);
+    return Objects.hash(this.privilege, this.roleIdentifiers);
   }
 
   @Override
   public boolean equals(Object o) {
     return (o instanceof UpsertPrivilegeRequest that)
         && Objects.equals(this.privilege, that.privilege)
-        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers)
-        && Objects.equals(this.auditParentId, that.auditParentId);
+        && Objects.equals(this.roleIdentifiers, that.roleIdentifiers);
   }
 
   @Override
@@ -72,9 +63,6 @@ public final class UpsertPrivilegeRequest {
         + privilege
         + ", roleIdentifiers="
         + roleIdentifiers
-        + ", auditParentId='"
-        + auditParentId
-        + '\''
         + '}';
   }
 
@@ -83,14 +71,12 @@ public final class UpsertPrivilegeRequest {
 
     private final Set<Identifier> roleIdentifiers = new TreeSet<>();
     private Privilege privilege;
-    private String auditParentId;
 
     private Builder() {}
 
     private Builder(UpsertPrivilegeRequest request) {
       this.privilege = request.privilege;
       this.roleIdentifiers.addAll(request.roleIdentifiers);
-      this.auditParentId = request.auditParentId;
     }
 
     public Builder privilege(Privilege privilege) {
@@ -106,13 +92,7 @@ public final class UpsertPrivilegeRequest {
       return this;
     }
 
-    public Builder auditParentId(String auditParentId) {
-      this.auditParentId = auditParentId;
-      return this;
-    }
-
     public UpsertPrivilegeRequest build() {
-      Objects.requireNonNull(this.privilege, "Privilege must not be null");
       return new UpsertPrivilegeRequest(this);
     }
   }

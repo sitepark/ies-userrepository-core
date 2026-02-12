@@ -13,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
  *   <li>{@link Unassigned} - Roles were successfully unassigned from users
  *   <li>{@link Skipped} - The role unassignment was skipped (no effective unassignments)
  * </ul>
- *
- * <p>The {@link Unassigned} variant contains unassignment information that can be used for audit
- * logging or tracking what roles were unassigned from which users.
  */
 public sealed interface UnassignRolesFromUsersResult {
 
@@ -43,9 +40,7 @@ public sealed interface UnassignRolesFromUsersResult {
    */
   record Skipped(@NotNull UserRoleAssignment unassignments)
       implements UnassignRolesFromUsersResult {
-    /**
-     * Creates a Skipped result with empty unassignments.
-     */
+    /** Creates a Skipped result with empty unassignments. */
     public Skipped() {
       this(UserRoleAssignment.builder().build());
     }

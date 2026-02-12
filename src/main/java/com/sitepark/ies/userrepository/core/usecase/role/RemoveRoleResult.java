@@ -14,9 +14,6 @@ import org.jetbrains.annotations.Nullable;
  *   <li>{@link Removed} - The role was successfully removed
  *   <li>{@link Skipped} - The role removal was skipped (e.g., built-in administrator role)
  * </ul>
- *
- * <p>The {@link Removed} variant contains snapshot information that can be used for audit logging
- * or revert operations.
  */
 public sealed interface RemoveRoleResult {
 

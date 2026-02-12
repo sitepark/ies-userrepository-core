@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @JsonDeserialize(builder = UpdateRoleRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
@@ -21,12 +20,9 @@ public final class UpdateRoleRequest {
 
   @NotNull private final List<Identifier> privilegeIdentifiers;
 
-  @Nullable private final String auditParentId;
-
   private UpdateRoleRequest(Builder builder) {
     this.role = builder.role;
     this.privilegeIdentifiers = List.copyOf(builder.privilegeIdentifiers);
-    this.auditParentId = builder.auditParentId;
   }
 
   public static Builder builder() {
@@ -43,26 +39,20 @@ public final class UpdateRoleRequest {
     return this.privilegeIdentifiers;
   }
 
-  @Nullable
-  public String auditParentId() {
-    return this.auditParentId;
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.role, this.privilegeIdentifiers, this.auditParentId);
+    return Objects.hash(this.role, this.privilegeIdentifiers);
   }
 
   @Override
   public boolean equals(Object o) {
     return (o instanceof UpdateRoleRequest that)
         && Objects.equals(this.role, that.role)
-        && Objects.equals(this.privilegeIdentifiers, that.privilegeIdentifiers)
-        && Objects.equals(this.auditParentId, that.auditParentId);
+        && Objects.equals(this.privilegeIdentifiers, that.privilegeIdentifiers);
   }
 
   @Override
@@ -72,9 +62,6 @@ public final class UpdateRoleRequest {
         + role
         + ", privilegeIdentifiers="
         + privilegeIdentifiers
-        + ", auditParentId='"
-        + auditParentId
-        + '\''
         + '}';
   }
 
@@ -83,14 +70,12 @@ public final class UpdateRoleRequest {
 
     private final Set<Identifier> privilegeIdentifiers = new TreeSet<>();
     private Role role;
-    private String auditParentId;
 
     private Builder() {}
 
     private Builder(UpdateRoleRequest request) {
       this.role = request.role;
       this.privilegeIdentifiers.addAll(request.privilegeIdentifiers);
-      this.auditParentId = request.auditParentId;
     }
 
     public Builder role(Role role) {
@@ -103,11 +88,6 @@ public final class UpdateRoleRequest {
       configurer.accept(listBuilder);
       this.privilegeIdentifiers.clear();
       this.privilegeIdentifiers.addAll(listBuilder.build());
-      return this;
-    }
-
-    public Builder auditParentId(String auditParentId) {
-      this.auditParentId = auditParentId;
       return this;
     }
 

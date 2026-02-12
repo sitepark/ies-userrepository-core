@@ -39,9 +39,11 @@ class UpsertRoleUseCaseTest {
     CreateRoleResult mockResult = new CreateRoleResult("123", null, null, Instant.now());
     when(this.createRoleUseCase.createRole(any())).thenReturn(mockResult);
 
-    String result = this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult result =
+        this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult.Created expected = UpsertRoleResult.created("123", mockResult);
 
-    assertEquals("123", result, "Expected role ID 123");
+    assertEquals(expected, result, "Unexpected result for upsertRole without ID and anchor");
   }
 
   @Test
@@ -66,9 +68,11 @@ class UpsertRoleUseCaseTest {
         new UpdateRoleResult("1", "test", Instant.now(), null, null, null);
     when(this.updateRoleUseCase.updateRole(any())).thenReturn(mockResult);
 
-    String result = this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult result =
+        this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult.Updated expected = UpsertRoleResult.updated("1", mockResult);
 
-    assertEquals("1", result, "Expected role ID 1");
+    assertEquals(expected, result, "Unexpected result for upsertRole with ID and without anchor");
   }
 
   @Test
@@ -93,9 +97,12 @@ class UpsertRoleUseCaseTest {
     CreateRoleResult mockResult = new CreateRoleResult("456", null, null, Instant.now());
     when(this.createRoleUseCase.createRole(any())).thenReturn(mockResult);
 
-    String result = this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult result =
+        this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult.Created expected = UpsertRoleResult.created("456", mockResult);
 
-    assertEquals("456", result, "Expected role ID 456");
+    assertEquals(
+        expected, result, "Unexpected result for upsertRole with unknown anchor and without ID");
   }
 
   @Test
@@ -122,9 +129,12 @@ class UpsertRoleUseCaseTest {
         new UpdateRoleResult("1", "test", Instant.now(), null, null, null);
     when(this.updateRoleUseCase.updateRole(any())).thenReturn(mockResult);
 
-    String result = this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult result =
+        this.useCase.upsertRole(UpsertRoleRequest.builder().role(role).build());
+    UpsertRoleResult.Updated expected = UpsertRoleResult.updated("1", mockResult);
 
-    assertEquals("1", result, "Expected role ID 1");
+    assertEquals(
+        expected, result, "Unexpected result for upsertRole with known anchor and without ID");
   }
 
   @Test

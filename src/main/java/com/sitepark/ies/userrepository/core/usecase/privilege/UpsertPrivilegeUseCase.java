@@ -21,7 +21,7 @@ public final class UpsertPrivilegeUseCase {
     this.updatePrivilegeUseCase = updatePrivilegeUseCase;
   }
 
-  public String upsertPrivilege(UpsertPrivilegeRequest request) {
+  public UpsertPrivilegeResult upsertPrivilege(UpsertPrivilegeRequest request) {
 
     Privilege privilegeResolved = this.toPrivilegeWithId(request.privilege());
     if (privilegeResolved.id() == null) {
@@ -31,7 +31,7 @@ public final class UpsertPrivilegeUseCase {
                   .privilege(privilegeResolved)
                   .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
                   .build());
-      return result.privilegeId();
+      return UpsertPrivilegeResult.created(result.privilegeId(), result);
     } else {
       UpdatePrivilegeResult result =
           this.updatePrivilegeUseCase.updatePrivilege(
@@ -39,7 +39,7 @@ public final class UpsertPrivilegeUseCase {
                   .privilege(privilegeResolved)
                   .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
                   .build());
-      return result.privilegeId();
+      return UpsertPrivilegeResult.updated(privilegeResolved.id(), result);
     }
   }
 

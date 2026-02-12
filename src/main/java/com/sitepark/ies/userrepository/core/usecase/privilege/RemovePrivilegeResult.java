@@ -14,9 +14,6 @@ import org.jetbrains.annotations.Nullable;
  *   <li>{@link Removed} - The privilege was successfully removed
  *   <li>{@link Skipped} - The privilege removal was skipped (e.g., built-in full access privilege)
  * </ul>
- *
- * <p>The {@link Removed} variant contains snapshot information that can be used for audit logging
- * or revert operations.
  */
 public sealed interface RemovePrivilegeResult {
 

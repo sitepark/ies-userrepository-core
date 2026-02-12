@@ -13,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
  *   <li>{@link Assigned} - Privileges were successfully assigned to roles
  *   <li>{@link Skipped} - The privilege assignment was skipped (no effective assignments)
  * </ul>
- *
- * <p>The {@link Assigned} variant contains assignment information that can be used for audit
- * logging or tracking what privileges were assigned to which roles.
  */
 public sealed interface AssignPrivilegesToRolesResult {
 
@@ -43,9 +40,7 @@ public sealed interface AssignPrivilegesToRolesResult {
    */
   record Skipped(@NotNull RolePrivilegeAssignment assignments)
       implements AssignPrivilegesToRolesResult {
-    /**
-     * Creates a Skipped result with empty assignments.
-     */
+    /** Creates a Skipped result with empty assignments. */
     public Skipped() {
       this(RolePrivilegeAssignment.builder().build());
     }
