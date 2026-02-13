@@ -63,7 +63,7 @@ public final class UnassignPrivilegesFromRolesRequest {
     return "UnassignPrivilegesFromRolesRequest{"
         + "privilegeIdentifiers="
         + privilegeIdentifiers
-        + ", roleIdsIdentifiers="
+        + ", roleIdentifiers="
         + roleIdentifiers
         + '}';
   }

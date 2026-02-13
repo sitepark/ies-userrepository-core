@@ -49,7 +49,7 @@ public final class ReassignRolesToPrivilegesUseCase {
     List<String> privilegeIds =
         IdentifierResolver.create(this.privilegeRepository).resolve(request.privilegeIdentifiers());
     List<String> roleIds =
-        IdentifierResolver.create(this.roleRepository).resolve(request.privilegeIdentifiers());
+        IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
 
     if (!this.privilegeEntityAuthorizationService.isWritable(privilegeIds)) {
       throw new AccessDeniedException("Not allowed to update privileges to reassign roles");

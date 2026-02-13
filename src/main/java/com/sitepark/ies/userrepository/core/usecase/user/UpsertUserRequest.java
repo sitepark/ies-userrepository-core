@@ -57,12 +57,7 @@ public final class UpsertUserRequest {
 
   @Override
   public String toString() {
-    return "CreatePrivilegeRequest{"
-        + "privilege="
-        + user
-        + ", roleIdentifiers="
-        + roleIdentifiers
-        + '}';
+    return "UpsertUserRequest{" + "user=" + user + ", roleIdentifiers=" + roleIdentifiers + '}';
   }
 
   @JsonPOJOBuilder(withPrefix = "")

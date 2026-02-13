@@ -59,7 +59,9 @@ public final class ReassignRolesToUsersRequest {
   @Override
   public String toString() {
     return "ReassignRolesToUsersRequest{"
-        + ", roleIdsIdentifiers="
+        + "userIdentifiers="
+        + userIdentifiers
+        + ", roleIdentifiers="
         + roleIdentifiers
         + "userIdentifiers="
         + userIdentifiers

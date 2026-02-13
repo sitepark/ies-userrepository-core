@@ -51,4 +51,45 @@ class IdentifierResolverTest {
         AnchorNotFoundException.class,
         () -> IdentifierResolver.create(repository).resolve(identifier));
   }
+
+  @Test
+  void testResolveListWithIds() {
+
+    Identifier id1 = Identifier.ofId("123");
+    Identifier id2 = Identifier.ofId("456");
+    UserRepository repository = mock();
+
+    var ids = IdentifierResolver.create(repository).resolve(java.util.List.of(id1, id2));
+
+    assertEquals(java.util.List.of("123", "456"), ids, "unexpected ids");
+  }
+
+  @Test
+  void testResolveListWithAnchors() {
+
+    Anchor anchor1 = Anchor.ofString("abc");
+    Anchor anchor2 = Anchor.ofString("def");
+    Identifier id1 = Identifier.ofAnchor(anchor1);
+    Identifier id2 = Identifier.ofAnchor(anchor2);
+    UserRepository repository = mock();
+    when(repository.resolveAnchor(anchor1)).thenReturn(Optional.of("123"));
+    when(repository.resolveAnchor(anchor2)).thenReturn(Optional.of("456"));
+
+    var ids = IdentifierResolver.create(repository).resolve(java.util.List.of(id1, id2));
+
+    assertEquals(java.util.List.of("123", "456"), ids, "unexpected ids");
+  }
+
+  @Test
+  void testResolveListWithAnchorNotFound() {
+
+    Anchor anchor = Anchor.ofString("abc");
+    Identifier identifier = Identifier.ofAnchor(anchor);
+    UserRepository repository = mock();
+    when(repository.resolveAnchor(any())).thenReturn(Optional.empty());
+
+    assertThrows(
+        AnchorNotFoundException.class,
+        () -> IdentifierResolver.create(repository).resolve(java.util.List.of(identifier)));
+  }
 }

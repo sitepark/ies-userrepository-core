@@ -57,8 +57,8 @@ public final class UpsertRoleRequest {
 
   @Override
   public String toString() {
-    return "CreatePrivilegeRequest{"
-        + "privilege="
+    return "UpsertRoleRequest{"
+        + "role="
         + role
         + ", privilegeIdentifiers="
         + privilegeIdentifiers

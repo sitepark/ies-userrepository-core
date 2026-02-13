@@ -61,8 +61,10 @@ public final class UnassignRolesFromUsersRequest {
 
   @Override
   public String toString() {
-    return "UnassignPrivilegesFromRolesRequest{"
-        + "roleIdsIdentifiers="
+    return "UnassignRolesFromUsersRequest{"
+        + "userIdentifiers="
+        + userIdentifiers
+        + ", roleIdentifiers="
         + roleIdentifiers
         + ", userIdentifiers="
         + userIdentifiers

@@ -62,7 +62,7 @@ public final class AssignPrivilegesToRolesRequest {
     return "AssignPrivilegesToRolesRequest{"
         + "privilegeIdentifiers="
         + privilegeIdentifiers
-        + ", roleIdsIdentifiers="
+        + ", roleIdentifiers="
         + roleIdentifiers
         + '}';
   }

@@ -58,8 +58,10 @@ public final class AssignRolesToUsersRequest {
 
   @Override
   public String toString() {
-    return "AssignPrivilegesToRolesRequest{"
-        + ", roleIdsIdentifiers="
+    return "AssignRolesToUsersRequest{"
+        + "userIdentifiers="
+        + userIdentifiers
+        + ", roleIdentifiers="
         + roleIdentifiers
         + "userIdentifiers="
         + userIdentifiers
