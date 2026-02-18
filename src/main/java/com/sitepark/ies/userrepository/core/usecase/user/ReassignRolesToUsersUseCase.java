@@ -41,10 +41,6 @@ public final class ReassignRolesToUsersUseCase {
 
   public ReassignRolesToUsersResult reassignRolesToUsers(AssignRolesToUsersRequest request) {
 
-    if (request.isEmpty()) {
-      return ReassignRolesToUsersResult.skipped();
-    }
-
     List<String> userIds =
         IdentifierResolver.create(this.userRepository).resolve(request.userIdentifiers());
     List<String> roleIds =

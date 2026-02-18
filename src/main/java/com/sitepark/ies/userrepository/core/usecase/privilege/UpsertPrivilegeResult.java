@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 public sealed interface UpsertPrivilegeResult {
 
+  public String privilegeId();
+
   record Created(@NotNull String privilegeId, @NotNull CreatePrivilegeResult createPrivilegeResult)
       implements UpsertPrivilegeResult {}
 

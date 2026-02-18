@@ -173,6 +173,8 @@ class UpdateUserUseCaseTest {
     PatchDocument patch = mock();
     when(patch.isEmpty()).thenReturn(true);
     when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+    when(this.reassignRolesToUsersUseCase.reassignRolesToUsers(any()))
+        .thenReturn(ReassignRolesToUsersResult.skipped());
 
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 

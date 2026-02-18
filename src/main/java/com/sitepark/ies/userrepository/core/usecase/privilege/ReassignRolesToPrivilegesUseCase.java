@@ -42,10 +42,6 @@ public final class ReassignRolesToPrivilegesUseCase {
   public ReassignRolesToPrivilegesResult reassignRolesToPrivileges(
       ReassignRolesToPrivilegesRequest request) {
 
-    if (request.isEmpty()) {
-      return ReassignRolesToPrivilegesResult.skipped();
-    }
-
     List<String> privilegeIds =
         IdentifierResolver.create(this.privilegeRepository).resolve(request.privilegeIdentifiers());
     List<String> roleIds =

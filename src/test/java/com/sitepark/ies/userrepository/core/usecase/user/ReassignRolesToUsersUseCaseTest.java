@@ -51,6 +51,7 @@ class ReassignRolesToUsersUseCaseTest {
 
   @Test
   void testEmptyRequestReturnsSkipped() {
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     ReassignRolesToUsersResult result =
         this.useCase.reassignRolesToUsers(AssignRolesToUsersRequest.builder().build());
 
@@ -143,6 +144,7 @@ class ReassignRolesToUsersUseCaseTest {
 
   @Test
   void testEmptyUserIdentifiersReturnsSkipped() {
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     ReassignRolesToUsersResult result =
         this.useCase.reassignRolesToUsers(
             AssignRolesToUsersRequest.builder().roleIdentifiers(b -> b.ids("3", "4")).build());
@@ -153,6 +155,10 @@ class ReassignRolesToUsersUseCaseTest {
 
   @Test
   void testEmptyRoleIdentifiersReturnsSkipped() {
+    when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
+    when(this.roleAssigner.getRolesAssignByUsers(any()))
+        .thenReturn(UserRoleAssignment.builder().build());
+
     ReassignRolesToUsersResult result =
         this.useCase.reassignRolesToUsers(
             AssignRolesToUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());

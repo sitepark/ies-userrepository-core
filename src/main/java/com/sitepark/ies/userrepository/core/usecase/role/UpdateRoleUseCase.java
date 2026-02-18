@@ -81,17 +81,12 @@ public final class UpdateRoleUseCase {
       revertPatch = this.patchService.createPatch(newRole, oldRole);
     }
 
-    ReassignPrivilegesToRolesResult privilegeReassignmentResult;
-    if (!request.privilegeIdentifiers().isEmpty()) {
-      privilegeReassignmentResult =
-          this.reassignPrivilegesToRolesUseCase.reassignPrivilegesToRoles(
-              AssignPrivilegesToRolesRequest.builder()
-                  .roleIdentifiers(b -> b.id(newRole.id()))
-                  .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
-                  .build());
-    } else {
-      privilegeReassignmentResult = ReassignPrivilegesToRolesResult.skipped();
-    }
+    ReassignPrivilegesToRolesResult privilegeReassignmentResult =
+        this.reassignPrivilegesToRolesUseCase.reassignPrivilegesToRoles(
+            AssignPrivilegesToRolesRequest.builder()
+                .roleIdentifiers(b -> b.id(newRole.id()))
+                .privilegeIdentifiers(b -> b.identifiers(request.privilegeIdentifiers()))
+                .build());
 
     return new UpdateRoleResult(
         newRole.id(), newRole.name(), timestamp, patch, revertPatch, privilegeReassignmentResult);

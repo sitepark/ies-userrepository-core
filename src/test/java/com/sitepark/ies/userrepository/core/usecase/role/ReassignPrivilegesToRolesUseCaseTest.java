@@ -51,6 +51,7 @@ class ReassignPrivilegesToRolesUseCaseTest {
 
   @Test
   void testEmptyRequestReturnsSkipped() {
+    when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     ReassignPrivilegesToRolesResult result =
         this.useCase.reassignPrivilegesToRoles(AssignPrivilegesToRolesRequest.builder().build());
 
@@ -143,6 +144,7 @@ class ReassignPrivilegesToRolesUseCaseTest {
 
   @Test
   void testEmptyRoleIdentifiersReturnsSkipped() {
+    when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     ReassignPrivilegesToRolesResult result =
         this.useCase.reassignPrivilegesToRoles(
             AssignPrivilegesToRolesRequest.builder()
@@ -155,6 +157,9 @@ class ReassignPrivilegesToRolesUseCaseTest {
 
   @Test
   void testEmptyPrivilegeIdentifiersReturnsSkipped() {
+    when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
+    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
+        .thenReturn(RolePrivilegeAssignment.builder().build());
     ReassignPrivilegesToRolesResult result =
         this.useCase.reassignPrivilegesToRoles(
             AssignPrivilegesToRolesRequest.builder().roleIdentifiers(b -> b.ids("1", "2")).build());

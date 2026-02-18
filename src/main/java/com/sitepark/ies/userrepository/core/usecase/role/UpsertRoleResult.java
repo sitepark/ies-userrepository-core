@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 public sealed interface UpsertRoleResult {
 
+  String roleId();
+
   record Created(@NotNull String roleId, @NotNull CreateRoleResult createRoleResult)
       implements UpsertRoleResult {}
 

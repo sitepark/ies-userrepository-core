@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 public sealed interface UpsertUserResult {
 
+  public String userId();
+
   record Created(@NotNull String userId, @NotNull CreateUserResult createUserResult)
       implements UpsertUserResult {}
 
