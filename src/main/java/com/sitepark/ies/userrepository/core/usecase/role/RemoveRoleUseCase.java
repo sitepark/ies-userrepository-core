@@ -1,5 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
+import static com.sitepark.ies.userrepository.core.domain.entity.Role.BUILT_IN_ROLE_ID_ADMINISTRATOR;
+
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
@@ -33,8 +35,6 @@ public final class RemoveRoleUseCase {
   private final RoleAssigner roleAssigner;
   private final RoleEntityAuthorizationService roleEntityAuthorizationService;
   private final Clock clock;
-
-  private static final String BUILT_IN_ROLE_ID_ADMINISTRATOR = "1";
 
   @Inject
   RemoveRoleUseCase(

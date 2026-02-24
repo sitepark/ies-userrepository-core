@@ -53,7 +53,7 @@ class ReassignRolesToUsersUseCaseTest {
   void testEmptyRequestReturnsSkipped() {
     when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     ReassignRolesToUsersResult result =
-        this.useCase.reassignRolesToUsers(AssignRolesToUsersRequest.builder().build());
+        this.useCase.reassignRolesToUsers(ReassignRolesToUsersRequest.builder().build());
 
     assertFalse(result.wasReassigned(), "Result should indicate skipped when request is empty");
   }
@@ -66,7 +66,7 @@ class ReassignRolesToUsersUseCaseTest {
         AccessDeniedException.class,
         () ->
             this.useCase.reassignRolesToUsers(
-                AssignRolesToUsersRequest.builder()
+                ReassignRolesToUsersRequest.builder()
                     .userIdentifiers(b -> b.ids("1", "2"))
                     .roleIdentifiers(b -> b.ids("3", "4"))
                     .build()),
@@ -85,7 +85,7 @@ class ReassignRolesToUsersUseCaseTest {
 
     ReassignRolesToUsersResult result =
         this.useCase.reassignRolesToUsers(
-            AssignRolesToUsersRequest.builder()
+            ReassignRolesToUsersRequest.builder()
                 .userIdentifiers(b -> b.ids("1", "2"))
                 .roleIdentifiers(b -> b.ids("3", "4"))
                 .build());
@@ -101,7 +101,7 @@ class ReassignRolesToUsersUseCaseTest {
         .thenReturn(UserRoleAssignment.builder().build());
 
     this.useCase.reassignRolesToUsers(
-        AssignRolesToUsersRequest.builder()
+        ReassignRolesToUsersRequest.builder()
             .userIdentifiers(b -> b.ids("1"))
             .roleIdentifiers(b -> b.ids("3", "4"))
             .build());
@@ -116,7 +116,7 @@ class ReassignRolesToUsersUseCaseTest {
         .thenReturn(UserRoleAssignment.builder().assignments("1", List.of("5", "6")).build());
 
     this.useCase.reassignRolesToUsers(
-        AssignRolesToUsersRequest.builder()
+        ReassignRolesToUsersRequest.builder()
             .userIdentifiers(b -> b.ids("1"))
             .roleIdentifiers(b -> b.ids("3", "4"))
             .build());
@@ -132,7 +132,7 @@ class ReassignRolesToUsersUseCaseTest {
 
     ReassignRolesToUsersResult result =
         this.useCase.reassignRolesToUsers(
-            AssignRolesToUsersRequest.builder()
+            ReassignRolesToUsersRequest.builder()
                 .userIdentifiers(b -> b.ids("1", "2"))
                 .roleIdentifiers(b -> b.ids("3", "4"))
                 .build());
@@ -147,7 +147,7 @@ class ReassignRolesToUsersUseCaseTest {
     when(this.userEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
     ReassignRolesToUsersResult result =
         this.useCase.reassignRolesToUsers(
-            AssignRolesToUsersRequest.builder().roleIdentifiers(b -> b.ids("3", "4")).build());
+            ReassignRolesToUsersRequest.builder().roleIdentifiers(b -> b.ids("3", "4")).build());
 
     assertFalse(
         result.wasReassigned(), "Result should indicate skipped when user identifiers are empty");
@@ -161,7 +161,7 @@ class ReassignRolesToUsersUseCaseTest {
 
     ReassignRolesToUsersResult result =
         this.useCase.reassignRolesToUsers(
-            AssignRolesToUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());
+            ReassignRolesToUsersRequest.builder().userIdentifiers(b -> b.ids("1", "2")).build());
 
     assertFalse(
         result.wasReassigned(), "Result should indicate skipped when role identifiers are empty");
@@ -178,7 +178,7 @@ class ReassignRolesToUsersUseCaseTest {
                 .build());
 
     this.useCase.reassignRolesToUsers(
-        AssignRolesToUsersRequest.builder()
+        ReassignRolesToUsersRequest.builder()
             .userIdentifiers(b -> b.ids("1", "2"))
             .roleIdentifiers(b -> b.ids("3", "4"))
             .build());
@@ -197,7 +197,7 @@ class ReassignRolesToUsersUseCaseTest {
                 .build());
 
     this.useCase.reassignRolesToUsers(
-        AssignRolesToUsersRequest.builder()
+        ReassignRolesToUsersRequest.builder()
             .userIdentifiers(b -> b.ids("1", "2"))
             .roleIdentifiers(b -> b.ids("3", "4"))
             .build());
@@ -216,7 +216,7 @@ class ReassignRolesToUsersUseCaseTest {
                 .build());
 
     this.useCase.reassignRolesToUsers(
-        AssignRolesToUsersRequest.builder()
+        ReassignRolesToUsersRequest.builder()
             .userIdentifiers(b -> b.ids("1", "2"))
             .roleIdentifiers(b -> b.ids("3", "4"))
             .build());

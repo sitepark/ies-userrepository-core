@@ -62,25 +62,34 @@ public final class CreateUserUseCase {
     Instant timestamp = Instant.now(this.clock);
 
     String id = this.userRepository.create(request.user());
-
-    List<String> roleIds =
-        IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
-
     User createdUser = request.user().toBuilder().id(id).build();
-    UserSnapshot snapshot = new UserSnapshot(createdUser, roleIds);
 
-    AssignRolesToUsersResult roleAssignmentResult = null;
-    if (!roleIds.isEmpty()) {
-      roleAssignmentResult =
-          this.assignRolesToUsersUseCase.assignRolesToUsers(
-              AssignRolesToUsersRequest.builder()
-                  .userIdentifiers(b -> b.id(id))
-                  .roleIdentifiers(b -> b.ids(roleIds))
-                  .build());
+    List<String> roleIds;
+    AssignRolesToUsersResult roleAssignmentResult;
+    if (request.roleIdentifiers().shouldUpdate()) {
+
+      roleIds =
+          IdentifierResolver.create(this.roleRepository)
+              .resolve(request.roleIdentifiers().getValue());
+
+      if (!roleIds.isEmpty()) {
+        roleAssignmentResult =
+            this.assignRolesToUsersUseCase.assignRolesToUsers(
+                AssignRolesToUsersRequest.builder()
+                    .userIdentifiers(b -> b.id(id))
+                    .roleIdentifiers(b -> b.ids(roleIds))
+                    .build());
+      } else {
+        roleAssignmentResult = AssignRolesToUsersResult.skipped();
+      }
+    } else {
+      roleAssignmentResult = AssignRolesToUsersResult.skipped();
+      roleIds = List.of();
     }
 
     this.extensionsNotifier.notifyCreated(createdUser);
 
+    UserSnapshot snapshot = new UserSnapshot(createdUser, roleIds);
     return new CreateUserResult(id, snapshot, roleAssignmentResult, timestamp);
   }
 

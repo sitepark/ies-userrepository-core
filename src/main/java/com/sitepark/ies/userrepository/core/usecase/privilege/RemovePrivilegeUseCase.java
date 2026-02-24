@@ -1,5 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import static com.sitepark.ies.userrepository.core.domain.entity.Privilege.BUILT_IN_PRIVILEGE_ID_FULL_ACCESS;
+
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
@@ -24,8 +26,8 @@ import java.util.List;
  *   <li>Privilege deletion from repository
  * </ul>
  *
- * <p>The use case returns a {@link RemovePrivilegeResult} which indicates whether the privilege
- * was removed or skipped.
+ * <p>The use case returns a {@link RemovePrivilegeResult} which indicates whether the privilege was
+ * removed or skipped.
  */
 public final class RemovePrivilegeUseCase {
 
@@ -33,8 +35,6 @@ public final class RemovePrivilegeUseCase {
   private final RoleAssigner roleAssigner;
   private final PrivilegeEntityAuthorizationService privilegeAuthorizationService;
   private final Clock clock;
-
-  private static final String BUILT_IN_PRIVILEGE_ID_FULL_ACCESS = "1";
 
   @Inject
   RemovePrivilegeUseCase(

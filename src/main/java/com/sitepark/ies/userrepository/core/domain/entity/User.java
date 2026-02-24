@@ -27,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
+  public static final String BUILT_IN_USER_ID_INITIAL_USER = "1";
+
   @Nullable private final String id;
 
   @Nullable private final Anchor anchor;

@@ -288,7 +288,7 @@ class UpdateUserUseCaseTest {
 
     verify(this.reassignRolesToUsersUseCase)
         .reassignRolesToUsers(
-            AssignRolesToUsersRequest.builder()
+            ReassignRolesToUsersRequest.builder()
                 .userIdentifiers(b -> b.id("123"))
                 .roleIdentifiers(b -> b.id("333"))
                 .build());
@@ -623,7 +623,7 @@ class UpdateUserUseCaseTest {
 
     verify(this.reassignRolesToUsersUseCase)
         .reassignRolesToUsers(
-            AssignRolesToUsersRequest.builder()
+            ReassignRolesToUsersRequest.builder()
                 .userIdentifiers(b -> b.id("123"))
                 .roleIdentifiers(b -> b.id("333"))
                 .build());

@@ -31,7 +31,7 @@ public final class UpsertUserUseCase {
           this.createUserUseCase.createUser(
               CreateUserRequest.builder()
                   .user(userResolved)
-                  .roleIdentifiers(r -> r.identifiers(request.roleIdentifiers()))
+                  .roleIdentifiers(r -> r.identifiers(request.roleIdentifiers().getValue()))
                   .build());
       return new Created(result.userId(), result);
     } else {
@@ -39,7 +39,7 @@ public final class UpsertUserUseCase {
           this.updateUserUseCase.updateUser(
               UpdateUserRequest.builder()
                   .user(userResolved)
-                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers().getValue()))
                   .build());
       return new Updated(userResolved.id(), result);
     }

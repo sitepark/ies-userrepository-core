@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
+import com.sitepark.ies.sharedkernel.base.Updatable;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +19,14 @@ public final class UpdateRoleRequest {
 
   @NotNull private final Role role;
 
-  @NotNull private final List<Identifier> privilegeIdentifiers;
+  @NotNull private final Updatable<List<Identifier>> privilegeIdentifiers;
 
   private UpdateRoleRequest(Builder builder) {
     this.role = builder.role;
-    this.privilegeIdentifiers = List.copyOf(builder.privilegeIdentifiers);
+    this.privilegeIdentifiers =
+        builder.privilegeIdentifiers != null
+            ? Updatable.of(List.copyOf(builder.privilegeIdentifiers))
+            : Updatable.unchanged();
   }
 
   public static Builder builder() {
@@ -35,7 +39,7 @@ public final class UpdateRoleRequest {
   }
 
   @NotNull
-  public List<Identifier> privilegeIdentifiers() {
+  public Updatable<List<Identifier>> privilegeIdentifiers() {
     return this.privilegeIdentifiers;
   }
 
@@ -68,14 +72,16 @@ public final class UpdateRoleRequest {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final Set<Identifier> privilegeIdentifiers = new TreeSet<>();
+    private Set<Identifier> privilegeIdentifiers;
     private Role role;
 
     private Builder() {}
 
     private Builder(UpdateRoleRequest request) {
       this.role = request.role;
-      this.privilegeIdentifiers.addAll(request.privilegeIdentifiers);
+      if (request.privilegeIdentifiers.shouldUpdate()) {
+        this.privilegeIdentifiers = new TreeSet<>(request.privilegeIdentifiers.getValue());
+      }
     }
 
     public Builder role(Role role) {
@@ -86,8 +92,10 @@ public final class UpdateRoleRequest {
     public Builder privilegeIdentifiers(Consumer<IdentifierListBuilder> configurer) {
       IdentifierListBuilder listBuilder = new IdentifierListBuilder();
       configurer.accept(listBuilder);
-      this.privilegeIdentifiers.clear();
-      this.privilegeIdentifiers.addAll(listBuilder.build());
+      if (listBuilder.changed()) {
+        this.privilegeIdentifiers = new TreeSet<>();
+        this.privilegeIdentifiers.addAll(listBuilder.build());
+      }
       return this;
     }
 

@@ -39,6 +39,18 @@ public class PrivilegeRoleAssignment {
     return List.copyOf(allRoleIds);
   }
 
+  public RolePrivilegeAssignment toRolePrivilegeAssignment() {
+    RolePrivilegeAssignment.Builder builder = RolePrivilegeAssignment.builder();
+    for (String roleId : this.roleIds()) {
+      for (Map.Entry<String, Set<String>> entry : this.assignments.entrySet()) {
+        if (entry.getValue().contains(roleId)) {
+          builder.assignment(roleId, entry.getKey());
+        }
+      }
+    }
+    return builder.build();
+  }
+
   public boolean isEmpty() {
     return this.assignments.isEmpty();
   }

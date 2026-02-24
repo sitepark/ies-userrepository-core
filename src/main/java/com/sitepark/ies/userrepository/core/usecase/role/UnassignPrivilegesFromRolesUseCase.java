@@ -1,5 +1,8 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
+import static com.sitepark.ies.userrepository.core.domain.entity.Privilege.BUILT_IN_PRIVILEGE_ID_FULL_ACCESS;
+import static com.sitepark.ies.userrepository.core.domain.entity.Role.BUILT_IN_ROLE_ID_ADMINISTRATOR;
+
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
@@ -11,6 +14,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -84,6 +88,12 @@ public final class UnassignPrivilegesFromRolesUseCase {
     for (String roleId : roleIds) {
       List<String> effectivePrivilegeIds =
           privilegeIds.stream().filter(assignments.privilegeIds(roleId)::contains).toList();
+      if (BUILT_IN_ROLE_ID_ADMINISTRATOR.equals(roleId)) {
+        effectivePrivilegeIds =
+            effectivePrivilegeIds.stream()
+                .filter(Predicate.not(BUILT_IN_PRIVILEGE_ID_FULL_ACCESS::equals))
+                .toList();
+      }
       if (!effectivePrivilegeIds.isEmpty()) {
         builder.assignments(roleId, effectivePrivilegeIds);
       }

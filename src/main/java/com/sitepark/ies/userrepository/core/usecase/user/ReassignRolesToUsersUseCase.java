@@ -1,5 +1,8 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
+import static com.sitepark.ies.userrepository.core.domain.entity.Role.BUILT_IN_ROLE_ID_ADMINISTRATOR;
+import static com.sitepark.ies.userrepository.core.domain.entity.User.BUILT_IN_USER_ID_INITIAL_USER;
+
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.UserEntityAuthorizationService;
@@ -39,7 +42,7 @@ public final class ReassignRolesToUsersUseCase {
     this.clock = clock;
   }
 
-  public ReassignRolesToUsersResult reassignRolesToUsers(AssignRolesToUsersRequest request) {
+  public ReassignRolesToUsersResult reassignRolesToUsers(ReassignRolesToUsersRequest request) {
 
     List<String> userIds =
         IdentifierResolver.create(this.userRepository).resolve(request.userIdentifiers());
@@ -112,6 +115,12 @@ public final class ReassignRolesToUsersUseCase {
       List<String> assignedRoles = assignments.roleIds(userId);
       List<String> effectiveRoleIds =
           assignedRoles.stream().filter(Predicate.not(roleIds::contains)).toList();
+      if (BUILT_IN_USER_ID_INITIAL_USER.equals(userId)) {
+        effectiveRoleIds =
+            effectiveRoleIds.stream()
+                .filter(Predicate.not(BUILT_IN_ROLE_ID_ADMINISTRATOR::equals))
+                .toList();
+      }
       if (!effectiveRoleIds.isEmpty()) {
         builder.assignments(userId, effectiveRoleIds);
       }

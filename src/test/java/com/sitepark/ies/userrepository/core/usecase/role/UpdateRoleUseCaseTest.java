@@ -142,7 +142,7 @@ class UpdateRoleUseCaseTest {
 
     verify(this.reassignPrivilegesToRolesUseCase)
         .reassignPrivilegesToRoles(
-            AssignPrivilegesToRolesRequest.builder()
+            ReassignPrivilegesToRolesRequest.builder()
                 .roleIdentifiers(b -> b.id("1"))
                 .privilegeIdentifiers(b -> b.id("12"))
                 .build());

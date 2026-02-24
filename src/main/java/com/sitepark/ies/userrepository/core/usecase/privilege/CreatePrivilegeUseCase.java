@@ -58,22 +58,30 @@ public final class CreatePrivilegeUseCase {
 
     String id = this.privilegeRepository.create(request.privilege());
 
-    List<String> roleIds =
-        IdentifierResolver.create(this.roleRepository).resolve(request.roleIdentifiers());
-
     Privilege createdPrivilege = request.privilege().toBuilder().id(id).build();
-    PrivilegeSnapshot snapshot = new PrivilegeSnapshot(createdPrivilege, roleIds);
 
-    AssignPrivilegesToRolesResult roleAssignmentResult = null;
-    if (!roleIds.isEmpty()) {
-      roleAssignmentResult =
-          this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
-              AssignPrivilegesToRolesRequest.builder()
-                  .privilegeIdentifiers(b -> b.id(id))
-                  .roleIdentifiers(b -> b.ids(roleIds))
-                  .build());
+    AssignPrivilegesToRolesResult roleAssignmentResult;
+    List<String> roleIds;
+    if (request.roleIdentifiers().shouldUpdate()) {
+      roleIds =
+          IdentifierResolver.create(this.roleRepository)
+              .resolve(request.roleIdentifiers().getValue());
+
+      if (!roleIds.isEmpty()) {
+        roleAssignmentResult =
+            this.assignPrivilegesToRolesUseCase.assignPrivilegesToRoles(
+                AssignPrivilegesToRolesRequest.builder()
+                    .privilegeIdentifiers(b -> b.id(id))
+                    .roleIdentifiers(b -> b.ids(roleIds))
+                    .build());
+      } else {
+        roleAssignmentResult = AssignPrivilegesToRolesResult.skipped();
+      }
+    } else {
+      roleAssignmentResult = AssignPrivilegesToRolesResult.skipped();
+      roleIds = List.of();
     }
-
+    PrivilegeSnapshot snapshot = new PrivilegeSnapshot(createdPrivilege, roleIds);
     return new CreatePrivilegeResult(id, snapshot, roleAssignmentResult, timestamp);
   }
 

@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 @Immutable
 public final class Privilege {
 
+  public static final String BUILT_IN_PRIVILEGE_ID_FULL_ACCESS = "1";
+
   @Nullable private final String id;
 
   @Nullable private final Anchor anchor;

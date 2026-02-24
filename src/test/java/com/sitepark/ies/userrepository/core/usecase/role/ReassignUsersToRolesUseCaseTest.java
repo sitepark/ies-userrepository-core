@@ -13,27 +13,27 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
-import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
-import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
+import com.sitepark.ies.userrepository.core.domain.value.RoleUserAssignment;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
+import com.sitepark.ies.userrepository.core.port.UserRepository;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ReassignPrivilegesToRolesUseCaseTest {
+class ReassignUsersToRolesUseCaseTest {
 
   private RoleAssigner roleAssigner;
   private RoleEntityAuthorizationService roleEntityAuthorizationService;
 
-  private ReassignPrivilegesToRolesUseCase useCase;
+  private ReassignUsersToRolesUseCase useCase;
 
   @BeforeEach
   void setUp() {
+    UserRepository userRepository = mock();
     RoleRepository roleRepository = mock();
-    PrivilegeRepository privilegeRepository = mock();
     this.roleAssigner = mock();
     this.roleEntityAuthorizationService = mock();
 
@@ -41,19 +41,19 @@ class ReassignPrivilegesToRolesUseCaseTest {
     Clock fixedClock = Clock.fixed(fixedTime.toInstant(), fixedTime.getOffset());
 
     this.useCase =
-        new ReassignPrivilegesToRolesUseCase(
+        new ReassignUsersToRolesUseCase(
+            userRepository,
             roleRepository,
-            privilegeRepository,
-            roleAssigner,
-            roleEntityAuthorizationService,
+            this.roleAssigner,
+            this.roleEntityAuthorizationService,
             fixedClock);
   }
 
   @Test
   void testEmptyRequestReturnsSkipped() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    ReassignPrivilegesToRolesResult result =
-        this.useCase.reassignPrivilegesToRoles(ReassignPrivilegesToRolesRequest.builder().build());
+    ReassignUsersToRolesResult result =
+        this.useCase.reassignUsersToRoles(ReassignUsersToRolesRequest.builder().build());
 
     assertFalse(result.wasReassigned(), "Result should indicate skipped when request is empty");
   }
@@ -65,10 +65,10 @@ class ReassignPrivilegesToRolesUseCaseTest {
     assertThrows(
         AccessDeniedException.class,
         () ->
-            this.useCase.reassignPrivilegesToRoles(
-                ReassignPrivilegesToRolesRequest.builder()
+            this.useCase.reassignUsersToRoles(
+                ReassignUsersToRolesRequest.builder()
                     .roleIdentifiers(b -> b.ids("1", "2"))
-                    .privilegeIdentifiers(b -> b.ids("3", "4"))
+                    .userIdentifiers(b -> b.ids("3", "4"))
                     .build()),
         "Should throw AccessDeniedException when roles are not writable");
   }
@@ -76,18 +76,18 @@ class ReassignPrivilegesToRolesUseCaseTest {
   @Test
   void testNoEffectiveChangesReturnsSkipped() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
         .thenReturn(
-            RolePrivilegeAssignment.builder()
+            RoleUserAssignment.builder()
                 .assignments("1", List.of("3", "4"))
                 .assignments("2", List.of("3", "4"))
                 .build());
 
-    ReassignPrivilegesToRolesResult result =
-        this.useCase.reassignPrivilegesToRoles(
-            ReassignPrivilegesToRolesRequest.builder()
+    ReassignUsersToRolesResult result =
+        this.useCase.reassignUsersToRoles(
+            ReassignUsersToRolesRequest.builder()
                 .roleIdentifiers(b -> b.ids("1", "2"))
-                .privilegeIdentifiers(b -> b.ids("3", "4"))
+                .userIdentifiers(b -> b.ids("3", "4"))
                 .build());
 
     assertFalse(
@@ -95,46 +95,46 @@ class ReassignPrivilegesToRolesUseCaseTest {
   }
 
   @Test
-  void testReassignWithNewAssignmentsCallsAssign() {
+  void testReassignWithNewUsersCallsAssign() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
-        .thenReturn(RolePrivilegeAssignment.builder().build());
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
+        .thenReturn(RoleUserAssignment.builder().build());
 
-    this.useCase.reassignPrivilegesToRoles(
-        ReassignPrivilegesToRolesRequest.builder()
+    this.useCase.reassignUsersToRoles(
+        ReassignUsersToRolesRequest.builder()
             .roleIdentifiers(b -> b.ids("1"))
-            .privilegeIdentifiers(b -> b.ids("3", "4"))
+            .userIdentifiers(b -> b.ids("3", "4"))
             .build());
 
-    verify(this.roleAssigner).assignPrivilegesToRoles(eq(List.of("1")), anyList());
+    verify(this.roleAssigner).assignRolesToUsers(anyList(), eq(List.of("1")));
   }
 
   @Test
   void testReassignWithUnassignmentsCallsUnassign() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
-        .thenReturn(RolePrivilegeAssignment.builder().assignments("1", List.of("5", "6")).build());
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
+        .thenReturn(RoleUserAssignment.builder().assignments("1", List.of("5", "6")).build());
 
-    this.useCase.reassignPrivilegesToRoles(
-        ReassignPrivilegesToRolesRequest.builder()
+    this.useCase.reassignUsersToRoles(
+        ReassignUsersToRolesRequest.builder()
             .roleIdentifiers(b -> b.ids("1"))
-            .privilegeIdentifiers(b -> b.ids("3", "4"))
+            .userIdentifiers(b -> b.ids("3", "4"))
             .build());
 
-    verify(this.roleAssigner).unassignPrivilegesFromRoles(eq(List.of("1")), anyList());
+    verify(this.roleAssigner).unassignRolesFromUsers(anyList(), eq(List.of("1")));
   }
 
   @Test
   void testReassignWithEffectiveChangesReturnsReassigned() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
-        .thenReturn(RolePrivilegeAssignment.builder().build());
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
+        .thenReturn(RoleUserAssignment.builder().build());
 
-    ReassignPrivilegesToRolesResult result =
-        this.useCase.reassignPrivilegesToRoles(
-            ReassignPrivilegesToRolesRequest.builder()
+    ReassignUsersToRolesResult result =
+        this.useCase.reassignUsersToRoles(
+            ReassignUsersToRolesRequest.builder()
                 .roleIdentifiers(b -> b.ids("1", "2"))
-                .privilegeIdentifiers(b -> b.ids("3", "4"))
+                .userIdentifiers(b -> b.ids("3", "4"))
                 .build());
 
     assertTrue(
@@ -145,86 +145,97 @@ class ReassignPrivilegesToRolesUseCaseTest {
   @Test
   void testEmptyRoleIdentifiersReturnsSkipped() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    ReassignPrivilegesToRolesResult result =
-        this.useCase.reassignPrivilegesToRoles(
-            ReassignPrivilegesToRolesRequest.builder()
-                .privilegeIdentifiers(b -> b.ids("3", "4"))
-                .build());
+    ReassignUsersToRolesResult result =
+        this.useCase.reassignUsersToRoles(
+            ReassignUsersToRolesRequest.builder().userIdentifiers(b -> b.ids("3", "4")).build());
 
     assertFalse(
         result.wasReassigned(), "Result should indicate skipped when role identifiers are empty");
   }
 
   @Test
-  void testEmptyPrivilegeIdentifiersReturnsSkipped() {
+  void testEmptyUserIdentifiersReturnsSkipped() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
-        .thenReturn(RolePrivilegeAssignment.builder().build());
-    ReassignPrivilegesToRolesResult result =
-        this.useCase.reassignPrivilegesToRoles(
-            ReassignPrivilegesToRolesRequest.builder()
-                .roleIdentifiers(b -> b.ids("1", "2"))
-                .build());
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
+        .thenReturn(RoleUserAssignment.builder().build());
+
+    ReassignUsersToRolesResult result =
+        this.useCase.reassignUsersToRoles(
+            ReassignUsersToRolesRequest.builder().roleIdentifiers(b -> b.ids("1", "2")).build());
 
     assertFalse(
-        result.wasReassigned(),
-        "Result should indicate skipped when privilege identifiers are empty");
+        result.wasReassigned(), "Result should indicate skipped when user identifiers are empty");
   }
 
   @Test
   void testPartialMatchCreatesEffectiveAssignments() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
         .thenReturn(
-            RolePrivilegeAssignment.builder()
+            RoleUserAssignment.builder()
                 .assignments("1", List.of("3"))
                 .assignments("2", List.of("3"))
                 .build());
 
-    this.useCase.reassignPrivilegesToRoles(
-        ReassignPrivilegesToRolesRequest.builder()
+    this.useCase.reassignUsersToRoles(
+        ReassignUsersToRolesRequest.builder()
             .roleIdentifiers(b -> b.ids("1", "2"))
-            .privilegeIdentifiers(b -> b.ids("3", "4"))
+            .userIdentifiers(b -> b.ids("3", "4"))
             .build());
 
-    verify(this.roleAssigner).assignPrivilegesToRoles(List.of("1"), List.of("4"));
+    verify(this.roleAssigner).assignRolesToUsers(List.of("4"), List.of("1"));
   }
 
   @Test
   void testWithoutEffectiveChangesDoesNotCallAssign() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
         .thenReturn(
-            RolePrivilegeAssignment.builder()
+            RoleUserAssignment.builder()
                 .assignments("1", List.of("3", "4"))
                 .assignments("2", List.of("3", "4"))
                 .build());
 
-    this.useCase.reassignPrivilegesToRoles(
-        ReassignPrivilegesToRolesRequest.builder()
+    this.useCase.reassignUsersToRoles(
+        ReassignUsersToRolesRequest.builder()
             .roleIdentifiers(b -> b.ids("1", "2"))
-            .privilegeIdentifiers(b -> b.ids("3", "4"))
+            .userIdentifiers(b -> b.ids("3", "4"))
             .build());
 
-    verify(this.roleAssigner, never()).assignPrivilegesToRoles(anyList(), anyList());
+    verify(this.roleAssigner, never()).assignRolesToUsers(anyList(), anyList());
   }
 
   @Test
   void testWithoutEffectiveChangesDoesNotCallUnassign() {
     when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
-    when(this.roleAssigner.getPrivilegesAssignByRoles(any()))
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
         .thenReturn(
-            RolePrivilegeAssignment.builder()
+            RoleUserAssignment.builder()
                 .assignments("1", List.of("3", "4"))
                 .assignments("2", List.of("3", "4"))
                 .build());
 
-    this.useCase.reassignPrivilegesToRoles(
-        ReassignPrivilegesToRolesRequest.builder()
+    this.useCase.reassignUsersToRoles(
+        ReassignUsersToRolesRequest.builder()
             .roleIdentifiers(b -> b.ids("1", "2"))
-            .privilegeIdentifiers(b -> b.ids("3", "4"))
+            .userIdentifiers(b -> b.ids("3", "4"))
             .build());
 
-    verify(this.roleAssigner, never()).unassignPrivilegesFromRoles(anyList(), anyList());
+    verify(this.roleAssigner, never()).unassignRolesFromUsers(anyList(), anyList());
+  }
+
+  @Test
+  void testAdministratorRoleDoesNotUnassignInitialUser() {
+    when(this.roleEntityAuthorizationService.isWritable(anyList())).thenReturn(true);
+    when(this.roleAssigner.getUsersAssignByRoles(any()))
+        .thenReturn(RoleUserAssignment.builder().assignments("1", List.of("1")).build());
+
+    this.useCase.reassignUsersToRoles(
+        ReassignUsersToRolesRequest.builder()
+            .roleIdentifiers(b -> b.ids("1"))
+            .userIdentifiers(b -> b.ids("3"))
+            .build());
+
+    verify(this.roleAssigner, never()).unassignRolesFromUsers(anyList(), anyList());
   }
 }

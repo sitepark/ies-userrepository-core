@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 @Immutable
 public final class Role {
 
+  public static final String BUILT_IN_ROLE_ID_ADMINISTRATOR = "1";
+
   @Nullable private final String id;
 
   @Nullable private final Anchor anchor;

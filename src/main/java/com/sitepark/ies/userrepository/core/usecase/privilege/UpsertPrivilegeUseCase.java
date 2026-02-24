@@ -29,7 +29,7 @@ public final class UpsertPrivilegeUseCase {
           this.createPrivilegeUseCase.createPrivilege(
               CreatePrivilegeRequest.builder()
                   .privilege(privilegeResolved)
-                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers().getValue()))
                   .build());
       return UpsertPrivilegeResult.created(result.privilegeId(), result);
     } else {
@@ -37,7 +37,7 @@ public final class UpsertPrivilegeUseCase {
           this.updatePrivilegeUseCase.updatePrivilege(
               UpdatePrivilegeRequest.builder()
                   .privilege(privilegeResolved)
-                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers().getValue()))
                   .build());
       return UpsertPrivilegeResult.updated(privilegeResolved.id(), result);
     }

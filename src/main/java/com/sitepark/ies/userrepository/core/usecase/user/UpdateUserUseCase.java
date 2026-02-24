@@ -96,12 +96,17 @@ public final class UpdateUserUseCase {
     }
 
     // Handle role assignments independently
-    ReassignRolesToUsersResult roleReassignmentResult =
-        this.reassignRolesToUsersUseCase.reassignRolesToUsers(
-            AssignRolesToUsersRequest.builder()
-                .userIdentifiers(b -> b.id(userForUpdate.id()))
-                .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers()))
-                .build());
+    ReassignRolesToUsersResult roleReassignmentResult;
+    if (request.roleIdentifiers().shouldUpdate()) {
+      roleReassignmentResult =
+          this.reassignRolesToUsersUseCase.reassignRolesToUsers(
+              ReassignRolesToUsersRequest.builder()
+                  .userIdentifiers(b -> b.id(userForUpdate.id()))
+                  .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers().getValue()))
+                  .build());
+    } else {
+      roleReassignmentResult = ReassignRolesToUsersResult.skipped();
+    }
 
     return new UpdateUserResult(
         userForUpdate.id(), timestamp, userUpdateResult, roleReassignmentResult);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
+import com.sitepark.ies.sharedkernel.base.Updatable;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import java.util.List;
 import java.util.Objects;
@@ -18,12 +19,15 @@ public final class UpsertPrivilegeRequest {
 
   @NotNull private final Privilege privilege;
 
-  @NotNull private final List<Identifier> roleIdentifiers;
+  @NotNull private final Updatable<List<Identifier>> roleIdentifiers;
 
   private UpsertPrivilegeRequest(Builder builder) {
     Objects.requireNonNull(builder.privilege, "Privilege must not be null");
     this.privilege = builder.privilege;
-    this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
+    this.roleIdentifiers =
+        builder.roleIdentifiers != null
+            ? Updatable.of(List.copyOf(builder.roleIdentifiers))
+            : Updatable.unchanged();
   }
 
   public static Builder builder() {
@@ -36,7 +40,7 @@ public final class UpsertPrivilegeRequest {
   }
 
   @NotNull
-  public List<Identifier> roleIdentifiers() {
+  public Updatable<List<Identifier>> roleIdentifiers() {
     return this.roleIdentifiers;
   }
 
@@ -69,14 +73,16 @@ public final class UpsertPrivilegeRequest {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private final Set<Identifier> roleIdentifiers = new TreeSet<>();
+    private Set<Identifier> roleIdentifiers;
     private Privilege privilege;
 
     private Builder() {}
 
     private Builder(UpsertPrivilegeRequest request) {
       this.privilege = request.privilege;
-      this.roleIdentifiers.addAll(request.roleIdentifiers);
+      if (request.roleIdentifiers.shouldUpdate()) {
+        this.roleIdentifiers = new TreeSet<>(request.roleIdentifiers.getValue());
+      }
     }
 
     public Builder privilege(Privilege privilege) {
@@ -87,8 +93,10 @@ public final class UpsertPrivilegeRequest {
     public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {
       IdentifierListBuilder listBuilder = new IdentifierListBuilder();
       configurer.accept(listBuilder);
-      this.roleIdentifiers.clear();
-      this.roleIdentifiers.addAll(listBuilder.build());
+      if (listBuilder.changed()) {
+        this.roleIdentifiers = new TreeSet<>();
+        this.roleIdentifiers.addAll(listBuilder.build());
+      }
       return this;
     }
 

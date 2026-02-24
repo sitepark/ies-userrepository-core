@@ -1,5 +1,8 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import static com.sitepark.ies.userrepository.core.domain.entity.Privilege.BUILT_IN_PRIVILEGE_ID_FULL_ACCESS;
+import static com.sitepark.ies.userrepository.core.domain.entity.Role.BUILT_IN_ROLE_ID_ADMINISTRATOR;
+
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
@@ -117,6 +120,12 @@ public final class ReassignRolesToPrivilegesUseCase {
       List<String> assignedRoles = assignments.roleIds(privilegeId);
       List<String> effectiveRoleIds =
           assignedRoles.stream().filter(Predicate.not(roleIds::contains)).toList();
+      if (BUILT_IN_PRIVILEGE_ID_FULL_ACCESS.equals(privilegeId)) {
+        effectiveRoleIds =
+            effectiveRoleIds.stream()
+                .filter(Predicate.not(BUILT_IN_ROLE_ID_ADMINISTRATOR::equals))
+                .toList();
+      }
       if (!effectiveRoleIds.isEmpty()) {
         builder.assignments(privilegeId, effectiveRoleIds);
       }

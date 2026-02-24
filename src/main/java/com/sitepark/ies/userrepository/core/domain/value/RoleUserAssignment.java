@@ -39,6 +39,18 @@ public class RoleUserAssignment {
     return List.copyOf(allUserIds);
   }
 
+  public UserRoleAssignment toUserRoleAssignment() {
+    UserRoleAssignment.Builder builder = UserRoleAssignment.builder();
+    for (String userId : this.userIds()) {
+      for (Map.Entry<String, Set<String>> entry : this.assignments.entrySet()) {
+        if (entry.getValue().contains(userId)) {
+          builder.assignment(userId, entry.getKey());
+        }
+      }
+    }
+    return builder.build();
+  }
+
   public boolean isEmpty() {
     return this.assignments.isEmpty();
   }

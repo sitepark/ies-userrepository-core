@@ -316,8 +316,14 @@ class FinishUserRegistrationUseCaseTest {
         .createUser(
             argThat(
                 createUserRequest ->
-                    !createUserRequest.roleIdentifiers().isEmpty()
-                        && "999".equals(createUserRequest.roleIdentifiers().getFirst().getId())));
+                    createUserRequest.roleIdentifiers().shouldUpdate()
+                        && "999"
+                            .equals(
+                                createUserRequest
+                                    .roleIdentifiers()
+                                    .getValue()
+                                    .getFirst()
+                                    .getId())));
   }
 
   @Test
@@ -349,11 +355,12 @@ class FinishUserRegistrationUseCaseTest {
         .createUser(
             argThat(
                 createUserRequest ->
-                    !createUserRequest.roleIdentifiers().isEmpty()
+                    createUserRequest.roleIdentifiers().shouldUpdate()
                         && "admin.role"
                             .equals(
                                 createUserRequest
                                     .roleIdentifiers()
+                                    .getValue()
                                     .getFirst()
                                     .getAnchor()
                                     .getName())));
