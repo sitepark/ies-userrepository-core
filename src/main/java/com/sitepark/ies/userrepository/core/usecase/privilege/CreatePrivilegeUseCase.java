@@ -16,6 +16,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,7 +67,10 @@ public final class CreatePrivilegeUseCase {
     if (request.roleIdentifiers().shouldUpdate()) {
       roleIds =
           IdentifierResolver.create(this.roleRepository)
-              .resolve(request.roleIdentifiers().getValue());
+              .resolve(
+                  Objects.requireNonNull(
+                      request.roleIdentifiers().getValue(),
+                      "roleIdentifiers are set when they should be updated"));
 
       if (!roleIds.isEmpty()) {
         roleAssignmentResult =
