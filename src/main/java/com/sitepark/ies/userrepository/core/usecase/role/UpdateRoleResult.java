@@ -2,8 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a role update operation.
@@ -29,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
  *     were reassigned
  */
 public record UpdateRoleResult(
-    @NotNull String roleId,
-    @NotNull String roleName,
-    @NotNull Instant timestamp,
+    String roleId,
+    String roleName,
+    Instant timestamp,
     @Nullable PatchDocument patch,
     @Nullable PatchDocument revertPatch,
     @Nullable ReassignPrivilegesToRolesResult privilegeReassignmentResult) {

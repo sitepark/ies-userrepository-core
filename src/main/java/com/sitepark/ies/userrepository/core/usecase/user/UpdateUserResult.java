@@ -1,7 +1,7 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a user update operation.
@@ -17,10 +17,10 @@ import org.jetbrains.annotations.NotNull;
  * </ul>
  */
 public record UpdateUserResult(
-    @NotNull String userId,
-    @NotNull Instant timestamp,
-    @NotNull UserUpdateResult userResult,
-    @NotNull ReassignRolesToUsersResult roleReassignmentResult) {
+    String userId,
+    Instant timestamp,
+    UserUpdateResult userResult,
+    ReassignRolesToUsersResult roleReassignmentResult) {
 
   /**
    * Checks if the user data was changed.
@@ -54,7 +54,7 @@ public record UpdateUserResult(
    *
    * @return the Updated result or null if unchanged
    */
-  public UserUpdateResult.Updated userUpdate() {
+  public UserUpdateResult.@Nullable Updated userUpdate() {
     return userResult instanceof UserUpdateResult.Updated updated ? updated : null;
   }
 
@@ -63,7 +63,8 @@ public record UpdateUserResult(
    *
    * @return the Assigned result or null if skipped
    */
-  public ReassignRolesToUsersResult roleReassignmentResult() {
+  @Override
+  public @Nullable ReassignRolesToUsersResult roleReassignmentResult() {
     return roleReassignmentResult instanceof ReassignRolesToUsersResult.Reassigned reassigned
         ? reassigned
         : null;

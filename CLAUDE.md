@@ -13,9 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Code Quality
 - **Format code**: `mvn spotless:apply`
 - **Check code formatting**: `mvn spotless:check`
-- **Run static analysis**: `mvn verify` (runs SpotBugs, PMD, and other quality checks)
+- **Run static analysis**: `mvn verify` (runs PMD, JaCoCo, and other quality checks)
 - **Run specific static analysis tools**:
-  - SpotBugs: `mvn spotbugs:check`
   - PMD: `mvn pmd:check`
 
 ### Packaging and Publishing
@@ -69,9 +68,9 @@ The project includes a sophisticated query system with:
 
 ### Code Quality Standards
 
-- **Java 21** target with modern language features
+- **Java 25** target with modern language features
 - **Google Java Format** for consistent code style
-- **SpotBugs** for bug pattern detection
+- **Error Prone and NullAway** (JSpecify mode) run during compilation; `-Werror` turns every warning into an error. Code is `@NullMarked`; nullable points use `org.jspecify.annotations.Nullable`
 - **PMD** for code quality rules
 - **JaCoCo** for test coverage monitoring
 - **JUnit 5** with Mockito for testing

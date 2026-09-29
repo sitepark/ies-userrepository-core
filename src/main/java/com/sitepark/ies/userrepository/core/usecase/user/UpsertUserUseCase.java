@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
 import com.sitepark.ies.userrepository.core.port.UserRepository;
@@ -46,18 +47,19 @@ public final class UpsertUserUseCase {
   }
 
   private User toUserWithId(User user) {
-    if (user.id() == null && user.anchor() != null) {
+    Anchor anchor = user.anchor();
+    if (user.id() == null && anchor != null) {
       return this.repository
-          .resolveAnchor(user.anchor())
+          .resolveAnchor(anchor)
           .map(s -> user.toBuilder().id(s).build())
           .orElse(user);
-    } else if (user.id() != null && user.anchor() != null) {
+    } else if (user.id() != null && anchor != null) {
       this.repository
-          .resolveAnchor(user.anchor())
+          .resolveAnchor(anchor)
           .ifPresent(
               owner -> {
                 if (!owner.equals(user.id())) {
-                  throw new AnchorAlreadyExistsException(user.anchor(), owner);
+                  throw new AnchorAlreadyExistsException(anchor, owner);
                 }
               });
     }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.time.Instant;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Encapsulates user properties indicating whether a user is blocked or has a limited validity
@@ -14,13 +14,12 @@ import javax.annotation.concurrent.Immutable;
  */
 @JsonDeserialize(builder = UserValidity.Builder.class)
 @SuppressWarnings("PMD.LawOfDemeter")
-@Immutable
 public class UserValidity {
 
   public static final UserValidity ALWAYS_VALID = UserValidity.builder().blocked(false).build();
   private final boolean blocked;
-  private final Instant validFrom;
-  private final Instant validTo;
+  private final @Nullable Instant validFrom;
+  private final @Nullable Instant validTo;
 
   protected UserValidity(Builder builder) {
     this.blocked = builder.blocked;
@@ -38,12 +37,12 @@ public class UserValidity {
   }
 
   @JsonProperty
-  public Instant validFrom() {
+  public @Nullable Instant validFrom() {
     return this.validFrom;
   }
 
   @JsonProperty
-  public Instant validTo() {
+  public @Nullable Instant validTo() {
     return this.validTo;
   }
 
@@ -79,7 +78,7 @@ public class UserValidity {
   @Override
   public final boolean equals(Object o) {
     return (o instanceof UserValidity validity)
-        && Objects.equals(this.blocked, validity.blocked)
+        && this.blocked == validity.blocked
         && Objects.equals(this.validFrom, validity.validFrom)
         && Objects.equals(this.validTo, validity.validTo);
   }
@@ -102,9 +101,9 @@ public class UserValidity {
 
     private boolean blocked;
 
-    private Instant validFrom;
+    private @Nullable Instant validFrom;
 
-    private Instant validTo;
+    private @Nullable Instant validTo;
 
     private Builder() {}
 

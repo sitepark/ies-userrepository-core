@@ -2,8 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.userrepository.core.domain.value.RoleSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a role removal operation.
@@ -22,7 +21,6 @@ public sealed interface RemoveRoleResult {
    *
    * @return the role ID
    */
-  @NotNull
   String roleId();
 
   /**
@@ -33,11 +31,7 @@ public sealed interface RemoveRoleResult {
    * @param snapshot the snapshot of the role state before removal
    * @param timestamp the timestamp when the removal occurred
    */
-  record Removed(
-      @NotNull String roleId,
-      @NotNull String roleName,
-      @NotNull RoleSnapshot snapshot,
-      @NotNull Instant timestamp)
+  record Removed(String roleId, String roleName, RoleSnapshot snapshot, Instant timestamp)
       implements RemoveRoleResult {}
 
   /**
@@ -46,7 +40,7 @@ public sealed interface RemoveRoleResult {
    * @param roleId the role ID
    * @param reason the reason why the removal was skipped
    */
-  record Skipped(@NotNull String roleId, @NotNull String reason) implements RemoveRoleResult {}
+  record Skipped(String roleId, String reason) implements RemoveRoleResult {}
 
   /**
    * Factory method for removed result.
@@ -58,10 +52,7 @@ public sealed interface RemoveRoleResult {
    * @return removed result
    */
   static RemoveRoleResult removed(
-      @NotNull String roleId,
-      @NotNull String roleName,
-      @NotNull RoleSnapshot snapshot,
-      @NotNull Instant timestamp) {
+      String roleId, String roleName, RoleSnapshot snapshot, Instant timestamp) {
     return new Removed(roleId, roleName, snapshot, timestamp);
   }
 
@@ -72,7 +63,7 @@ public sealed interface RemoveRoleResult {
    * @param reason the reason for skipping
    * @return skipped result
    */
-  static RemoveRoleResult skipped(@NotNull String roleId, @NotNull String reason) {
+  static RemoveRoleResult skipped(String roleId, String reason) {
     return new Skipped(roleId, reason);
   }
 

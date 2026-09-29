@@ -2,14 +2,13 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Request to remove a single user from the repository.
  *
  * @param identifier the identifier (ID or anchor) of the user to remove
  */
-public record RemoveUserRequest(@NotNull Identifier identifier) {
+public record RemoveUserRequest(Identifier identifier) {
 
   /**
    * Creates a new builder for RemoveUserRequest.
@@ -21,6 +20,7 @@ public record RemoveUserRequest(@NotNull Identifier identifier) {
   }
 
   /** Builder for RemoveUserRequest. */
+  @SuppressWarnings("NullAway.Init")
   public static final class Builder {
 
     private Identifier identifier;

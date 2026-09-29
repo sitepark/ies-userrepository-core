@@ -9,15 +9,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
 
 @JsonDeserialize(builder = UnassignPrivilegesFromRolesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 public final class UnassignPrivilegesFromRolesRequest {
 
-  @NotNull private final List<Identifier> privilegeIdentifiers;
+  private final List<Identifier> privilegeIdentifiers;
 
-  @NotNull private final List<Identifier> roleIdentifiers;
+  private final List<Identifier> roleIdentifiers;
 
   private UnassignPrivilegesFromRolesRequest(Builder builder) {
     this.privilegeIdentifiers = List.copyOf(builder.privilegeIdentifiers);
@@ -32,12 +31,10 @@ public final class UnassignPrivilegesFromRolesRequest {
     return this.roleIdentifiers.isEmpty() || this.privilegeIdentifiers.isEmpty();
   }
 
-  @NotNull
   public List<Identifier> privilegeIdentifiers() {
     return this.privilegeIdentifiers;
   }
 
-  @NotNull
   public List<Identifier> roleIdentifiers() {
     return this.roleIdentifiers;
   }

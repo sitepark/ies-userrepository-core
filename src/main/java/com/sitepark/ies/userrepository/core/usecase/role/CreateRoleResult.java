@@ -2,8 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.userrepository.core.domain.value.RoleSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a role creation operation.
@@ -24,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * @param timestamp the timestamp when the role was created
  */
 public record CreateRoleResult(
-    @NotNull String roleId,
-    @NotNull RoleSnapshot snapshot,
+    String roleId,
+    RoleSnapshot snapshot,
     @Nullable AssignPrivilegesToRolesResult privilegeAssignmentResult,
-    @NotNull Instant timestamp) {}
+    Instant timestamp) {}

@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.userrepository.core.domain.value.RoleSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a role restore operation.
@@ -20,7 +19,6 @@ public sealed interface RestoreRoleResult {
    *
    * @return the role ID
    */
-  @NotNull
   String roleId();
 
   /**
@@ -30,8 +28,7 @@ public sealed interface RestoreRoleResult {
    * @param snapshot snapshot of the restored role data including users and privileges
    * @param timestamp when the restore occurred
    */
-  record Restored(
-      @NotNull String roleId, @NotNull RoleSnapshot snapshot, @NotNull Instant timestamp)
+  record Restored(String roleId, RoleSnapshot snapshot, Instant timestamp)
       implements RestoreRoleResult {}
 
   /**
@@ -40,7 +37,7 @@ public sealed interface RestoreRoleResult {
    * @param roleId the ID of the role that already exists
    * @param reason explanation why restoration was skipped
    */
-  record Skipped(@NotNull String roleId, @NotNull String reason) implements RestoreRoleResult {}
+  record Skipped(String roleId, String reason) implements RestoreRoleResult {}
 
   /**
    * Factory method for creating a restored result.

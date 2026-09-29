@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
@@ -101,11 +102,12 @@ public final class CreateRoleUseCase {
   }
 
   private void validateAnchor(Role role) {
-    if (role.anchor() != null) {
-      Optional<String> anchorOwner = this.roleRepository.resolveAnchor(role.anchor());
+    Anchor anchor = role.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.roleRepository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(role.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }

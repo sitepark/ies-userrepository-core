@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
@@ -11,6 +12,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,14 +44,16 @@ public final class RestorePrivilegeUseCase {
 
     this.validatePrivilege(privilege);
 
+    String privilegeId = Objects.requireNonNull(privilege.id(), "id was validated");
+
     this.checkAuthorization(privilege);
 
-    if (this.repository.get(privilege.id()).isPresent()) {
+    if (this.repository.get(privilegeId).isPresent()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Skip restore, privilege with ID {} already exists.", privilege.id());
+        LOGGER.info("Skip restore, privilege with ID {} already exists.", privilegeId);
       }
       return RestorePrivilegeResult.skipped(
-          privilege.id(), "Privilege with ID " + privilege.id() + " already exists");
+          privilegeId, "Privilege with ID " + privilegeId + " already exists");
     }
 
     this.validateAnchor(privilege);
@@ -64,12 +68,10 @@ public final class RestorePrivilegeUseCase {
 
     this.repository.restore(privilege);
     if (!roleIds.isEmpty()) {
-      String privilegeId = privilege.id();
-      assert privilegeId != null : "privilege.id() was validated in validatePrivilege()";
       this.roleAssigner.assignPrivilegesToRoles(roleIds, List.of(privilegeId));
     }
 
-    return RestorePrivilegeResult.restored(privilege.id(), snapshot, timestamp);
+    return RestorePrivilegeResult.restored(privilegeId, snapshot, timestamp);
   }
 
   private void validatePrivilege(Privilege privilege) {
@@ -91,11 +93,12 @@ public final class RestorePrivilegeUseCase {
   }
 
   private void validateAnchor(Privilege privilege) {
-    if (privilege.anchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(privilege.anchor());
+    Anchor anchor = privilege.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }

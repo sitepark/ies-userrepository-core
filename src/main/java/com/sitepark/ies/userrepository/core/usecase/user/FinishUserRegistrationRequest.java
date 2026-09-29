@@ -19,6 +19,7 @@ public record FinishUserRegistrationRequest(
     roleIdentifiers = roleIdentifiers == null ? List.of() : List.copyOf(roleIdentifiers);
   }
 
+  @Override
   public List<Identifier> roleIdentifiers() {
     return List.copyOf(roleIdentifiers);
   }

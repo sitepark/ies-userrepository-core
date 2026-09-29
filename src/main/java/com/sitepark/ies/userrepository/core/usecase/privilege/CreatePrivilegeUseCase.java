@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
@@ -104,11 +105,12 @@ public final class CreatePrivilegeUseCase {
   }
 
   private void validateAnchor(Privilege privilege) {
-    if (privilege.anchor() != null) {
-      Optional<String> anchorOwner = this.privilegeRepository.resolveAnchor(privilege.anchor());
+    Anchor anchor = privilege.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.privilegeRepository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }

@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a user data update (without role assignments).
@@ -25,8 +24,7 @@ public sealed interface UserUpdateResult {
    * @param patch the forward patch (old state to new state)
    * @param revertPatch the revert patch (new state to old state)
    */
-  record Updated(
-      @NotNull String displayName, @NotNull PatchDocument patch, @NotNull PatchDocument revertPatch)
+  record Updated(String displayName, PatchDocument patch, PatchDocument revertPatch)
       implements UserUpdateResult {}
 
   /**
@@ -47,9 +45,7 @@ public sealed interface UserUpdateResult {
    * @return updated result
    */
   static UserUpdateResult updated(
-      @NotNull String displayName,
-      @NotNull PatchDocument patch,
-      @NotNull PatchDocument revertPatch) {
+      String displayName, PatchDocument patch, PatchDocument revertPatch) {
     return new Updated(displayName, patch, revertPatch);
   }
 }

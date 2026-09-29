@@ -2,8 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.sitepark.ies.userrepository.core.domain.value.PrivilegeSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a privilege removal operation.
@@ -22,7 +21,6 @@ public sealed interface RemovePrivilegeResult {
    *
    * @return the privilege ID
    */
-  @NotNull
   String privilegeId();
 
   /**
@@ -34,10 +32,7 @@ public sealed interface RemovePrivilegeResult {
    * @param timestamp the timestamp when the removal occurred
    */
   record Removed(
-      @NotNull String privilegeId,
-      @NotNull String privilegeName,
-      @NotNull PrivilegeSnapshot snapshot,
-      @NotNull Instant timestamp)
+      String privilegeId, String privilegeName, PrivilegeSnapshot snapshot, Instant timestamp)
       implements RemovePrivilegeResult {}
 
   /**
@@ -46,8 +41,7 @@ public sealed interface RemovePrivilegeResult {
    * @param privilegeId the privilege ID
    * @param reason the reason why the removal was skipped
    */
-  record Skipped(@NotNull String privilegeId, @NotNull String reason)
-      implements RemovePrivilegeResult {}
+  record Skipped(String privilegeId, String reason) implements RemovePrivilegeResult {}
 
   /**
    * Factory method for removed result.
@@ -59,10 +53,7 @@ public sealed interface RemovePrivilegeResult {
    * @return removed result
    */
   static RemovePrivilegeResult removed(
-      @NotNull String privilegeId,
-      @NotNull String privilegeName,
-      @NotNull PrivilegeSnapshot snapshot,
-      @NotNull Instant timestamp) {
+      String privilegeId, String privilegeName, PrivilegeSnapshot snapshot, Instant timestamp) {
     return new Removed(privilegeId, privilegeName, snapshot, timestamp);
   }
 
@@ -73,7 +64,7 @@ public sealed interface RemovePrivilegeResult {
    * @param reason the reason for skipping
    * @return skipped result
    */
-  static RemovePrivilegeResult skipped(@NotNull String privilegeId, @NotNull String reason) {
+  static RemovePrivilegeResult skipped(String privilegeId, String reason) {
     return new Skipped(privilegeId, reason);
   }
 

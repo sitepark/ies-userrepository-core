@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
@@ -44,18 +45,19 @@ public final class UpsertPrivilegeUseCase {
   }
 
   private Privilege toPrivilegeWithId(Privilege privilege) {
-    if (privilege.id() == null && privilege.anchor() != null) {
+    Anchor anchor = privilege.anchor();
+    if (privilege.id() == null && anchor != null) {
       return this.repository
-          .resolveAnchor(privilege.anchor())
+          .resolveAnchor(anchor)
           .map(s -> privilege.toBuilder().id(s).build())
           .orElse(privilege);
-    } else if (privilege.id() != null && privilege.anchor() != null) {
+    } else if (privilege.id() != null && anchor != null) {
       this.repository
-          .resolveAnchor(privilege.anchor())
+          .resolveAnchor(anchor)
           .ifPresent(
               owner -> {
                 if (!owner.equals(privilege.id())) {
-                  throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
+                  throw new AnchorAlreadyExistsException(anchor, owner);
                 }
               });
     }

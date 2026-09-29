@@ -82,7 +82,7 @@ public class RoleEntityAuthorizationService extends AbstractEntityAuthorizationS
 
     List<String> allowedPrivilegeIds = this.getUserPermission().roleGrant().allowedPrivilegeIds();
     return allowedPrivilegeIds.isEmpty()
-        || this.getUserPermission().roleGrant().assignPrivileges()
-            && new HashSet<>(allowedPrivilegeIds).containsAll(privilegesIds);
+        || (this.getUserPermission().roleGrant().assignPrivileges()
+            && new HashSet<>(allowedPrivilegeIds).containsAll(privilegesIds));
   }
 }

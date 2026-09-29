@@ -2,8 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.userrepository.core.domain.value.UserSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a user removal operation.
@@ -22,7 +21,6 @@ public sealed interface RemoveUserResult {
    *
    * @return the user ID
    */
-  @NotNull
   String userId();
 
   /**
@@ -33,11 +31,7 @@ public sealed interface RemoveUserResult {
    * @param snapshot the snapshot of the user state before removal
    * @param timestamp the timestamp when the removal occurred
    */
-  record Removed(
-      @NotNull String userId,
-      @NotNull String displayName,
-      @NotNull UserSnapshot snapshot,
-      @NotNull Instant timestamp)
+  record Removed(String userId, String displayName, UserSnapshot snapshot, Instant timestamp)
       implements RemoveUserResult {}
 
   /**
@@ -46,7 +40,7 @@ public sealed interface RemoveUserResult {
    * @param userId the user ID
    * @param reason the reason why the removal was skipped
    */
-  record Skipped(@NotNull String userId, @NotNull String reason) implements RemoveUserResult {}
+  record Skipped(String userId, String reason) implements RemoveUserResult {}
 
   /**
    * Factory method for removed result.
@@ -58,10 +52,7 @@ public sealed interface RemoveUserResult {
    * @return removed result
    */
   static RemoveUserResult removed(
-      @NotNull String userId,
-      @NotNull String displayName,
-      @NotNull UserSnapshot snapshot,
-      @NotNull Instant timestamp) {
+      String userId, String displayName, UserSnapshot snapshot, Instant timestamp) {
     return new Removed(userId, displayName, snapshot, timestamp);
   }
 
@@ -72,7 +63,7 @@ public sealed interface RemoveUserResult {
    * @param reason the reason for skipping
    * @return skipped result
    */
-  static RemoveUserResult skipped(@NotNull String userId, @NotNull String reason) {
+  static RemoveUserResult skipped(String userId, String reason) {
     return new Skipped(userId, reason);
   }
 

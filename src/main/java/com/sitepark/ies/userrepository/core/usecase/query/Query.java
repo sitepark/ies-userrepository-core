@@ -5,20 +5,22 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.usecase.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.usecase.query.sort.SortCriteria;
-import java.util.*;
-import javax.annotation.concurrent.Immutable;
-import org.jetbrains.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 @JsonDeserialize(builder = Query.Builder.class)
 @SuppressWarnings("PMD.LawOfDemeter")
-@Immutable
 public final class Query {
 
-  private final Filter filter;
+  private final @Nullable Filter filter;
 
   private final List<SortCriteria> sort;
 
-  private final Limit limit;
+  private final @Nullable Limit limit;
 
   private Query(Builder builder) {
     this.filter = builder.filter;
@@ -64,11 +66,11 @@ public final class Query {
   @JsonPOJOBuilder(withPrefix = "")
   public static class Builder {
 
-    protected Filter filter;
+    protected @Nullable Filter filter;
 
     protected List<SortCriteria> sort = new ArrayList<>();
 
-    protected Limit limit;
+    protected @Nullable Limit limit;
 
     protected Builder() {}
 

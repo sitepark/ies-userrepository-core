@@ -2,14 +2,13 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Request to remove a single role from the repository.
  *
  * @param identifier the identifier (ID or anchor) of the role to remove
  */
-public record RemoveRoleRequest(@NotNull Identifier identifier) {
+public record RemoveRoleRequest(Identifier identifier) {
 
   /**
    * Creates a new builder for RemoveRoleRequest.
@@ -21,6 +20,7 @@ public record RemoveRoleRequest(@NotNull Identifier identifier) {
   }
 
   /** Builder for RemoveRoleRequest. */
+  @SuppressWarnings("NullAway.Init")
   public static final class Builder {
 
     private Identifier identifier;

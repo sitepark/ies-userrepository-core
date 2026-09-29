@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.sitepark.ies.userrepository.core.domain.value.PrivilegeSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a privilege restore operation.
@@ -21,7 +20,6 @@ public sealed interface RestorePrivilegeResult {
    *
    * @return the privilege ID
    */
-  @NotNull
   String privilegeId();
 
   /**
@@ -31,8 +29,7 @@ public sealed interface RestorePrivilegeResult {
    * @param snapshot snapshot of the restored privilege data including roles
    * @param timestamp when the restore occurred
    */
-  record Restored(
-      @NotNull String privilegeId, @NotNull PrivilegeSnapshot snapshot, @NotNull Instant timestamp)
+  record Restored(String privilegeId, PrivilegeSnapshot snapshot, Instant timestamp)
       implements RestorePrivilegeResult {}
 
   /**
@@ -41,8 +38,7 @@ public sealed interface RestorePrivilegeResult {
    * @param privilegeId the ID of the privilege that already exists
    * @param reason explanation why restoration was skipped
    */
-  record Skipped(@NotNull String privilegeId, @NotNull String reason)
-      implements RestorePrivilegeResult {}
+  record Skipped(String privilegeId, String reason) implements RestorePrivilegeResult {}
 
   /**
    * Factory method for creating a restored result.

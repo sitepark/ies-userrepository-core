@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a privilege unassignment operation.
@@ -21,7 +20,6 @@ public sealed interface UnassignPrivilegesFromRolesResult {
    *
    * @return the role-privilege unassignments
    */
-  @NotNull
   RolePrivilegeAssignment unassignments();
 
   /**
@@ -30,7 +28,7 @@ public sealed interface UnassignPrivilegesFromRolesResult {
    * @param unassignments the effective role-privilege unassignments that were made
    * @param timestamp the timestamp when the unassignment occurred
    */
-  record Unassigned(@NotNull RolePrivilegeAssignment unassignments, @NotNull Instant timestamp)
+  record Unassigned(RolePrivilegeAssignment unassignments, Instant timestamp)
       implements UnassignPrivilegesFromRolesResult {}
 
   /**
@@ -38,7 +36,7 @@ public sealed interface UnassignPrivilegesFromRolesResult {
    *
    * @param unassignments empty unassignments (no effective changes)
    */
-  record Skipped(@NotNull RolePrivilegeAssignment unassignments)
+  record Skipped(RolePrivilegeAssignment unassignments)
       implements UnassignPrivilegesFromRolesResult {
     /** Creates a Skipped result with empty unassignments. */
     public Skipped() {
@@ -54,7 +52,7 @@ public sealed interface UnassignPrivilegesFromRolesResult {
    * @return unassigned result
    */
   static UnassignPrivilegesFromRolesResult unassigned(
-      @NotNull RolePrivilegeAssignment unassignments, @NotNull Instant timestamp) {
+      RolePrivilegeAssignment unassignments, Instant timestamp) {
     return new Unassigned(unassignments, timestamp);
   }
 

@@ -7,14 +7,11 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.ListBuilder;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.annotation.concurrent.Immutable;
 
-@Immutable
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.TooManyMethods"})
 @JsonDeserialize(builder = UserGrant.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -196,16 +193,15 @@ public final class UserGrant {
     }
   }
 
-  @SuppressFBWarnings({
-    "EQ_CHECK_FOR_OPERAND_NOT_COMPATIBLE_WITH_THIS",
-    "EQ_UNUSUAL",
-    "HE_EQUALS_USE_HASHCODE"
-  })
-  @SuppressWarnings("PMD.OverrideBothEqualsAndHashcode")
   public static final class JsonEmptyFilter {
     @Override
     public boolean equals(Object obj) {
       return (obj instanceof UserGrant userGrant) && userGrant.isEmpty();
+    }
+
+    @Override
+    public int hashCode() {
+      return JsonEmptyFilter.class.hashCode();
     }
   }
 }

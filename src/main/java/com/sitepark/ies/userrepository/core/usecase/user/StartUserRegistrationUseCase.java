@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 public final class StartUserRegistrationUseCase {
@@ -116,10 +117,10 @@ public final class StartUserRegistrationUseCase {
     data.put(
         "user",
         com.sitepark.ies.sharedkernel.security.User.builder()
-            .id(user.id())
-            .email(user.email())
-            .firstName(user.firstName())
-            .lastName(user.lastName())
+            .id(Objects.requireNonNull(user.id(), "user.id is null"))
+            .email(Objects.requireNonNull(user.email(), "user.email is null"))
+            .firstName(Objects.requireNonNull(user.firstName(), "user.firstName is null"))
+            .lastName(Objects.requireNonNull(user.lastName(), "user.lastName is null"))
             .username(user.login())
             .build());
 

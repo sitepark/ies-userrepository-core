@@ -1,8 +1,5 @@
 package com.sitepark.ies.userrepository.core.usecase.query.sort;
 
-import javax.annotation.concurrent.Immutable;
-
-@Immutable
 public class CreatedAt extends SortCriteria {
 
   public CreatedAt(Direction direction) {

@@ -11,15 +11,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 @JsonDeserialize(builder = UpdatePrivilegeRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
 public final class UpdatePrivilegeRequest {
 
-  @NotNull private final Privilege privilege;
+  private final Privilege privilege;
 
-  @NotNull private final Updatable<List<Identifier>> roleIdentifiers;
+  private final Updatable<List<Identifier>> roleIdentifiers;
 
   private UpdatePrivilegeRequest(Builder builder) {
     this.privilege = builder.privilege;
@@ -33,12 +33,10 @@ public final class UpdatePrivilegeRequest {
     return new Builder();
   }
 
-  @NotNull
   public Privilege privilege() {
     return this.privilege;
   }
 
-  @NotNull
   public Updatable<List<Identifier>> roleIdentifiers() {
     return this.roleIdentifiers;
   }
@@ -69,11 +67,12 @@ public final class UpdatePrivilegeRequest {
         + '}';
   }
 
+  @SuppressWarnings("NullAway.Init")
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private Privilege privilege;
-    private Set<Identifier> roleIdentifiers;
+    private @Nullable Set<Identifier> roleIdentifiers;
 
     private Builder() {}
 

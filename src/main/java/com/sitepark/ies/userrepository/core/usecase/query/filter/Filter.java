@@ -1,7 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.query.filter;
 
 import com.sitepark.ies.sharedkernel.json.UseUniquePropertyDeserializer;
-import javax.annotation.concurrent.Immutable;
 
 @UseUniquePropertyDeserializer(
     types = {
@@ -24,7 +23,6 @@ import javax.annotation.concurrent.Immutable;
       LabelIdList.class
     })
 @SuppressWarnings("PMD.TooManyMethods")
-@Immutable
 public interface Filter {
 
   static Id id(String id) {

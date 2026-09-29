@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
@@ -109,11 +110,12 @@ public final class CreateUserUseCase {
   }
 
   private void validateAnchor(User user) {
-    if (user.anchor() != null) {
-      Optional<String> anchorOwner = this.userRepository.resolveAnchor(user.anchor());
+    Anchor anchor = user.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.userRepository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(user.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }

@@ -9,15 +9,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
 
 @JsonDeserialize(builder = AssignRolesToUsersRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 public final class AssignRolesToUsersRequest {
 
-  @NotNull private final List<Identifier> roleIdentifiers;
+  private final List<Identifier> roleIdentifiers;
 
-  @NotNull private final List<Identifier> userIdentifiers;
+  private final List<Identifier> userIdentifiers;
 
   private AssignRolesToUsersRequest(Builder builder) {
     this.roleIdentifiers = List.copyOf(builder.roleIdentifiers);
