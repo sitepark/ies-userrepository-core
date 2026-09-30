@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a privilege reassignment operation.
@@ -24,9 +23,7 @@ public sealed interface ReassignPrivilegesToRolesResult {
    * @param timestamp the timestamp when the reassignment occurred
    */
   record Reassigned(
-      @NotNull RolePrivilegeAssignment assignments,
-      @NotNull RolePrivilegeAssignment unassignments,
-      @NotNull Instant timestamp)
+      RolePrivilegeAssignment assignments, RolePrivilegeAssignment unassignments, Instant timestamp)
       implements ReassignPrivilegesToRolesResult {}
 
   /** Result when the privilege reassignment was skipped. */
@@ -41,9 +38,9 @@ public sealed interface ReassignPrivilegesToRolesResult {
    * @return reassigned result
    */
   static ReassignPrivilegesToRolesResult reassigned(
-      @NotNull RolePrivilegeAssignment assignments,
-      @NotNull RolePrivilegeAssignment unassignments,
-      @NotNull Instant timestamp) {
+      RolePrivilegeAssignment assignments,
+      RolePrivilegeAssignment unassignments,
+      Instant timestamp) {
     return new Reassigned(assignments, unassignments, timestamp);
   }
 

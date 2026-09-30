@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
@@ -15,6 +16,7 @@ import com.sitepark.ies.userrepository.core.port.UserRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +57,8 @@ public final class UpdateUserUseCase {
       newUser = request.user();
     }
 
-    this.checkAuthorization(newUser);
+    String userId = Objects.requireNonNull(newUser.id(), "id is null");
+    this.checkAuthorization(newUser, userId);
     this.validateLogin(newUser);
 
     if (LOGGER.isInfoEnabled()) {
@@ -64,9 +67,8 @@ public final class UpdateUserUseCase {
 
     User oldUser =
         this.userRepository
-            .get(newUser.id())
-            .orElseThrow(
-                () -> new UserNotFoundException("No user with ID " + newUser.id() + " found."))
+            .get(userId)
+            .orElseThrow(() -> new UserNotFoundException("No user with ID " + userId + " found."))
             .toBuilder()
             .build();
 
@@ -78,15 +80,13 @@ public final class UpdateUserUseCase {
 
     // Determine user update result
     UserUpdateResult userUpdateResult;
-    User userForUpdate;
     if (patch.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("Skip user update, user with ID {} is unchanged.", joinedUser.id());
       }
       userUpdateResult = UserUpdateResult.unchanged();
-      userForUpdate = joinedUser;
     } else {
-      userForUpdate = joinedUser.toBuilder().changedAt(timestamp).build();
+      User userForUpdate = joinedUser.toBuilder().changedAt(timestamp).build();
       this.userRepository.update(userForUpdate);
       this.extensionsNotifier.notifyUpdated(userForUpdate);
 
@@ -101,24 +101,24 @@ public final class UpdateUserUseCase {
       roleReassignmentResult =
           this.reassignRolesToUsersUseCase.reassignRolesToUsers(
               ReassignRolesToUsersRequest.builder()
-                  .userIdentifiers(b -> b.id(userForUpdate.id()))
+                  .userIdentifiers(b -> b.id(userId))
                   .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers().getValue()))
                   .build());
     } else {
       roleReassignmentResult = ReassignRolesToUsersResult.skipped();
     }
 
-    return new UpdateUserResult(
-        userForUpdate.id(), timestamp, userUpdateResult, roleReassignmentResult);
+    return new UpdateUserResult(userId, timestamp, userUpdateResult, roleReassignmentResult);
   }
 
   private User toUserWithId(User user) {
     if (user.id() == null) {
-      if (user.anchor() != null) {
+      Anchor anchor = user.anchor();
+      if (anchor != null) {
         String id =
             this.userRepository
-                .resolveAnchor(user.anchor())
-                .orElseThrow(() -> new AnchorNotFoundException(user.anchor()));
+                .resolveAnchor(anchor)
+                .orElseThrow(() -> new AnchorNotFoundException(anchor));
         return user.toBuilder().id(id).build();
       }
       throw new IllegalArgumentException("Neither id nor anchor is specified to update the user.");
@@ -127,19 +127,20 @@ public final class UpdateUserUseCase {
   }
 
   private void validateAnchor(User user) {
-    if (user.anchor() != null) {
-      Optional<String> anchorOwner = this.userRepository.resolveAnchor(user.anchor());
+    Anchor anchor = user.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.userRepository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
             if (!owner.equals(user.id())) {
-              throw new AnchorAlreadyExistsException(user.anchor(), owner);
+              throw new AnchorAlreadyExistsException(anchor, owner);
             }
           });
     }
   }
 
-  private void checkAuthorization(User user) {
-    if (!this.userEntityAuthorizationService.isWritable(user.id())) {
+  private void checkAuthorization(User user, String id) {
+    if (!this.userEntityAuthorizationService.isWritable(id)) {
       throw new AccessDeniedException("Not allowed to update user " + user);
     }
   }
@@ -156,8 +157,8 @@ public final class UpdateUserUseCase {
     if (updateUser.anchor() == null && storedUser.anchor() != null) {
       builder.anchor(storedUser.anchor()).build();
     }
-    builder.createdAt(storedUser.createdAt());
-    builder.changedAt(storedUser.changedAt());
+    builder.createdAt(Objects.requireNonNull(storedUser.createdAt(), "createdAt is null"));
+    builder.changedAt(Objects.requireNonNull(storedUser.changedAt(), "changedAt is null"));
 
     return builder.build();
   }

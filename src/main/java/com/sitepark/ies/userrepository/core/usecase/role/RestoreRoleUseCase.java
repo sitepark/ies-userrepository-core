@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
@@ -11,6 +12,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,13 +45,15 @@ public final class RestoreRoleUseCase {
 
     this.validateRole(role);
 
-    this.checkAccessControl(role, userIds);
+    String roleId = Objects.requireNonNull(role.id(), "id was validated");
 
-    if (this.repository.get(role.id()).isPresent()) {
+    this.checkAccessControl(role, roleId, userIds);
+
+    if (this.repository.get(roleId).isPresent()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Skip restore, role with ID {} already exists.", role.id());
+        LOGGER.info("Skip restore, role with ID {} already exists.", roleId);
       }
-      return RestoreRoleResult.skipped(role.id(), "Role with ID " + role.id() + " already exists");
+      return RestoreRoleResult.skipped(roleId, "Role with ID " + roleId + " already exists");
     }
 
     this.validateAnchor(role);
@@ -64,17 +68,13 @@ public final class RestoreRoleUseCase {
 
     this.repository.restore(role);
     if (!userIds.isEmpty()) {
-      String roleId = role.id();
-      assert roleId != null : "role.id() was validated in validateUser()";
       this.roleAssigner.assignRolesToUsers(userIds, List.of(roleId));
     }
     if (!privilegeIds.isEmpty()) {
-      String roleId = role.id();
-      assert roleId != null : "role.id() was validated in validateUser()";
       this.roleAssigner.assignPrivilegesToRoles(List.of(roleId), privilegeIds);
     }
 
-    return RestoreRoleResult.restored(role.id(), snapshot, timestamp);
+    return RestoreRoleResult.restored(roleId, snapshot, timestamp);
   }
 
   private void validateRole(Role role) {
@@ -86,25 +86,26 @@ public final class RestoreRoleUseCase {
     }
   }
 
-  private void checkAccessControl(Role role, List<String> userIds) {
+  private void checkAccessControl(Role role, String roleId, List<String> userIds) {
     if (!this.roleEntityAuthorizationService.isCreatable()) {
       throw new AccessDeniedException("Not allowed to create role " + role);
     }
 
     if (userIds != null
         && !userIds.isEmpty()
-        && !this.roleEntityAuthorizationService.isWritable(role.id())) {
+        && !this.roleEntityAuthorizationService.isWritable(roleId)) {
       throw new AccessDeniedException(
           "Not allowed to update user to create role " + role + " -> " + userIds);
     }
   }
 
   private void validateAnchor(Role role) {
-    if (role.anchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(role.anchor());
+    Anchor anchor = role.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(role.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }

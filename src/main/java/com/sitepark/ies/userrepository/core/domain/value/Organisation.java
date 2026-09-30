@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 @JsonDeserialize(builder = Organisation.Builder.class)
-@Immutable
 public final class Organisation {
 
   @Nullable private final String name;
@@ -23,7 +21,7 @@ public final class Organisation {
   }
 
   @JsonProperty("name")
-  public String name() {
+  public @Nullable String name() {
     return name;
   }
 

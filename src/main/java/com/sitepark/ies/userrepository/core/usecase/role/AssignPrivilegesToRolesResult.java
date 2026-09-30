@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.role;
 
 import com.sitepark.ies.userrepository.core.domain.value.RolePrivilegeAssignment;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a privilege assignment operation.
@@ -21,7 +20,6 @@ public sealed interface AssignPrivilegesToRolesResult {
    *
    * @return the role-privilege assignments
    */
-  @NotNull
   RolePrivilegeAssignment assignments();
 
   /**
@@ -30,7 +28,7 @@ public sealed interface AssignPrivilegesToRolesResult {
    * @param assignments the effective role-privilege assignments that were made
    * @param timestamp the timestamp when the assignment occurred
    */
-  record Assigned(@NotNull RolePrivilegeAssignment assignments, @NotNull Instant timestamp)
+  record Assigned(RolePrivilegeAssignment assignments, Instant timestamp)
       implements AssignPrivilegesToRolesResult {}
 
   /**
@@ -38,8 +36,7 @@ public sealed interface AssignPrivilegesToRolesResult {
    *
    * @param assignments empty assignments (no effective changes)
    */
-  record Skipped(@NotNull RolePrivilegeAssignment assignments)
-      implements AssignPrivilegesToRolesResult {
+  record Skipped(RolePrivilegeAssignment assignments) implements AssignPrivilegesToRolesResult {
     /** Creates a Skipped result with empty assignments. */
     public Skipped() {
       this(RolePrivilegeAssignment.builder().build());
@@ -54,7 +51,7 @@ public sealed interface AssignPrivilegesToRolesResult {
    * @return assigned result
    */
   static AssignPrivilegesToRolesResult assigned(
-      @NotNull RolePrivilegeAssignment assignments, @NotNull Instant timestamp) {
+      RolePrivilegeAssignment assignments, Instant timestamp) {
     return new Assigned(assignments, timestamp);
   }
 

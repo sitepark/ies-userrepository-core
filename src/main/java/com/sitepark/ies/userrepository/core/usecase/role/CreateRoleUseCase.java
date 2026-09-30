@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
@@ -12,6 +13,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +65,10 @@ public final class CreateRoleUseCase {
     if (request.privilegeIdentifiers().shouldUpdate()) {
       privilegeIds =
           IdentifierResolver.create(this.privilegeRepository)
-              .resolve(request.privilegeIdentifiers().getValue());
+              .resolve(
+                  Objects.requireNonNull(
+                      request.privilegeIdentifiers().getValue(),
+                      "privilegeIdentifiers are set when they should be updated"));
 
       if (!privilegeIds.isEmpty()) {
         privilegeAssignmentResult =
@@ -101,11 +106,12 @@ public final class CreateRoleUseCase {
   }
 
   private void validateAnchor(Role role) {
-    if (role.anchor() != null) {
-      Optional<String> anchorOwner = this.roleRepository.resolveAnchor(role.anchor());
+    Anchor anchor = role.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.roleRepository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(role.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }

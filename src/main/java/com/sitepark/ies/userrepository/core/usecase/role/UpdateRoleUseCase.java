@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
@@ -13,6 +14,7 @@ import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,7 +55,8 @@ public final class UpdateRoleUseCase {
       newRole = request.role();
     }
 
-    this.checkAuthorization(newRole);
+    String roleId = Objects.requireNonNull(newRole.id(), "id is null");
+    this.checkAuthorization(newRole, roleId);
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("update role: {}", newRole);
@@ -61,9 +64,8 @@ public final class UpdateRoleUseCase {
 
     Role oldRole =
         this.repository
-            .get(newRole.id())
-            .orElseThrow(
-                () -> new RoleNotFoundException("No role with ID " + newRole.id() + " found."))
+            .get(roleId)
+            .orElseThrow(() -> new RoleNotFoundException("No role with ID " + roleId + " found."))
             .toBuilder()
             .build();
 
@@ -74,7 +76,7 @@ public final class UpdateRoleUseCase {
 
     if (patch.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Skip update, role with ID {} is unchanged.", newRole.id());
+        LOGGER.info("Skip update, role with ID {} is unchanged.", roleId);
       }
     } else {
       this.repository.update(newRole);
@@ -86,7 +88,7 @@ public final class UpdateRoleUseCase {
       privilegeReassignmentResult =
           this.reassignPrivilegesToRolesUseCase.reassignPrivilegesToRoles(
               ReassignPrivilegesToRolesRequest.builder()
-                  .roleIdentifiers(b -> b.id(newRole.id()))
+                  .roleIdentifiers(b -> b.id(roleId))
                   .privilegeIdentifiers(
                       b -> b.identifiers(request.privilegeIdentifiers().getValue()))
                   .build());
@@ -95,26 +97,27 @@ public final class UpdateRoleUseCase {
     }
 
     return new UpdateRoleResult(
-        newRole.id(), newRole.name(), timestamp, patch, revertPatch, privilegeReassignmentResult);
+        roleId, newRole.name(), timestamp, patch, revertPatch, privilegeReassignmentResult);
   }
 
   private void validateRole(Role role) {
     assert role.name() != null && !role.name().isBlank();
   }
 
-  private void checkAuthorization(Role role) {
-    if (!this.roleEntityAuthorizationService.isWritable(role.id())) {
+  private void checkAuthorization(Role role, String id) {
+    if (!this.roleEntityAuthorizationService.isWritable(id)) {
       throw new AccessDeniedException("Not allowed to update role " + role);
     }
   }
 
   private Role toRoleWithId(Role role) {
     if (role.id() == null) {
-      if (role.anchor() != null) {
+      Anchor anchor = role.anchor();
+      if (anchor != null) {
         String id =
             this.repository
-                .resolveAnchor(role.anchor())
-                .orElseThrow(() -> new AnchorNotFoundException(role.anchor()));
+                .resolveAnchor(anchor)
+                .orElseThrow(() -> new AnchorNotFoundException(anchor));
         return role.toBuilder().id(id).build();
       }
       throw new IllegalArgumentException("Neither id nor anchor is specified to update the role.");
@@ -123,12 +126,13 @@ public final class UpdateRoleUseCase {
   }
 
   private void validateAnchor(Role role) {
-    if (role.anchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(role.anchor());
+    Anchor anchor = role.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
             if (!owner.equals(role.id())) {
-              throw new AnchorAlreadyExistsException(role.anchor(), owner);
+              throw new AnchorAlreadyExistsException(anchor, owner);
             }
           });
     }

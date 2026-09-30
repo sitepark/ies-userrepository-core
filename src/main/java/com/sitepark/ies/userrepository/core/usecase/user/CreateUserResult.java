@@ -2,8 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.userrepository.core.domain.value.UserSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a user creation operation.
@@ -23,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
  * @param timestamp the timestamp when the user was created
  */
 public record CreateUserResult(
-    @NotNull String userId,
-    @NotNull UserSnapshot snapshot,
+    String userId,
+    UserSnapshot snapshot,
     @Nullable AssignRolesToUsersResult roleAssignmentResult,
-    @NotNull Instant timestamp) {}
+    Instant timestamp) {}

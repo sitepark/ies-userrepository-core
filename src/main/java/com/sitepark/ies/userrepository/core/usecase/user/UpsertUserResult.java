@@ -1,22 +1,18 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
-import org.jetbrains.annotations.NotNull;
-
 public sealed interface UpsertUserResult {
 
   public String userId();
 
-  record Created(@NotNull String userId, @NotNull CreateUserResult createUserResult)
-      implements UpsertUserResult {}
+  record Created(String userId, CreateUserResult createUserResult) implements UpsertUserResult {}
 
-  record Updated(@NotNull String userId, @NotNull UpdateUserResult updateUserResult)
-      implements UpsertUserResult {}
+  record Updated(String userId, UpdateUserResult updateUserResult) implements UpsertUserResult {}
 
-  static Created created(@NotNull String userId, @NotNull CreateUserResult result) {
+  static Created created(String userId, CreateUserResult result) {
     return new Created(userId, result);
   }
 
-  static Updated updated(@NotNull String userId, @NotNull UpdateUserResult result) {
+  static Updated updated(String userId, UpdateUserResult result) {
     return new Updated(userId, result);
   }
 }

@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
@@ -46,18 +47,19 @@ public final class UpsertRoleUseCase {
   }
 
   private Role toRoleWithId(Role role) {
-    if (role.id() == null && role.anchor() != null) {
+    Anchor anchor = role.anchor();
+    if (role.id() == null && anchor != null) {
       return this.repository
-          .resolveAnchor(role.anchor())
+          .resolveAnchor(anchor)
           .map(s -> role.toBuilder().id(s).build())
           .orElse(role);
-    } else if (role.id() != null && role.anchor() != null) {
+    } else if (role.id() != null && anchor != null) {
       this.repository
-          .resolveAnchor(role.anchor())
+          .resolveAnchor(anchor)
           .ifPresent(
               owner -> {
                 if (!owner.equals(role.id())) {
-                  throw new AnchorAlreadyExistsException(role.anchor(), owner);
+                  throw new AnchorAlreadyExistsException(anchor, owner);
                 }
               });
     }

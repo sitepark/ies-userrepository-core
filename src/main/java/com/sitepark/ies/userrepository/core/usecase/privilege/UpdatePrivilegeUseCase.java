@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
@@ -13,6 +14,7 @@ import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +54,8 @@ public final class UpdatePrivilegeUseCase {
     }
 
     this.validatePrivilege(newPrivilege);
-    this.checkAuthorization(newPrivilege);
+    String privilegeId = Objects.requireNonNull(newPrivilege.id(), "id is null");
+    this.checkAuthorization(newPrivilege, privilegeId);
 
     if (LOGGER.isInfoEnabled()) {
       LOGGER.info("update privilege: {}", request.privilege());
@@ -60,11 +63,11 @@ public final class UpdatePrivilegeUseCase {
 
     Privilege oldPrivilege =
         this.repository
-            .get(newPrivilege.id())
+            .get(privilegeId)
             .orElseThrow(
                 () ->
                     new PrivilegeNotFoundException(
-                        "No privilege with ID " + newPrivilege.id() + " found."))
+                        "No privilege with ID " + privilegeId + " found."))
             .toBuilder()
             .build();
 
@@ -75,7 +78,7 @@ public final class UpdatePrivilegeUseCase {
 
     if (patch.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Skip update, privilege with ID {} is unchanged.", newPrivilege.id());
+        LOGGER.info("Skip update, privilege with ID {} is unchanged.", privilegeId);
       }
     } else {
       this.repository.update(newPrivilege);
@@ -89,19 +92,14 @@ public final class UpdatePrivilegeUseCase {
           this.reassignRolesToPrivilegesUseCase.reassignRolesToPrivileges(
               ReassignRolesToPrivilegesRequest.builder()
                   .roleIdentifiers(b -> b.identifiers(request.roleIdentifiers().getValue()))
-                  .privilegeIdentifiers(b -> b.id(newPrivilege.id()))
+                  .privilegeIdentifiers(b -> b.id(privilegeId))
                   .build());
     } else {
       roleReassignmentResult = ReassignRolesToPrivilegesResult.skipped();
     }
 
     return new UpdatePrivilegeResult(
-        newPrivilege.id(),
-        newPrivilege.name(),
-        timestamp,
-        patch,
-        revertPatch,
-        roleReassignmentResult);
+        privilegeId, newPrivilege.name(), timestamp, patch, revertPatch, roleReassignmentResult);
   }
 
   private void validatePrivilege(Privilege privilege) {
@@ -113,19 +111,20 @@ public final class UpdatePrivilegeUseCase {
     }
   }
 
-  private void checkAuthorization(Privilege privilege) {
-    if (!this.privilegeAuthorizationService.isWritable(privilege.id())) {
+  private void checkAuthorization(Privilege privilege, String id) {
+    if (!this.privilegeAuthorizationService.isWritable(id)) {
       throw new AccessDeniedException("Not allowed to update privilege " + privilege);
     }
   }
 
   private Privilege toPrivilegeWithId(Privilege privilege) {
     if (privilege.id() == null) {
-      if (privilege.anchor() != null) {
+      Anchor anchor = privilege.anchor();
+      if (anchor != null) {
         String id =
             this.repository
-                .resolveAnchor(privilege.anchor())
-                .orElseThrow(() -> new AnchorNotFoundException(privilege.anchor()));
+                .resolveAnchor(anchor)
+                .orElseThrow(() -> new AnchorNotFoundException(anchor));
         return privilege.toBuilder().id(id).build();
       }
       throw new IllegalArgumentException(
@@ -135,12 +134,13 @@ public final class UpdatePrivilegeUseCase {
   }
 
   private void validateAnchor(Privilege privilege) {
-    if (privilege.anchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(privilege.anchor());
+    Anchor anchor = privilege.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
             if (!owner.equals(privilege.id())) {
-              throw new AnchorAlreadyExistsException(privilege.anchor(), owner);
+              throw new AnchorAlreadyExistsException(anchor, owner);
             }
           });
     }

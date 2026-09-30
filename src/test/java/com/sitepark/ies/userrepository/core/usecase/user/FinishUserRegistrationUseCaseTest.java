@@ -253,8 +253,7 @@ class FinishUserRegistrationUseCaseTest {
 
     verify(this.createUserUseCase)
         .createUser(
-            argThat(
-                createUserRequest -> createUserRequest.user().gender().equals(GenderType.DIVERSE)));
+            argThat(createUserRequest -> createUserRequest.user().gender() == GenderType.DIVERSE));
   }
 
   @Test
@@ -283,8 +282,7 @@ class FinishUserRegistrationUseCaseTest {
 
     verify(this.createUserUseCase)
         .createUser(
-            argThat(
-                createUserRequest -> createUserRequest.user().gender().equals(GenderType.UNKNOWN)));
+            argThat(createUserRequest -> createUserRequest.user().gender() == GenderType.UNKNOWN));
   }
 
   @Test

@@ -11,15 +11,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 @JsonDeserialize(builder = UpsertRoleRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
 public final class UpsertRoleRequest {
 
-  @NotNull private final Role role;
+  private final Role role;
 
-  @NotNull private final Updatable<List<Identifier>> privilegeIdentifiers;
+  private final Updatable<List<Identifier>> privilegeIdentifiers;
 
   private UpsertRoleRequest(Builder builder) {
     this.role = builder.role;
@@ -33,12 +33,10 @@ public final class UpsertRoleRequest {
     return new Builder();
   }
 
-  @NotNull
   public Role role() {
     return this.role;
   }
 
-  @NotNull
   public Updatable<List<Identifier>> privilegeIdentifiers() {
     return this.privilegeIdentifiers;
   }
@@ -69,11 +67,12 @@ public final class UpsertRoleRequest {
         + '}';
   }
 
+  @SuppressWarnings("NullAway.Init")
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private Role role;
-    private Set<Identifier> privilegeIdentifiers;
+    private @Nullable Set<Identifier> privilegeIdentifiers;
 
     private Builder() {}
 

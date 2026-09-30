@@ -7,16 +7,14 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.Permission;
-import java.util.*;
-import javax.annotation.concurrent.Immutable;
-import org.jetbrains.annotations.Nullable;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Defines user privileges to manage permissions and access control based on the provided privilege
  */
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 @JsonDeserialize(builder = Privilege.Builder.class)
-@Immutable
 public final class Privilege {
 
   public static final String BUILT_IN_PRIVILEGE_ID_FULL_ACCESS = "1";
@@ -34,7 +32,7 @@ public final class Privilege {
   private Privilege(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
-    this.name = builder.name;
+    this.name = Objects.requireNonNull(builder.name, "name is not set");
     this.description = builder.description;
     this.permission = builder.permission;
   }
@@ -44,12 +42,12 @@ public final class Privilege {
   }
 
   @JsonProperty
-  public String id() {
+  public @Nullable String id() {
     return this.id;
   }
 
   @JsonProperty
-  public Anchor anchor() {
+  public @Nullable Anchor anchor() {
     return this.anchor;
   }
 
@@ -59,12 +57,12 @@ public final class Privilege {
   }
 
   @JsonProperty
-  public String description() {
+  public @Nullable String description() {
     return this.description;
   }
 
   @JsonProperty
-  public Permission permission() {
+  public @Nullable Permission permission() {
     return this.permission;
   }
 
@@ -109,11 +107,11 @@ public final class Privilege {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private String id;
-    private Anchor anchor;
-    private String name;
-    private String description;
-    private Permission permission;
+    private @Nullable String id;
+    private @Nullable Anchor anchor;
+    private @Nullable String name;
+    private @Nullable String description;
+    private @Nullable Permission permission;
 
     private Builder() {}
 
@@ -177,7 +175,7 @@ public final class Privilege {
     }
 
     @JsonIgnore
-    private String trimToNull(String str) {
+    private @Nullable String trimToNull(@Nullable String str) {
       return ((str == null) || str.isBlank()) ? null : str.trim();
     }
   }

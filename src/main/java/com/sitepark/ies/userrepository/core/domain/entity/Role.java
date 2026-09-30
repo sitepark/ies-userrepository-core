@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Defines user roles to manage permissions and access control based on the provided role name,
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
  */
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 @JsonDeserialize(builder = Role.Builder.class)
-@Immutable
 public final class Role {
 
   public static final String BUILT_IN_ROLE_ID_ADMINISTRATOR = "1";
@@ -32,7 +30,7 @@ public final class Role {
   private Role(Builder builder) {
     this.id = builder.id;
     this.anchor = builder.anchor;
-    this.name = builder.name;
+    this.name = Objects.requireNonNull(builder.name, "name is not set");
     this.description = builder.description;
   }
 
@@ -41,12 +39,12 @@ public final class Role {
   }
 
   @JsonProperty
-  public String id() {
+  public @Nullable String id() {
     return this.id;
   }
 
   @JsonProperty
-  public Anchor anchor() {
+  public @Nullable Anchor anchor() {
     return this.anchor;
   }
 
@@ -56,7 +54,7 @@ public final class Role {
   }
 
   @JsonProperty
-  public String description() {
+  public @Nullable String description() {
     return this.description;
   }
 
@@ -98,10 +96,10 @@ public final class Role {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private String id;
-    private Anchor anchor;
-    private String name;
-    private String description;
+    private @Nullable String id;
+    private @Nullable Anchor anchor;
+    private @Nullable String name;
+    private @Nullable String description;
 
     private Builder() {}
 
@@ -159,7 +157,7 @@ public final class Role {
     }
 
     @JsonIgnore
-    private String trimToNull(String str) {
+    private @Nullable String trimToNull(@Nullable String str) {
       return ((str == null) || str.isBlank()) ? null : str.trim();
     }
   }

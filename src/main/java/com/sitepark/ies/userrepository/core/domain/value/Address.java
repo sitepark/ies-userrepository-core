@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 @JsonDeserialize(builder = Address.Builder.class)
-@Immutable
 public final class Address {
 
   @Nullable private final String street;
@@ -32,22 +30,22 @@ public final class Address {
   }
 
   @JsonProperty("street")
-  public String street() {
+  public @Nullable String street() {
     return street;
   }
 
   @JsonProperty("houseNumber")
-  public String houseNumber() {
+  public @Nullable String houseNumber() {
     return houseNumber;
   }
 
   @JsonProperty("postalCode")
-  public String postalCode() {
+  public @Nullable String postalCode() {
     return postalCode;
   }
 
   @JsonProperty("city")
-  public String city() {
+  public @Nullable String city() {
     return city;
   }
 

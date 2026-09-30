@@ -19,10 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.annotation.concurrent.Immutable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
-@Immutable
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.TooManyMethods"})
 @JsonDeserialize(builder = User.Builder.class)
 public final class User {
@@ -72,7 +70,7 @@ public final class User {
     this.description = builder.description;
     this.createdAt = builder.createdAt;
     this.changedAt = builder.changedAt;
-    this.login = builder.login;
+    this.login = Objects.requireNonNull(builder.login, "login is not set");
     this.identities = List.copyOf(builder.identities);
     this.validity = builder.validity;
     this.address = builder.address;
@@ -125,32 +123,32 @@ public final class User {
   }
 
   @JsonProperty
-  public String id() {
+  public @Nullable String id() {
     return this.id;
   }
 
   @JsonProperty
-  public Anchor anchor() {
+  public @Nullable Anchor anchor() {
     return this.anchor;
   }
 
   @JsonProperty
-  public String title() {
+  public @Nullable String title() {
     return this.title;
   }
 
   @JsonProperty
-  public String firstName() {
+  public @Nullable String firstName() {
     return this.firstName;
   }
 
   @JsonProperty
-  public String lastName() {
+  public @Nullable String lastName() {
     return this.lastName;
   }
 
   @JsonProperty
-  public String email() {
+  public @Nullable String email() {
     return this.email;
   }
 
@@ -160,17 +158,17 @@ public final class User {
   }
 
   @JsonProperty
-  public String description() {
+  public @Nullable String description() {
     return this.description;
   }
 
   @JsonProperty
-  public Instant createdAt() {
+  public @Nullable Instant createdAt() {
     return this.createdAt;
   }
 
   @JsonProperty
-  public Instant changedAt() {
+  public @Nullable Instant changedAt() {
     return this.changedAt;
   }
 
@@ -190,17 +188,17 @@ public final class User {
   }
 
   @JsonProperty
-  public Address address() {
+  public @Nullable Address address() {
     return this.address;
   }
 
   @JsonProperty
-  public Contact contact() {
+  public @Nullable Contact contact() {
     return this.contact;
   }
 
   @JsonProperty
-  public Organisation organisation() {
+  public @Nullable Organisation organisation() {
     return this.organisation;
   }
 
@@ -299,22 +297,22 @@ public final class User {
   @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
-    private String id;
-    private String title;
-    private Anchor anchor;
-    private String firstName;
-    private String lastName;
+    private @Nullable String id;
+    private @Nullable String title;
+    private @Nullable Anchor anchor;
+    private @Nullable String firstName;
+    private @Nullable String lastName;
     private GenderType gender = GenderType.UNKNOWN;
-    private String email;
-    private String description;
-    private Instant createdAt;
-    private Instant changedAt;
-    private String login;
+    private @Nullable String email;
+    private @Nullable String description;
+    private @Nullable Instant createdAt;
+    private @Nullable Instant changedAt;
+    private @Nullable String login;
     private final List<Identity> identities = new ArrayList<>();
     private UserValidity validity = UserValidity.ALWAYS_VALID;
-    private Address address;
-    private Contact contact;
-    private Organisation organisation;
+    private @Nullable Address address;
+    private @Nullable Contact contact;
+    private @Nullable Organisation organisation;
 
     private Builder() {}
 
@@ -371,18 +369,18 @@ public final class User {
       return this;
     }
 
-    public Builder firstName(String firstname) {
-      this.firstName = this.trimToNull(firstname);
+    public Builder firstName(String firstName) {
+      this.firstName = this.trimToNull(firstName);
       return this;
     }
 
-    public Builder lastName(String lastname) {
-      this.lastName = this.trimToNull(lastname);
+    public Builder lastName(String lastName) {
+      this.lastName = this.trimToNull(lastName);
       return this;
     }
 
-    public Builder title(String lastname) {
-      this.title = this.trimToNull(lastname);
+    public Builder title(String title) {
+      this.title = this.trimToNull(title);
       return this;
     }
 
@@ -469,7 +467,7 @@ public final class User {
     }
 
     @JsonIgnore
-    private String trimToNull(String str) {
+    private @Nullable String trimToNull(@Nullable String str) {
       return ((str == null) || str.isBlank()) ? null : str.trim();
     }
   }

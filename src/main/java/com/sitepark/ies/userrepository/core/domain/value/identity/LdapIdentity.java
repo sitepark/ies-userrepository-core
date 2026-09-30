@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * The <code>LdapIdentity</code> class represents an identity provider using LDAP for user
  * authentication. It facilitates user authentication and access control using LDAP credentials.
  */
 @JsonDeserialize(builder = LdapIdentity.Builder.class)
-@Immutable
 public final class LdapIdentity implements Identity {
 
   private final String serverId;
@@ -65,7 +63,7 @@ public final class LdapIdentity implements Identity {
   }
 
   @JsonPOJOBuilder(withPrefix = "")
-  @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
+  @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "NullAway.Init"})
   public static final class Builder {
 
     private String serverId;

@@ -1,6 +1,9 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -17,17 +20,11 @@ import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import com.sitepark.ies.userrepository.core.domain.value.Organisation;
 import com.sitepark.ies.userrepository.core.domain.value.UserValidity;
 import com.sitepark.ies.userrepository.core.domain.value.identity.LdapIdentity;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-@SuppressFBWarnings({
-  "PI_DO_NOT_REUSE_PUBLIC_IDENTIFIERS_CLASS_NAMES",
-  "NP_NULL_PARAM_DEREF_NONVIRTUAL",
-  "NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS"
-})
 class UserTest {
 
   private static final Identity TEST_IDENTITY =

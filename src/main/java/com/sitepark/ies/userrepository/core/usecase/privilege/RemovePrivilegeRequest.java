@@ -2,14 +2,13 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Request to remove a single privilege from the repository.
  *
  * @param identifier the identifier (ID or anchor) of the privilege to remove
  */
-public record RemovePrivilegeRequest(@NotNull Identifier identifier) {
+public record RemovePrivilegeRequest(Identifier identifier) {
 
   /**
    * Creates a new builder for RemovePrivilegeRequest.
@@ -21,6 +20,7 @@ public record RemovePrivilegeRequest(@NotNull Identifier identifier) {
   }
 
   /** Builder for RemovePrivilegeRequest. */
+  @SuppressWarnings("NullAway.Init")
   public static final class Builder {
 
     private Identifier identifier;

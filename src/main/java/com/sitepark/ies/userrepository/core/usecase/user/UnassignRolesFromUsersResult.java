@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.userrepository.core.domain.value.UserRoleAssignment;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a role unassignment operation.
@@ -21,7 +20,6 @@ public sealed interface UnassignRolesFromUsersResult {
    *
    * @return the user-role unassignments
    */
-  @NotNull
   UserRoleAssignment unassignments();
 
   /**
@@ -30,7 +28,7 @@ public sealed interface UnassignRolesFromUsersResult {
    * @param unassignments the effective user-role unassignments that were made
    * @param timestamp the timestamp when the unassignment occurred
    */
-  record Unassigned(@NotNull UserRoleAssignment unassignments, @NotNull Instant timestamp)
+  record Unassigned(UserRoleAssignment unassignments, Instant timestamp)
       implements UnassignRolesFromUsersResult {}
 
   /**
@@ -38,8 +36,7 @@ public sealed interface UnassignRolesFromUsersResult {
    *
    * @param unassignments empty unassignments (no effective changes)
    */
-  record Skipped(@NotNull UserRoleAssignment unassignments)
-      implements UnassignRolesFromUsersResult {
+  record Skipped(UserRoleAssignment unassignments) implements UnassignRolesFromUsersResult {
     /** Creates a Skipped result with empty unassignments. */
     public Skipped() {
       this(UserRoleAssignment.builder().build());
@@ -54,7 +51,7 @@ public sealed interface UnassignRolesFromUsersResult {
    * @return unassigned result
    */
   static UnassignRolesFromUsersResult unassigned(
-      @NotNull UserRoleAssignment unassignments, @NotNull Instant timestamp) {
+      UserRoleAssignment unassignments, Instant timestamp) {
     return new Unassigned(unassignments, timestamp);
   }
 

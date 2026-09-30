@@ -16,6 +16,7 @@ import com.sitepark.ies.userrepository.core.domain.value.GenderType;
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class FinishUserRegistrationUseCase {
 
@@ -78,7 +79,12 @@ public final class FinishUserRegistrationUseCase {
         Email.builder()
             .from(request.emailParameters().from())
             .replyTo(configurer -> configurer.set(request.emailParameters().replyTo()))
-            .to(configurer -> configurer.set(EmailAddress.builder().address(user.email()).build()))
+            .to(
+                configurer ->
+                    configurer.set(
+                        EmailAddress.builder()
+                            .address(Objects.requireNonNull(user.email(), "user.email is null"))
+                            .build()))
             .message(message)
             .build();
     try {

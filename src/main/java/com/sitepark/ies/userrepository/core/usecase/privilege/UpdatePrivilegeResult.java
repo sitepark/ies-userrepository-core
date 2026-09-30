@@ -2,8 +2,7 @@ package com.sitepark.ies.userrepository.core.usecase.privilege;
 
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a privilege update operation.
@@ -28,9 +27,9 @@ import org.jetbrains.annotations.Nullable;
  * @param roleReassignmentResult the result of role reassignments, null if no roles were reassigned
  */
 public record UpdatePrivilegeResult(
-    @NotNull String privilegeId,
-    @NotNull String privilegeName,
-    @NotNull Instant timestamp,
+    String privilegeId,
+    String privilegeName,
+    Instant timestamp,
     @Nullable PatchDocument patch,
     @Nullable PatchDocument revertPatch,
     @Nullable ReassignRolesToPrivilegesResult roleReassignmentResult) {

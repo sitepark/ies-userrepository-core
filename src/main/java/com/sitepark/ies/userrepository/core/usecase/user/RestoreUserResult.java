@@ -2,7 +2,6 @@ package com.sitepark.ies.userrepository.core.usecase.user;
 
 import com.sitepark.ies.userrepository.core.domain.value.UserSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a user restore operation.
@@ -20,7 +19,6 @@ public sealed interface RestoreUserResult {
    *
    * @return the user ID
    */
-  @NotNull
   String userId();
 
   /**
@@ -30,8 +28,7 @@ public sealed interface RestoreUserResult {
    * @param snapshot snapshot of the restored user data including roles
    * @param timestamp when the restore occurred
    */
-  record Restored(
-      @NotNull String userId, @NotNull UserSnapshot snapshot, @NotNull Instant timestamp)
+  record Restored(String userId, UserSnapshot snapshot, Instant timestamp)
       implements RestoreUserResult {}
 
   /**
@@ -40,7 +37,7 @@ public sealed interface RestoreUserResult {
    * @param userId the ID of the user that already exists
    * @param reason explanation why restoration was skipped
    */
-  record Skipped(@NotNull String userId, @NotNull String reason) implements RestoreUserResult {}
+  record Skipped(String userId, String reason) implements RestoreUserResult {}
 
   /**
    * Factory method for creating a restored result.

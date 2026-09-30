@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.User;
@@ -11,6 +12,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,13 +44,15 @@ public final class RestoreUserUseCase {
 
     this.validateUser(user);
 
+    String userId = Objects.requireNonNull(user.id(), "id was validated");
+
     this.checkAccessControl(user);
 
-    if (this.repository.get(user.id()).isPresent()) {
+    if (this.repository.get(userId).isPresent()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Skip restore, user with ID {} already exists.", user.id());
+        LOGGER.info("Skip restore, user with ID {} already exists.", userId);
       }
-      return RestoreUserResult.skipped(user.id(), "User with ID " + user.id() + " already exists");
+      return RestoreUserResult.skipped(userId, "User with ID " + userId + " already exists");
     }
 
     this.validateAnchor(user);
@@ -63,12 +67,10 @@ public final class RestoreUserUseCase {
 
     this.repository.restore(user);
     if (!roleIds.isEmpty()) {
-      String userId = user.id();
-      assert userId != null : "user.id() was validated in validateUser()";
       this.roleAssigner.assignRolesToUsers(List.of(userId), roleIds);
     }
 
-    return RestoreUserResult.restored(user.id(), snapshot, timestamp);
+    return RestoreUserResult.restored(userId, snapshot, timestamp);
   }
 
   private void validateUser(User user) {
@@ -87,11 +89,12 @@ public final class RestoreUserUseCase {
   }
 
   private void validateAnchor(User user) {
-    if (user.anchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(user.anchor());
+    Anchor anchor = user.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(user.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }
