@@ -1,9 +1,11 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +17,7 @@ import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.sharedkernel.security.Permission;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.exception.PrivilegeNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import java.time.Clock;
@@ -181,5 +184,51 @@ class UpdatePrivilegeUseCaseTest {
                 .roleIdentifiers(b -> b.ids("1", "2"))
                 .privilegeIdentifiers(b -> b.id("3"))
                 .build());
+  }
+
+  @Test
+  void testPrivilegeNotFound() {
+    when(this.privilegeAuthorizationService.isWritable("1")).thenReturn(true);
+    when(this.repository.get("1")).thenReturn(Optional.empty());
+    Privilege privilege =
+        Privilege.builder().id("1").name("testPrivilege").permission(new TestPermission()).build();
+
+    assertThrows(
+        PrivilegeNotFoundException.class,
+        () ->
+            this.usecase.updatePrivilege(
+                UpdatePrivilegeRequest.builder().privilege(privilege).build()),
+        "updating a missing privilege should fail");
+  }
+
+  @Test
+  void testUnchangedPrivilegeSkipsRepositoryUpdate() {
+    when(this.privilegeAuthorizationService.isWritable("1")).thenReturn(true);
+    Privilege privilege =
+        Privilege.builder().id("1").name("testPrivilege").permission(new TestPermission()).build();
+    when(this.repository.get("1")).thenReturn(Optional.of(privilege));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    this.usecase.updatePrivilege(UpdatePrivilegeRequest.builder().privilege(privilege).build());
+
+    verify(this.repository, never()).update(any());
+  }
+
+  @Test
+  void testUnchangedPrivilegeHasNoChanges() {
+    when(this.privilegeAuthorizationService.isWritable("1")).thenReturn(true);
+    Privilege privilege =
+        Privilege.builder().id("1").name("testPrivilege").permission(new TestPermission()).build();
+    when(this.repository.get("1")).thenReturn(Optional.of(privilege));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    UpdatePrivilegeResult result =
+        this.usecase.updatePrivilege(UpdatePrivilegeRequest.builder().privilege(privilege).build());
+
+    assertFalse(result.hasAnyChanges(), "unchanged privilege without reassignment has no changes");
   }
 }

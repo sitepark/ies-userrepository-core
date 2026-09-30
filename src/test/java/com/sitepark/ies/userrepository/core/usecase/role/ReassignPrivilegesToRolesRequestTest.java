@@ -1,4 +1,4 @@
-package com.sitepark.ies.userrepository.core.usecase.privilege;
+package com.sitepark.ies.userrepository.core.usecase.role;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,45 +8,45 @@ import com.jparams.verifier.tostring.ToStringVerifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-class ReassignRolesToPrivilegesRequestTest {
+class ReassignPrivilegesToRolesRequestTest {
 
   @Test
   void testEquals() {
-    EqualsVerifier.forClass(ReassignRolesToPrivilegesRequest.class).verify();
+    EqualsVerifier.forClass(ReassignPrivilegesToRolesRequest.class).verify();
   }
 
   @Test
   void testToString() {
-    ToStringVerifier.forClass(ReassignRolesToPrivilegesRequest.class).verify();
+    ToStringVerifier.forClass(ReassignPrivilegesToRolesRequest.class).verify();
   }
 
   @Test
   void testIsEmptyWithoutIdentifiers() {
     assertTrue(
-        ReassignRolesToPrivilegesRequest.builder().build().isEmpty(),
+        ReassignPrivilegesToRolesRequest.builder().build().isEmpty(),
         "request without identifiers should be empty");
   }
 
   @Test
   void testIsEmptyWithoutRoles() {
-    ReassignRolesToPrivilegesRequest request =
-        ReassignRolesToPrivilegesRequest.builder().privilegeIdentifiers(b -> b.id("1")).build();
+    ReassignPrivilegesToRolesRequest request =
+        ReassignPrivilegesToRolesRequest.builder().privilegeIdentifiers(b -> b.id("1")).build();
 
     assertTrue(request.isEmpty(), "request without role identifiers should be empty");
   }
 
   @Test
   void testIsEmptyWithoutPrivileges() {
-    ReassignRolesToPrivilegesRequest request =
-        ReassignRolesToPrivilegesRequest.builder().roleIdentifiers(b -> b.id("1")).build();
+    ReassignPrivilegesToRolesRequest request =
+        ReassignPrivilegesToRolesRequest.builder().roleIdentifiers(b -> b.id("1")).build();
 
     assertTrue(request.isEmpty(), "request without privilege identifiers should be empty");
   }
 
   @Test
   void testIsNotEmptyWithBothSides() {
-    ReassignRolesToPrivilegesRequest request =
-        ReassignRolesToPrivilegesRequest.builder()
+    ReassignPrivilegesToRolesRequest request =
+        ReassignPrivilegesToRolesRequest.builder()
             .roleIdentifiers(b -> b.id("1"))
             .privilegeIdentifiers(b -> b.id("2"))
             .build();
@@ -56,8 +56,8 @@ class ReassignRolesToPrivilegesRequestTest {
 
   @Test
   void testToBuilderBuildEqualsOriginal() {
-    ReassignRolesToPrivilegesRequest request =
-        ReassignRolesToPrivilegesRequest.builder()
+    ReassignPrivilegesToRolesRequest request =
+        ReassignPrivilegesToRolesRequest.builder()
             .roleIdentifiers(b -> b.ids("1", "2"))
             .privilegeIdentifiers(b -> b.ids("3", "4"))
             .build();

@@ -244,4 +244,33 @@ class PrivilegeRoleAssignmentTest {
 
     assertTrue(toString.contains("PrivilegeRoleAssignment"), "toString should contain class name");
   }
+
+  @Test
+  void testToRolePrivilegeAssignmentInvertsAssignments() {
+    PrivilegeRoleAssignment assignment =
+        PrivilegeRoleAssignment.builder()
+            .assignments("privilege1", "role1", "role2")
+            .assignment("privilege2", "role2")
+            .build();
+
+    RolePrivilegeAssignment expected =
+        RolePrivilegeAssignment.builder()
+            .assignment("role1", "privilege1")
+            .assignment("role2", "privilege1")
+            .assignment("role2", "privilege2")
+            .build();
+
+    assertEquals(
+        expected, assignment.toRolePrivilegeAssignment(), "assignments should be inverted");
+  }
+
+  @Test
+  void testToRolePrivilegeAssignmentOfEmptyAssignment() {
+    PrivilegeRoleAssignment assignment = PrivilegeRoleAssignment.builder().build();
+
+    assertEquals(
+        RolePrivilegeAssignment.builder().build(),
+        assignment.toRolePrivilegeAssignment(),
+        "empty assignment should stay empty");
+  }
 }

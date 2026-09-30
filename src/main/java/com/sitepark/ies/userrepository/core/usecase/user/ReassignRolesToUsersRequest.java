@@ -76,7 +76,7 @@ public final class ReassignRolesToUsersRequest {
     private Builder() {}
 
     private Builder(ReassignRolesToUsersRequest request) {
-      this.roleIdentifiers.addAll(request.userIdentifiers);
+      this.roleIdentifiers.addAll(request.roleIdentifiers);
       this.userIdentifiers.addAll(request.userIdentifiers);
     }
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
-import com.sitepark.ies.userrepository.core.usecase.user.AssignRolesToUsersRequest.Builder;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -76,7 +75,7 @@ public final class AssignPrivilegesToRolesRequest {
 
     private Builder(AssignPrivilegesToRolesRequest request) {
       this.privilegeIdentifiers.addAll(request.privilegeIdentifiers);
-      this.roleIdentifiers.addAll(request.privilegeIdentifiers);
+      this.roleIdentifiers.addAll(request.roleIdentifiers);
     }
 
     public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {

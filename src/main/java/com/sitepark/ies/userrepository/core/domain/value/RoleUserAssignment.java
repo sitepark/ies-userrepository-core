@@ -70,7 +70,7 @@ public class RoleUserAssignment {
 
   @Override
   public String toString() {
-    return "PrivilegeRoleAssignment{" + "assignments=" + assignments + '}';
+    return "RoleUserAssignment{" + "assignments=" + assignments + '}';
   }
 
   public Builder toBuilder() {
