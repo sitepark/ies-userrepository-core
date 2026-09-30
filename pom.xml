@@ -385,7 +385,6 @@
 								<rule>
 									<element>BUNDLE</element>
 									<limits>
-										<!-- Measured state when the QA stack was harmonized; raise as tests grow, do not lower. -->
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
@@ -394,7 +393,7 @@
 										<limit>
 											<counter>BRANCH</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.78</minimum>
+											<minimum>0.80</minimum>
 										</limit>
 									</limits>
 								</rule>
