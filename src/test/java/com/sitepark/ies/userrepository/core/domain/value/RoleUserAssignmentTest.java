@@ -241,6 +241,34 @@ class RoleUserAssignmentTest {
 
     String toString = assignment.toString();
 
-    assertTrue(toString.contains("PrivilegeRoleAssignment"), "toString should contain class name");
+    assertTrue(toString.contains("RoleUserAssignment"), "toString should contain class name");
+  }
+
+  @Test
+  void testToUserRoleAssignmentInvertsAssignments() {
+    RoleUserAssignment assignment =
+        RoleUserAssignment.builder()
+            .assignments("role1", "user1", "user2")
+            .assignment("role2", "user2")
+            .build();
+
+    UserRoleAssignment expected =
+        UserRoleAssignment.builder()
+            .assignment("user1", "role1")
+            .assignment("user2", "role1")
+            .assignment("user2", "role2")
+            .build();
+
+    assertEquals(expected, assignment.toUserRoleAssignment(), "assignments should be inverted");
+  }
+
+  @Test
+  void testToUserRoleAssignmentOfEmptyAssignment() {
+    RoleUserAssignment assignment = RoleUserAssignment.builder().build();
+
+    assertEquals(
+        UserRoleAssignment.builder().build(),
+        assignment.toUserRoleAssignment(),
+        "empty assignment should stay empty");
   }
 }

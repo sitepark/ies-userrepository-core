@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
 import com.sitepark.ies.sharedkernel.patch.PatchService;
@@ -638,5 +639,51 @@ class UpdateUserUseCaseTest {
         .createdAt(this.createdAt)
         .changedAt(this.changedAtBefore)
         .build();
+  }
+
+  @Test
+  void testAnchorAlreadyOwnedByOtherUser() {
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
+    when(this.repository.resolveAnchor(Anchor.ofString("user.test"))).thenReturn(Optional.of("55"));
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+
+    assertThrows(
+        AnchorAlreadyExistsException.class,
+        () -> this.useCase.updateUser(UpdateUserRequest.builder().user(user).build()),
+        "anchor owned by another user should be rejected");
+  }
+
+  @Test
+  void testUnchangedUserHasNoChanges() {
+    User storedUser = this.createStoredUser();
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+    UpdateUserResult result =
+        this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    assertEquals(
+        false, result.hasAnyChanges(), "unchanged user without reassignment has no changes");
+  }
+
+  @Test
+  void testUnchangedUserDoesNotNotifyExtensions() {
+    User storedUser = this.createStoredUser();
+    when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
+    when(this.repository.resolveLogin("test")).thenReturn(Optional.of("123"));
+    when(this.repository.get(anyString())).thenReturn(Optional.of(storedUser));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    User user = User.builder().id("123").anchor("user.test").login("test").build();
+    this.useCase.updateUser(UpdateUserRequest.builder().user(user).build());
+
+    verify(this.extensionsNotifier, Mockito.never()).notifyUpdated(any());
   }
 }

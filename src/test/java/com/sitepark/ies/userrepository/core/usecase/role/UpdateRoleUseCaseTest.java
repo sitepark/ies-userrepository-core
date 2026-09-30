@@ -1,10 +1,13 @@
 package com.sitepark.ies.userrepository.core.usecase.role;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +18,7 @@ import com.sitepark.ies.sharedkernel.patch.PatchService;
 import com.sitepark.ies.sharedkernel.patch.PatchServiceFactory;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import com.sitepark.ies.userrepository.core.domain.exception.RoleNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
 import java.time.Clock;
@@ -147,5 +151,62 @@ class UpdateRoleUseCaseTest {
                 .roleIdentifiers(b -> b.id("1"))
                 .privilegeIdentifiers(b -> b.id("12"))
                 .build());
+  }
+
+  @Test
+  void testRoleNotFound() {
+    when(this.roleEntityAuthorizationService.isWritable("1")).thenReturn(true);
+    when(this.repository.get("1")).thenReturn(Optional.empty());
+    Role role = Role.builder().id("1").name("test").build();
+
+    assertThrows(
+        RoleNotFoundException.class,
+        () -> this.useCase.updateRole(UpdateRoleRequest.builder().role(role).build()),
+        "updating a missing role should fail");
+  }
+
+  @Test
+  void testUnchangedRoleSkipsRepositoryUpdate() {
+    when(this.roleEntityAuthorizationService.isWritable("1")).thenReturn(true);
+    Role role = Role.builder().id("1").name("test").build();
+    when(this.repository.get("1")).thenReturn(Optional.of(role));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    this.useCase.updateRole(UpdateRoleRequest.builder().role(role).build());
+
+    verify(this.repository, never()).update(any());
+  }
+
+  @Test
+  void testUnchangedRoleHasNoChanges() {
+    when(this.roleEntityAuthorizationService.isWritable("1")).thenReturn(true);
+    Role role = Role.builder().id("1").name("test").build();
+    when(this.repository.get("1")).thenReturn(Optional.of(role));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(true);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    UpdateRoleResult result =
+        this.useCase.updateRole(UpdateRoleRequest.builder().role(role).build());
+
+    assertFalse(result.hasAnyChanges(), "unchanged role without reassignment has no changes");
+  }
+
+  @Test
+  void testChangedRoleHasRoleChanges() {
+    when(this.roleEntityAuthorizationService.isWritable("1")).thenReturn(true);
+    when(this.repository.get("1"))
+        .thenReturn(Optional.of(Role.builder().id("1").name("old").build()));
+    PatchDocument patch = mock();
+    when(patch.isEmpty()).thenReturn(false);
+    when(this.patchService.createPatch(any(), any())).thenReturn(patch);
+
+    UpdateRoleResult result =
+        this.useCase.updateRole(
+            UpdateRoleRequest.builder().role(Role.builder().id("1").name("new").build()).build());
+
+    assertTrue(result.hasRoleChanges(), "changed role should be reported as changed");
   }
 }
