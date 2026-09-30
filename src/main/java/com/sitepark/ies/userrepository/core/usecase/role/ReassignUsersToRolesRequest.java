@@ -57,7 +57,7 @@ public final class ReassignUsersToRolesRequest {
 
   @Override
   public String toString() {
-    return "ReassignRolesToUsersRequest{"
+    return "ReassignUsersToRolesRequest{"
         + "userIdentifiers="
         + userIdentifiers
         + ", roleIdentifiers="
@@ -76,7 +76,7 @@ public final class ReassignUsersToRolesRequest {
     private Builder() {}
 
     private Builder(ReassignUsersToRolesRequest request) {
-      this.roleIdentifiers.addAll(request.userIdentifiers);
+      this.roleIdentifiers.addAll(request.roleIdentifiers);
       this.userIdentifiers.addAll(request.userIdentifiers);
     }
 

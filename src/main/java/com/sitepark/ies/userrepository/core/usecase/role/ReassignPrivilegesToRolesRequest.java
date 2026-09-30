@@ -57,7 +57,7 @@ public final class ReassignPrivilegesToRolesRequest {
 
   @Override
   public String toString() {
-    return "AssignPrivilegesToRolesRequest{"
+    return "ReassignPrivilegesToRolesRequest{"
         + "privilegeIdentifiers="
         + privilegeIdentifiers
         + ", roleIdentifiers="
@@ -75,7 +75,7 @@ public final class ReassignPrivilegesToRolesRequest {
 
     private Builder(ReassignPrivilegesToRolesRequest request) {
       this.privilegeIdentifiers.addAll(request.privilegeIdentifiers);
-      this.roleIdentifiers.addAll(request.privilegeIdentifiers);
+      this.roleIdentifiers.addAll(request.roleIdentifiers);
     }
 
     public Builder roleIdentifiers(Consumer<IdentifierListBuilder> configurer) {
