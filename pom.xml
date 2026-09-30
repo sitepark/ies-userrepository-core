@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>com.sitepark.ies</groupId>
 			<artifactId>ies-shared-kernel</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -130,14 +130,6 @@
 		</dependency>
 
 		<!-- Test-Dependencies -->
-		<!-- ies-shared-kernel 1.0.0 declares "requires jsr305" in its module-info; needed on the
-		     module path at test runtime until a shared-kernel release without it is used. -->
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>3.0.2</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
