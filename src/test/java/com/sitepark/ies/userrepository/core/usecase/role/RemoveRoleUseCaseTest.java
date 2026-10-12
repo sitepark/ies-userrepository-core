@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import com.sitepark.ies.userrepository.core.domain.exception.RoleNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
 import com.sitepark.ies.userrepository.core.port.RoleRepository;
@@ -122,5 +123,19 @@ class RemoveRoleUseCaseTest {
     this.useCase.removeRole(RemoveRoleRequest.builder().id("2").build());
 
     verify(this.repository).remove("2");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testRoleNotFound() {
+    when(this.roleEntityAuthorizationService.isRemovable(any(String.class))).thenReturn(true);
+    when(this.repository.get("999")).thenReturn(Optional.empty());
+
+    RoleNotFoundException exception =
+        assertThrows(
+            RoleNotFoundException.class,
+            () -> this.useCase.removeRole(RemoveRoleRequest.builder().id("999").build()),
+            "Expected RoleNotFoundException for non-existing role");
+    assertEquals("999", exception.getId(), "Expected the id of the missing role");
   }
 }

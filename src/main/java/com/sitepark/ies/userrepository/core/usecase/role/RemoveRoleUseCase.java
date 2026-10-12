@@ -4,6 +4,7 @@ import static com.sitepark.ies.userrepository.core.domain.entity.Role.BUILT_IN_R
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Role;
+import com.sitepark.ies.userrepository.core.domain.exception.RoleNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.RoleEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.RoleSnapshot;
@@ -55,7 +56,7 @@ public final class RemoveRoleUseCase {
    * @param request the removal request containing the role identifier
    * @return the removal result (either Removed or Skipped)
    * @throws AccessDeniedException if the current user is not allowed to remove roles
-   * @throws IllegalArgumentException if the role does not exist
+   * @throws RoleNotFoundException if the role does not exist
    */
   public RemoveRoleResult removeRole(RemoveRoleRequest request) {
 
@@ -89,8 +90,6 @@ public final class RemoveRoleUseCase {
   }
 
   private Role loadRole(String id) {
-    return this.repository
-        .get(id)
-        .orElseThrow(() -> new IllegalArgumentException("Role with id " + id + " not found."));
+    return this.repository.get(id).orElseThrow(() -> new RoleNotFoundException(id));
   }
 }
