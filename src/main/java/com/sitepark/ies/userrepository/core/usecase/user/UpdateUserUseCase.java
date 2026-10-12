@@ -68,7 +68,7 @@ public final class UpdateUserUseCase {
     User oldUser =
         this.userRepository
             .get(userId)
-            .orElseThrow(() -> new UserNotFoundException("No user with ID " + userId + " found."))
+            .orElseThrow(() -> new UserNotFoundException(userId))
             .toBuilder()
             .build();
 

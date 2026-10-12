@@ -94,6 +94,6 @@ public final class RemoveUserUseCase {
         .orElseThrow(
             () ->
                 new com.sitepark.ies.userrepository.core.domain.exception.UserNotFoundException(
-                    "User with id " + id + " not found."));
+                    id));
   }
 }

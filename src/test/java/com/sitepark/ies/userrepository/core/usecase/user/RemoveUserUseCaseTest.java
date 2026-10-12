@@ -127,14 +127,17 @@ class RemoveUserUseCaseTest {
   }
 
   @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testUserNotFound() {
     when(this.userEntityAuthorizationService.isRemovable(anyString())).thenReturn(true);
     when(this.repository.get("999")).thenReturn(Optional.empty());
 
-    assertThrows(
-        UserNotFoundException.class,
-        () -> this.useCase.removeUser(RemoveUserRequest.builder().id("999").build()),
-        "Should throw UserNotFoundException when user does not exist");
+    UserNotFoundException exception =
+        assertThrows(
+            UserNotFoundException.class,
+            () -> this.useCase.removeUser(RemoveUserRequest.builder().id("999").build()),
+            "Should throw UserNotFoundException when user does not exist");
+    assertEquals("999", exception.getId(), "Expected the id of the missing user");
   }
 
   @Test

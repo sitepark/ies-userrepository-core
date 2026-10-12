@@ -64,10 +64,7 @@ public final class UpdatePrivilegeUseCase {
     Privilege oldPrivilege =
         this.repository
             .get(privilegeId)
-            .orElseThrow(
-                () ->
-                    new PrivilegeNotFoundException(
-                        "No privilege with ID " + privilegeId + " found."))
+            .orElseThrow(() -> new PrivilegeNotFoundException(privilegeId))
             .toBuilder()
             .build();
 

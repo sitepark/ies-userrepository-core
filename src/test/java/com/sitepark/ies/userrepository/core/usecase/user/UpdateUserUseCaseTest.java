@@ -96,14 +96,18 @@ class UpdateUserUseCaseTest {
   }
 
   @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testUpdateUserNotFound() {
 
     when(this.userEntityAuthorizationService.isWritable(anyString())).thenReturn(true);
     User user = User.builder().id("123").anchor("user.test").login("test").build();
 
-    assertThrows(
-        UserNotFoundException.class,
-        () -> this.useCase.updateUser(UpdateUserRequest.builder().user(user).build()));
+    UserNotFoundException exception =
+        assertThrows(
+            UserNotFoundException.class,
+            () -> this.useCase.updateUser(UpdateUserRequest.builder().user(user).build()),
+            "Expected UserNotFoundException for non-existing user");
+    assertEquals("123", exception.getId(), "Expected the id of the missing user");
   }
 
   @Test

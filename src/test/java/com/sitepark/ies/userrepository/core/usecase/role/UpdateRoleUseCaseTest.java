@@ -154,15 +154,18 @@ class UpdateRoleUseCaseTest {
   }
 
   @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testRoleNotFound() {
     when(this.roleEntityAuthorizationService.isWritable("1")).thenReturn(true);
     when(this.repository.get("1")).thenReturn(Optional.empty());
     Role role = Role.builder().id("1").name("test").build();
 
-    assertThrows(
-        RoleNotFoundException.class,
-        () -> this.useCase.updateRole(UpdateRoleRequest.builder().role(role).build()),
-        "updating a missing role should fail");
+    RoleNotFoundException exception =
+        assertThrows(
+            RoleNotFoundException.class,
+            () -> this.useCase.updateRole(UpdateRoleRequest.builder().role(role).build()),
+            "updating a missing role should fail");
+    assertEquals("1", exception.getId(), "Expected the id of the missing role");
   }
 
   @Test

@@ -63,10 +63,7 @@ public final class UpdateRoleUseCase {
     }
 
     Role oldRole =
-        this.repository
-            .get(roleId)
-            .orElseThrow(() -> new RoleNotFoundException("No role with ID " + roleId + " found."))
-            .toBuilder()
+        this.repository.get(roleId).orElseThrow(() -> new RoleNotFoundException(roleId)).toBuilder()
             .build();
 
     Instant timestamp = Instant.now(this.clock);

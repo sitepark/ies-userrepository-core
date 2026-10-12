@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -187,18 +188,21 @@ class UpdatePrivilegeUseCaseTest {
   }
 
   @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
   void testPrivilegeNotFound() {
     when(this.privilegeAuthorizationService.isWritable("1")).thenReturn(true);
     when(this.repository.get("1")).thenReturn(Optional.empty());
     Privilege privilege =
         Privilege.builder().id("1").name("testPrivilege").permission(new TestPermission()).build();
 
-    assertThrows(
-        PrivilegeNotFoundException.class,
-        () ->
-            this.usecase.updatePrivilege(
-                UpdatePrivilegeRequest.builder().privilege(privilege).build()),
-        "updating a missing privilege should fail");
+    PrivilegeNotFoundException exception =
+        assertThrows(
+            PrivilegeNotFoundException.class,
+            () ->
+                this.usecase.updatePrivilege(
+                    UpdatePrivilegeRequest.builder().privilege(privilege).build()),
+            "updating a missing privilege should fail");
+    assertEquals("1", exception.getId(), "Expected the id of the missing privilege");
   }
 
   @Test
