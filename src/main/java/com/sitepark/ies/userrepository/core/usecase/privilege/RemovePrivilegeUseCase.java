@@ -4,6 +4,7 @@ import static com.sitepark.ies.userrepository.core.domain.entity.Privilege.BUILT
 
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.exception.PrivilegeNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.IdentifierResolver;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.domain.value.PrivilegeSnapshot;
@@ -55,7 +56,7 @@ public final class RemovePrivilegeUseCase {
    * @param request the removal request containing the privilege identifier
    * @return the removal result (either Removed or Skipped)
    * @throws AccessDeniedException if the current user is not allowed to remove privileges
-   * @throws IllegalArgumentException if the privilege does not exist
+   * @throws PrivilegeNotFoundException if the privilege does not exist
    */
   public RemovePrivilegeResult removePrivilege(RemovePrivilegeRequest request) {
 
@@ -88,8 +89,6 @@ public final class RemovePrivilegeUseCase {
   }
 
   private Privilege loadPrivilege(String id) {
-    return this.repository
-        .get(id)
-        .orElseThrow(() -> new IllegalArgumentException("Privilege with id " + id + " not found."));
+    return this.repository.get(id).orElseThrow(() -> new PrivilegeNotFoundException(id));
   }
 }

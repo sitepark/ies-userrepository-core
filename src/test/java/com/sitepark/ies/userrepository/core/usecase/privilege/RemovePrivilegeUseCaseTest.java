@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import com.sitepark.ies.userrepository.core.domain.entity.Privilege;
+import com.sitepark.ies.userrepository.core.domain.exception.PrivilegeNotFoundException;
 import com.sitepark.ies.userrepository.core.domain.service.PrivilegeEntityAuthorizationService;
 import com.sitepark.ies.userrepository.core.port.PrivilegeRepository;
 import com.sitepark.ies.userrepository.core.port.RoleAssigner;
@@ -109,5 +110,19 @@ class RemovePrivilegeUseCaseTest {
     this.useCase.removePrivilege(RemovePrivilegeRequest.builder().id("2").build());
 
     verify(this.repository).remove("2");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.UnitTestContainsTooManyAsserts")
+  void testPrivilegeNotFound() {
+    when(this.privilegeAuthorizationService.isRemovable(any(String.class))).thenReturn(true);
+    when(this.repository.get("999")).thenReturn(Optional.empty());
+
+    PrivilegeNotFoundException exception =
+        assertThrows(
+            PrivilegeNotFoundException.class,
+            () -> this.useCase.removePrivilege(RemovePrivilegeRequest.builder().id("999").build()),
+            "Expected PrivilegeNotFoundException for non-existing privilege");
+    assertEquals("999", exception.getId(), "Expected the id of the missing privilege");
   }
 }
