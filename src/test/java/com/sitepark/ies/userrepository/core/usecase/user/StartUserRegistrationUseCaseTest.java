@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -182,7 +183,8 @@ class StartUserRegistrationUseCaseTest {
             "fake-challenge-456",
             Instant.parse("2025-01-01T10:00:00Z"),
             Instant.parse("2025-01-01T11:00:00Z"));
-    when(this.codeVerificationService.createFakeChallenge()).thenReturn(fakeChallenge);
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(fakeChallenge);
 
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
@@ -213,7 +215,8 @@ class StartUserRegistrationUseCaseTest {
     CodeVerificationChallenge fakeChallenge =
         createTestChallenge(
             "fake-challenge-456", fakeCreatedAt, Instant.parse("2025-01-01T11:00:00Z"));
-    when(this.codeVerificationService.createFakeChallenge()).thenReturn(fakeChallenge);
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(fakeChallenge);
 
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
@@ -244,7 +247,8 @@ class StartUserRegistrationUseCaseTest {
     CodeVerificationChallenge fakeChallenge =
         createTestChallenge(
             "fake-challenge-456", Instant.parse("2025-01-01T10:00:00Z"), fakeExpiresAt);
-    when(this.codeVerificationService.createFakeChallenge()).thenReturn(fakeChallenge);
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(fakeChallenge);
 
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
@@ -259,7 +263,7 @@ class StartUserRegistrationUseCaseTest {
   }
 
   @Test
-  void testCallsCreateFakeChallengeWhenEmailAlreadyExists() {
+  void testStartsChallengeForTheEmailWhenEmailAlreadyExists() {
 
     when(this.repository.resolveLogin("test@example.com")).thenReturn(Optional.of("123"));
     User existingUser =
@@ -276,14 +280,18 @@ class StartUserRegistrationUseCaseTest {
             "fake-challenge-456",
             Instant.parse("2025-01-01T10:00:00Z"),
             Instant.parse("2025-01-01T11:00:00Z"));
-    when(this.codeVerificationService.createFakeChallenge()).thenReturn(fakeChallenge);
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(fakeChallenge);
 
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
 
     this.useCase.startUserRegistration(request);
 
-    verify(this.codeVerificationService).createFakeChallenge();
+    verify(this.codeVerificationService)
+        .startChallenge(
+            argThat(
+                (UserRegistrationPayload payload) -> "test@example.com".equals(payload.email())));
   }
 
   @Test
@@ -304,7 +312,8 @@ class StartUserRegistrationUseCaseTest {
             "fake-challenge-456",
             Instant.parse("2025-01-01T10:00:00Z"),
             Instant.parse("2025-01-01T11:00:00Z"));
-    when(this.codeVerificationService.createFakeChallenge()).thenReturn(fakeChallenge);
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(fakeChallenge);
 
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
@@ -380,7 +389,8 @@ class StartUserRegistrationUseCaseTest {
             "fake-challenge-456",
             Instant.parse("2025-01-01T10:00:00Z"),
             Instant.parse("2025-01-01T11:00:00Z"));
-    when(this.codeVerificationService.createFakeChallenge()).thenReturn(fakeChallenge);
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(fakeChallenge);
 
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
@@ -395,6 +405,55 @@ class StartUserRegistrationUseCaseTest {
     EmailAddress replyTo = EmailAddress.builder().address("support@example.com").build();
     EmailMessageThemeIdentifier theme = new EmailMessageThemeIdentifier("default", "light");
     return new ExternalEmailParameters(from, List.of(replyTo), theme, "en");
+  }
+
+  @Test
+  void testSendsNoCodeEmailWhenCodeWasAlreadySent() throws EmailSendException {
+
+    when(this.repository.resolveLogin(anyString())).thenReturn(Optional.empty());
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(createAlreadySentChallenge());
+
+    StartUserRegistrationRequest request =
+        new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
+
+    this.useCase.startUserRegistration(request);
+
+    verify(this.emailService, never()).send(any(Email.class));
+  }
+
+  @Test
+  void testSendsNoEmailAlreadyExistsNotificationWhenAlreadySent() throws EmailSendException {
+
+    when(this.repository.resolveLogin("test@example.com")).thenReturn(Optional.of("123"));
+    User existingUser =
+        User.builder()
+            .id("123")
+            .login("test@example.com")
+            .firstName("Max")
+            .lastName("Mustermann")
+            .build();
+    when(this.repository.get("123")).thenReturn(Optional.of(existingUser));
+    when(this.codeVerificationService.startChallenge(any(UserRegistrationPayload.class)))
+        .thenReturn(createAlreadySentChallenge());
+
+    StartUserRegistrationRequest request =
+        new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
+
+    this.useCase.startUserRegistration(request);
+
+    verify(this.emailService, never()).send(any(Email.class));
+  }
+
+  private CodeVerificationChallenge createAlreadySentChallenge() {
+    return new CodeVerificationChallenge(
+        "challenge-789",
+        123456,
+        new UserRegistrationPayload("test@example.com"),
+        Instant.parse("2025-01-01T10:00:00Z"),
+        Instant.parse("2025-01-01T11:00:00Z"),
+        0,
+        false);
   }
 
   private CodeVerificationChallenge createTestChallenge(

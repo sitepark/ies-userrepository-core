@@ -47,30 +47,34 @@ public final class StartUserRegistrationUseCase {
     Optional<User> user =
         this.repository.resolveLogin(request.email()).flatMap(this.repository::get);
 
-    if (user.isPresent()) {
-      return this.handleEmailAlreadyExists(request, user.get());
-    }
-
     UserRegistrationPayload payload = new UserRegistrationPayload(request.email());
 
+    // A challenge is also started for an existing email address. Its code is never sent, but it
+    // limits the "email already exists" notifications in the same way as the code emails.
     CodeVerificationChallenge challenge = this.codeVerificationService.startChallenge(payload);
 
-    TemplateEmailMessage message =
-        this.createSendCodeEmailMessage(request.emailParameters(), challenge);
-    this.sendEmail(request, message);
+    if (user.isPresent()) {
+      return this.handleEmailAlreadyExists(request, user.get(), challenge);
+    }
+
+    if (challenge.sendCode()) {
+      TemplateEmailMessage message =
+          this.createSendCodeEmailMessage(request.emailParameters(), challenge);
+      this.sendEmail(request, message);
+    }
 
     return new StartUserRegistrationResult(
         challenge.challengeId(), challenge.createdAt(), challenge.expiresAt());
   }
 
   private StartUserRegistrationResult handleEmailAlreadyExists(
-      StartUserRegistrationRequest request, User user) {
+      StartUserRegistrationRequest request, User user, CodeVerificationChallenge challenge) {
 
-    TemplateEmailMessage message =
-        this.createSendEmailAlreadyExistsMessage(request.emailParameters(), user);
-    this.sendEmail(request, message);
-
-    CodeVerificationChallenge challenge = this.codeVerificationService.createFakeChallenge();
+    if (challenge.sendCode()) {
+      TemplateEmailMessage message =
+          this.createSendEmailAlreadyExistsMessage(request.emailParameters(), user);
+      this.sendEmail(request, message);
+    }
 
     return new StartUserRegistrationResult(
         challenge.challengeId(), challenge.createdAt(), challenge.expiresAt());

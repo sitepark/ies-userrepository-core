@@ -520,11 +520,12 @@ class UserTest {
             .build();
     String expected =
         """
-				User [id=100560100000014842, anchor=user.peterpan, login=peterpan,\s\
-				password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE,\s\
-				note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null],\s\
-				identities=[LdapIdentity [server=2, dn=userdn]],\s\
-				roles=[USER, test.anchor, 123]]""";
+        User [id=100560100000014842, anchor=user.peterpan, login=peterpan,\s\
+        password=null, firstname=Peter, lastname=Pan, email=peter.pan@nimmer.land, gender=MALE,\s\
+        note=a note, validity=UserValidity [blocked=false, validFrom=null, validTo=null],\s\
+        identities=[LdapIdentity [server=2, dn=userdn]],\s\
+        roles=[USER, test.anchor, 123]]\
+        """;
     assertEquals(expected, user.toString(), "unexpected string representation");
   }
 
@@ -579,18 +580,19 @@ class UserTest {
 
     String json =
         """
-			{\
-			"id":100560100000014842,\
-			"anchor":"user.peterpan",\
-			"login":"peterpan",\
-			"firstName":"Peter",\
-			"lastName":"Pan",\
-			"email":"peter.pan@nimmer.land",\
-			"gender":"MALE",\
-			"description":"a note",\
-			"identities":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-			"roles":["USER","test.anchor","123"]\
-			}""";
+        {\
+        "id":100560100000014842,\
+        "anchor":"user.peterpan",\
+        "login":"peterpan",\
+        "firstName":"Peter",\
+        "lastName":"Pan",\
+        "email":"peter.pan@nimmer.land",\
+        "gender":"MALE",\
+        "description":"a note",\
+        "identities":[{"@type":"ldap","server":2,"dn":"userdn"}],\
+        "roles":["USER","test.anchor","123"]\
+        }\
+        """;
 
     User user = mapper.readValue(json, User.class);
 
