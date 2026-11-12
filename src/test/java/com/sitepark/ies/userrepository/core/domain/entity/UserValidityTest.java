@@ -233,10 +233,11 @@ class UserValidityTest {
 
     String expected =
         """
-    	{\
-    	"blocked":false,\
-    	"validFrom":"2023-08-21T00:00:00+02:00",\
-    	"validTo":"2023-10-01T00:00:00+02:00"}""";
+        {\
+        "blocked":false,\
+        "validFrom":"2023-08-21T00:00:00+02:00",\
+        "validTo":"2023-10-01T00:00:00+02:00"}\
+        """;
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -251,10 +252,11 @@ class UserValidityTest {
 
     String json =
         """
-    	{\
-    	"blocked":false,\
-    	"validFrom":"2023-08-21T00:00:00+02:00",\
-    	"validTo":"2023-10-01T00:00:00+02:00"}""";
+        {\
+        "blocked":false,\
+        "validFrom":"2023-08-21T00:00:00+02:00",\
+        "validTo":"2023-10-01T00:00:00+02:00"}\
+        """;
 
     UserValidity userValidity = mapper.readValue(json, UserValidity.class);
 

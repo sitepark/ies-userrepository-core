@@ -25,8 +25,10 @@ class UserManagementPermissionTest {
 
     String json = mapper.writeValueAsString(permission);
 
-    String expected = """
-        {"type":"USER_MANAGEMENT","userGrant":{"read":true}}""";
+    String expected =
+        """
+        {"type":"USER_MANAGEMENT","userGrant":{"read":true}}\
+        """;
 
     assertEquals(expected, json, "unexpected json");
   }
@@ -39,8 +41,10 @@ class UserManagementPermissionTest {
     SimpleModule module = new SimpleModule();
     mapper.registerModule(module);
 
-    String json = """
-        {"type":"USER_MANAGEMENT","userGrant":{"read":true}}""";
+    String json =
+        """
+        {"type":"USER_MANAGEMENT","userGrant":{"read":true}}\
+        """;
 
     UserManagementPermission permission = mapper.readValue(json, UserManagementPermission.class);
 
