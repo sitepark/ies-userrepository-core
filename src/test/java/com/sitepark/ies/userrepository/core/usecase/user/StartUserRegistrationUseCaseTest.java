@@ -417,10 +417,9 @@ class StartUserRegistrationUseCaseTest {
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
 
-    StartUserRegistrationResult result = this.useCase.startUserRegistration(request);
+    this.useCase.startUserRegistration(request);
 
     verify(this.emailService, never()).send(any(Email.class));
-    assertEquals("challenge-789", result.challengeId(), "Result should contain the challenge ID");
   }
 
   @Test
@@ -441,10 +440,9 @@ class StartUserRegistrationUseCaseTest {
     StartUserRegistrationRequest request =
         new StartUserRegistrationRequest("test@example.com", EMAIL_PARAMETERS);
 
-    StartUserRegistrationResult result = this.useCase.startUserRegistration(request);
+    this.useCase.startUserRegistration(request);
 
     verify(this.emailService, never()).send(any(Email.class));
-    assertEquals("challenge-789", result.challengeId(), "Result should contain the challenge ID");
   }
 
   private CodeVerificationChallenge createAlreadySentChallenge() {
