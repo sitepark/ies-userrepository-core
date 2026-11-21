@@ -1,7 +1,5 @@
 package com.sitepark.ies.userrepository.core.domain.entity.query;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.domain.entity.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.domain.entity.query.sort.SortCriteria;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@JsonDeserialize(builder = Query.Builder.class)
 public final class Query {
 
   private final Filter filter;
@@ -64,7 +61,6 @@ public final class Query {
     return new Builder(this);
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
   public static class Builder {
 
     protected Filter filter;

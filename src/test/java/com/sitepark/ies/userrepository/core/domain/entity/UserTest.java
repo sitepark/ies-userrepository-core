@@ -6,10 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.userrepository.core.domain.entity.identity.LdapIdentity;
 import com.sitepark.ies.userrepository.core.domain.entity.role.Ref;
 import com.sitepark.ies.userrepository.core.domain.entity.role.UserLevelRoles;
@@ -19,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.TooManyMethods", "PMD.GodClass"})
 @SuppressFBWarnings({
@@ -530,11 +528,14 @@ class UserTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
+  void testSerialize() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     User user =
         User.builder()
@@ -568,49 +569,6 @@ class UserTest {
         """;
 
     assertEquals(expected, json, "unexpected json");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    SimpleModule module = new SimpleModule();
-    mapper.registerModule(module);
-
-    String json =
-        """
-        {\
-        "id":100560100000014842,\
-        "anchor":"user.peterpan",\
-        "login":"peterpan",\
-        "firstName":"Peter",\
-        "lastName":"Pan",\
-        "email":"peter.pan@nimmer.land",\
-        "gender":"MALE",\
-        "description":"a note",\
-        "identities":[{"@type":"ldap","server":2,"dn":"userdn"}],\
-        "roles":["USER","test.anchor","123"]\
-        }\
-        """;
-
-    User user = mapper.readValue(json, User.class);
-
-    User expected =
-        User.builder()
-            .id("100560100000014842")
-            .anchor("user.peterpan")
-            .firstName("Peter")
-            .lastName("Pan")
-            .email("peter.pan@nimmer.land")
-            .gender(GenderType.MALE)
-            .login("peterpan")
-            .roles(UserLevelRoles.USER, Ref.ofAnchor("test.anchor"), Ref.ofId("123"))
-            .identity(TEST_IDENTITY)
-            .description("a note")
-            .build();
-
-    assertEquals(expected, user, "unexpected user");
   }
 
   private User.Builder createBuilderWithRequiredValues() {

@@ -4,15 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.value.permission.UserGrant.Builder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-@JsonDeserialize(builder = PrivilegeGrant.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PrivilegeGrant {
   private final boolean create;
@@ -96,7 +93,6 @@ public class PrivilegeGrant {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   @SuppressWarnings("PMD.TooManyMethods")
   public static final class Builder {
 

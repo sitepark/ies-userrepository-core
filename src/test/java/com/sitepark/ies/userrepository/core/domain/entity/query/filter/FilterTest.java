@@ -1,13 +1,12 @@
 package com.sitepark.ies.userrepository.core.domain.entity.query.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.mock;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sitepark.ies.userrepository.core.domain.entity.databind.DatabindModule;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class FilterTest {
@@ -97,7 +96,8 @@ class FilterTest {
                 com.sitepark.ies.userrepository.core.domain.entity.Anchor.ofString("abc")),
             Filter.and(Filter.lastName("test"), Filter.login("test")));
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonMapper objectMapper =
+        JsonMapper.builder().disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY).build();
     String json = objectMapper.writeValueAsString(filter);
 
     assertEquals(
@@ -106,56 +106,5 @@ class FilterTest {
         """,
         json,
         "unexpected json-data");
-  }
-
-  @Test
-  @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
-  void testDeserialize() throws Exception {
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new DatabindModule());
-
-    String json =
-        """
-        {
-            "or":[
-                {"idList":["6"]},
-                {"anchor":"abc"},
-                {
-                    "and":[
-                        {"login":"login"},
-                        {"firstName":"firstName"},
-                        {
-                            "not":{"lastName":"lastName"}
-                        }
-                    ]
-                }
-            ]
-        }
-        """;
-
-    Filter filter = objectMapper.readValue(json, Filter.class);
-
-    assertInstanceOf(Or.class, filter);
-
-    Or or = (Or) filter;
-
-    assertInstanceOf(IdList.class, or.getOr().get(0));
-    assertInstanceOf(Anchor.class, or.getOr().get(1));
-    assertEquals("abc", ((Anchor) (or.getOr().get(1))).getAnchor().getName(), "wront root");
-    assertInstanceOf(And.class, or.getOr().get(2));
-
-    And and = (And) or.getOr().get(2);
-
-    assertInstanceOf(Login.class, and.getAnd().get(0));
-    assertEquals("login", ((Login) and.getAnd().get(0)).getLogin(), "wront login");
-    assertInstanceOf(FirstName.class, and.getAnd().get(1));
-    assertEquals("firstName", ((FirstName) and.getAnd().get(1)).getFirstName(), "wront first name");
-    assertInstanceOf(Not.class, and.getAnd().get(2));
-
-    Not not = (Not) and.getAnd().get(2);
-
-    assertInstanceOf(LastName.class, not.getNot());
-    assertEquals("lastName", ((LastName) not.getNot()).getLastName(), "wront last name (in not)");
   }
 }

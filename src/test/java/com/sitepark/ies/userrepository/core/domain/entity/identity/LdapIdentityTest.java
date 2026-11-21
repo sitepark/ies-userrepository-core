@@ -4,13 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @SuppressWarnings("PMD.TooManyMethods")
 @SuppressFBWarnings({
@@ -29,13 +27,13 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSetServer() throws JsonProcessingException {
+  void testSetServer() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();
     assertEquals(2, ldapIdentity.getServer(), "unexpected server");
   }
 
   @Test
-  void testSetInvalidServer() throws JsonProcessingException {
+  void testSetInvalidServer() {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
@@ -44,7 +42,7 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSetNullDn() throws JsonProcessingException {
+  void testSetNullDn() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -53,7 +51,7 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSetBlankdDn() throws JsonProcessingException {
+  void testSetBlankdDn() {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
@@ -62,7 +60,7 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testMissingServer() throws JsonProcessingException {
+  void testMissingServer() {
     assertThrows(
         IllegalStateException.class,
         () -> {
@@ -71,7 +69,7 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testMissingDn() throws JsonProcessingException {
+  void testMissingDn() {
     assertThrows(
         IllegalStateException.class,
         () -> {
@@ -80,14 +78,14 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSetDn() throws JsonProcessingException {
+  void testSetDn() {
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();
     assertEquals(USER_DN, ldapIdentity.getDn(), "unexpected server");
   }
 
   @Test
   @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
-  void testToBuilder() throws JsonProcessingException {
+  void testToBuilder() {
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();
 
@@ -98,11 +96,14 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
+  void testSerialize() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().server(2).dn(USER_DN).build();
 
@@ -111,22 +112,5 @@ class LdapIdentityTest {
     String expected = "{\"@type\":\"ldap\",\"server\":2,\"dn\":\"userdn\"}";
 
     assertEquals(expected, json, "unexpected json");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    SimpleModule module = new SimpleModule();
-    mapper.registerModule(module);
-
-    String json = "{\"@type\":\"ldap\",\"server\":2,\"dn\":\"userdn\"}";
-
-    LdapIdentity ldapIdentity = mapper.readValue(json, LdapIdentity.class);
-
-    LdapIdentity expected = LdapIdentity.builder().server(2).dn(USER_DN).build();
-
-    assertEquals(expected, ldapIdentity, "unexpected ldapIdentity");
   }
 }

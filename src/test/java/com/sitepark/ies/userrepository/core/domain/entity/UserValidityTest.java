@@ -6,18 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @SuppressWarnings({
   "PMD.JUnitTestContainsTooManyAsserts",
@@ -40,7 +36,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testToBuilder() throws JsonProcessingException {
+  void testToBuilder() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -58,7 +54,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testToString() throws JsonProcessingException {
+  void testToString() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -76,7 +72,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testAlwaysValid() throws JsonProcessingException {
+  void testAlwaysValid() {
 
     UserValidity userValidity = UserValidity.ALWAYS_VALID;
 
@@ -86,7 +82,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsNowValid() throws JsonProcessingException {
+  void testIsNowValid() {
 
     UserValidity userValidity = UserValidity.builder().blocked(false).build();
 
@@ -94,7 +90,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsValidWithNullBase() throws JsonProcessingException {
+  void testIsValidWithNullBase() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -103,7 +99,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsValidBlocked() throws JsonProcessingException {
+  void testIsValidBlocked() {
 
     UserValidity userValidity = UserValidity.builder().blocked(true).build();
 
@@ -114,7 +110,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsValidFrom() throws JsonProcessingException {
+  void testIsValidFrom() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -128,7 +124,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsNotValidFrom() throws JsonProcessingException {
+  void testIsNotValidFrom() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -142,7 +138,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsValidTo() throws JsonProcessingException {
+  void testIsValidTo() {
 
     OffsetDateTime validTo =
         LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -156,7 +152,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testIsNotValidTo() throws JsonProcessingException {
+  void testIsNotValidTo() {
 
     OffsetDateTime validTo =
         LocalDate.of(2023, 8, 30).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -170,7 +166,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testSetValidFrom() throws JsonProcessingException {
+  void testSetValidFrom() {
 
     OffsetDateTime validFrom =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -183,7 +179,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testSetValidFromToNull() throws JsonProcessingException {
+  void testSetValidFromToNull() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -192,7 +188,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testSetValidTo() throws JsonProcessingException {
+  void testSetValidTo() {
 
     OffsetDateTime validTo =
         LocalDate.of(2023, 8, 21).atStartOfDay().atZone(ZONE_ID).toOffsetDateTime();
@@ -205,7 +201,7 @@ class UserValidityTest {
   }
 
   @Test
-  void testSetValidToToNull() throws JsonProcessingException {
+  void testSetValidToToNull() {
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -214,13 +210,14 @@ class UserValidityTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
+  void testSerialize() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     UserValidity userValidity =
         UserValidity.builder()
@@ -240,43 +237,5 @@ class UserValidityTest {
         """;
 
     assertEquals(expected, json, "unexpected json");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-    String json =
-        """
-        {\
-        "blocked":false,\
-        "validFrom":"2023-08-21T00:00:00+02:00",\
-        "validTo":"2023-10-01T00:00:00+02:00"}\
-        """;
-
-    UserValidity userValidity = mapper.readValue(json, UserValidity.class);
-
-    UserValidity expected =
-        UserValidity.builder()
-            .blocked(false)
-            .validFrom(
-                LocalDate.of(2023, 8, 21)
-                    .atStartOfDay()
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime()
-                    .withOffsetSameInstant(ZoneOffset.UTC))
-            .validTo(
-                LocalDate.of(2023, 10, 1)
-                    .atStartOfDay()
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime()
-                    .withOffsetSameInstant(ZoneOffset.UTC))
-            .build();
-
-    assertEquals(expected, userValidity, "unexpected userValidity");
   }
 }
