@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.ListBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +11,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.TooManyMethods"})
-@JsonDeserialize(builder = UserGrant.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public final class UserGrant {
   private final boolean create;
@@ -124,7 +121,6 @@ public final class UserGrant {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private boolean create;

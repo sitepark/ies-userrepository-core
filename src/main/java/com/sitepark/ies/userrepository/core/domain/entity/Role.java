@@ -2,8 +2,6 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Objects;
@@ -14,7 +12,6 @@ import org.jspecify.annotations.Nullable;
  * allowing for custom role definitions in the application logic.
  */
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
-@JsonDeserialize(builder = Role.Builder.class)
 public final class Role {
 
   public static final String BUILT_IN_ROLE_ID_ADMINISTRATOR = "1";
@@ -93,7 +90,6 @@ public final class Role {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private @Nullable String id;

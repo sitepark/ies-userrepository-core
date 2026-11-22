@@ -22,12 +22,9 @@ module com.sitepark.ies.userrepository.core {
 
   requires static org.jspecify;
   requires jakarta.inject;
-  requires com.fasterxml.jackson.datatype.jdk8;
-  requires com.fasterxml.jackson.datatype.jsr310;
   requires com.sitepark.ies.sharedkernel;
   requires org.apache.logging.log4j;
   requires com.fasterxml.jackson.annotation;
-  requires com.fasterxml.jackson.databind;
   requires jdk.jfr;
 
   opens com.sitepark.ies.userrepository.core.domain.entity;

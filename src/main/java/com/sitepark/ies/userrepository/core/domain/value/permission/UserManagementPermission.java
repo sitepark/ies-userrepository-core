@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.security.Permission;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
-@JsonDeserialize(builder = UserManagementPermission.Builder.class)
 @JsonPropertyOrder({"type", "userGrant", "roleGrant", "privilegeGrant"})
 public final class UserManagementPermission implements Permission {
 
@@ -89,7 +86,6 @@ public final class UserManagementPermission implements Permission {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   @JsonIgnoreProperties({"type"})
   public static final class Builder {
     private @Nullable UserGrant userGrant;

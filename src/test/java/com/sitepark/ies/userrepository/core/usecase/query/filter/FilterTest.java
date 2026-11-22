@@ -3,10 +3,11 @@ package com.sitepark.ies.userrepository.core.usecase.query.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 class FilterTest {
 
@@ -118,7 +119,8 @@ class FilterTest {
             Filter.anchor(com.sitepark.ies.sharedkernel.anchor.Anchor.ofString("abc")),
             Filter.and(Filter.lastName("test"), Filter.login("test")));
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonMapper objectMapper =
+        JsonMapper.builder().disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY).build();
     String json = objectMapper.writeValueAsString(filter);
 
     assertEquals(

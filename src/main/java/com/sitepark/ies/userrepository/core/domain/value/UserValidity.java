@@ -2,8 +2,6 @@ package com.sitepark.ies.userrepository.core.domain.value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.time.Instant;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -12,7 +10,6 @@ import org.jspecify.annotations.Nullable;
  * Encapsulates user properties indicating whether a user is blocked or has a limited validity
  * period.
  */
-@JsonDeserialize(builder = UserValidity.Builder.class)
 @SuppressWarnings("PMD.LawOfDemeter")
 public class UserValidity {
 
@@ -95,7 +92,6 @@ public class UserValidity {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   public static final class Builder {
 

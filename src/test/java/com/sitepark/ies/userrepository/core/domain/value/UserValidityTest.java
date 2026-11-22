@@ -6,16 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 class UserValidityTest {
 
@@ -172,13 +169,14 @@ class UserValidityTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
+  void testSerialize() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     UserValidity userValidity =
         UserValidity.builder()
@@ -198,33 +196,5 @@ class UserValidityTest {
         """;
 
     assertEquals(expected, json, "unexpected json");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-    String json =
-        """
-        {\
-        "blocked":false,\
-        "validFrom":"2023-08-21T00:00:00+02:00",\
-        "validTo":"2023-10-01T00:00:00+02:00"}\
-        """;
-
-    UserValidity userValidity = mapper.readValue(json, UserValidity.class);
-
-    UserValidity expected =
-        UserValidity.builder()
-            .blocked(false)
-            .validFrom(LocalDate.of(2023, 8, 21).atStartOfDay(ZONE_ID).toInstant())
-            .validTo(LocalDate.of(2023, 10, 1).atStartOfDay(ZONE_ID).toInstant())
-            .build();
-
-    assertEquals(expected, userValidity, "unexpected userValidity");
   }
 }

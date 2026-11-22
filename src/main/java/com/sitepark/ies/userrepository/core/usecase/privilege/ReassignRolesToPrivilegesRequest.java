@@ -1,7 +1,5 @@
 package com.sitepark.ies.userrepository.core.usecase.privilege;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.userrepository.core.usecase.privilege.ReassignRolesToPrivilegesRequest.Builder;
@@ -11,7 +9,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
-@JsonDeserialize(builder = ReassignRolesToPrivilegesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 public final class ReassignRolesToPrivilegesRequest {
 
@@ -66,7 +63,6 @@ public final class ReassignRolesToPrivilegesRequest {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private final Set<Identifier> roleIdentifiers = new TreeSet<>();

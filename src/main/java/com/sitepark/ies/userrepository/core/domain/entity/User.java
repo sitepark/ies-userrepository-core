@@ -3,8 +3,6 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.ListBuilder;
@@ -22,7 +20,6 @@ import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.TooManyMethods"})
-@JsonDeserialize(builder = User.Builder.class)
 public final class User {
 
   public static final String BUILT_IN_USER_ID_INITIAL_USER = "1";
@@ -294,7 +291,6 @@ public final class User {
   }
 
   @SuppressWarnings("PMD.TooManyMethods")
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private @Nullable String id;

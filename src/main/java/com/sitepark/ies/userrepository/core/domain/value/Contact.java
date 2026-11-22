@@ -1,13 +1,10 @@
 package com.sitepark.ies.userrepository.core.domain.value;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
-@JsonDeserialize(builder = Contact.Builder.class)
 public final class Contact {
 
   @Nullable private final String phonePrivate;
@@ -59,7 +56,6 @@ public final class Contact {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
     @Nullable private String phonePrivate;
     @Nullable private String phoneOffice;
