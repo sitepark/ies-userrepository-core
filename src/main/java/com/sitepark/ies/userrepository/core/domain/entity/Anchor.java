@@ -1,5 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.sitepark.ies.userrepository.core.domain.exception.InvalidAnchorException;
 import java.io.Serializable;
@@ -54,6 +55,7 @@ public final class Anchor implements Serializable {
     this.name = name;
   }
 
+  @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
   public static Anchor ofString(String name) {
 
     if (name == null) {

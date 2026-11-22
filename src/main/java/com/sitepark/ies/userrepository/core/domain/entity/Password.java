@@ -1,11 +1,8 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.Objects;
 
-@JsonDeserialize(builder = Password.Builder.class)
 public final class Password {
 
   private final String hashAlgorithm;
@@ -71,7 +68,6 @@ public final class Password {
         + "]";
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
   public static final class Builder {
 
     private String hashAlgorithm;

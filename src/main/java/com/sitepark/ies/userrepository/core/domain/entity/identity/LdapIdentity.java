@@ -1,7 +1,5 @@
 package com.sitepark.ies.userrepository.core.domain.entity.identity;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.entity.Identity;
 import java.util.Objects;
 
@@ -10,7 +8,6 @@ import java.util.Objects;
  * LDAP for user authentication. It facilitates user authentication and access
  * control using LDAP credentials.
  */
-@JsonDeserialize(builder = LdapIdentity.Builder.class)
 public final class LdapIdentity implements Identity {
 
   private final int server;
@@ -63,7 +60,6 @@ public final class LdapIdentity implements Identity {
     return true;
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
   public static final class Builder {
 
     private int server;

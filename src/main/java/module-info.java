@@ -18,10 +18,7 @@ module com.sitepark.ies.userrepository.core {
   requires org.apache.logging.log4j;
   requires com.github.spotbugs.annotations;
   requires jakarta.inject;
-  requires transitive com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.annotation;
-  requires com.fasterxml.jackson.datatype.jdk8;
-  requires com.fasterxml.jackson.datatype.jsr310;
   requires org.eclipse.jdt.annotation;
   requires com.sitepark.ies.sharedkernel;
   requires jsr305;

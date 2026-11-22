@@ -1,8 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.sitepark.ies.userrepository.core.domain.entity.role.RoleDeserializer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 
@@ -11,7 +9,6 @@ import java.util.Objects;
  * based on the provided role name, allowing for custom role
  * definitions in the application logic.
  */
-@JsonDeserialize(using = RoleDeserializer.class)
 public class Role {
 
   @JsonValue private final String name;

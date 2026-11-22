@@ -1,8 +1,6 @@
 package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,7 +9,6 @@ import java.util.Optional;
  * Encapsulates user properties indicating whether a user
  * is blocked or has a limited validity period.
  */
-@JsonDeserialize(builder = UserValidity.Builder.class)
 public class UserValidity {
 
   private final boolean blocked;
@@ -108,7 +105,6 @@ public class UserValidity {
         + "]";
   }
 
-  @JsonPOJOBuilder(withPrefix = "", buildMethodName = "build")
   public static final class Builder {
 
     private boolean blocked;

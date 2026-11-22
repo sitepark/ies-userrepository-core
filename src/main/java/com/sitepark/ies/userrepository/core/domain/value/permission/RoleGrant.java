@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.ListBuilder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import java.util.function.Consumer;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-@JsonDeserialize(builder = RoleGrant.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RoleGrant {
   private final boolean create;
@@ -126,7 +123,6 @@ public class RoleGrant {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   @SuppressWarnings("PMD.TooManyMethods")
   public static final class Builder {
 
