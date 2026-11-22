@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.domain.value.permission.UserGrant.Builder;
 import java.util.Objects;
 
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
-@JsonDeserialize(builder = PrivilegeGrant.Builder.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public final class PrivilegeGrant {
   private final boolean create;
@@ -94,7 +91,6 @@ public final class PrivilegeGrant {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private boolean create;

@@ -2,8 +2,6 @@ package com.sitepark.ies.userrepository.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.security.Permission;
@@ -14,7 +12,6 @@ import org.jspecify.annotations.Nullable;
  * Defines user privileges to manage permissions and access control based on the provided privilege
  */
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
-@JsonDeserialize(builder = Privilege.Builder.class)
 public final class Privilege {
 
   public static final String BUILT_IN_PRIVILEGE_ID_FULL_ACCESS = "1";
@@ -104,7 +101,6 @@ public final class Privilege {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private @Nullable String id;

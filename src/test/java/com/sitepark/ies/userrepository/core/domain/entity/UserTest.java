@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
@@ -24,6 +21,8 @@ import java.time.Instant;
 import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 class UserTest {
 
@@ -366,11 +365,14 @@ class UserTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
+  void testSerialize() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     User user =
         User.builder()
@@ -393,35 +395,6 @@ class UserTest {
         """;
 
     assertEquals(expected, json, "unexpected json");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-
-    String json =
-        """
-        {"id":"100560100000014842","anchor":"user.peterpan","firstName":"Peter","lastName":"Pan","email":"peter.pan@nimmer.land","gender":"MALE","description":"a note","login":"peterpan","identities":[{"serverId":"2","dn":"userdn","type":"ldap"}],"validity":{"blocked":false}}\
-        """;
-
-    User user = mapper.readValue(json, User.class);
-
-    User expected =
-        User.builder()
-            .id("100560100000014842")
-            .anchor("user.peterpan")
-            .firstName("Peter")
-            .lastName("Pan")
-            .email("peter.pan@nimmer.land")
-            .gender(GenderType.MALE)
-            .login("peterpan")
-            .identities(b -> b.add(TEST_IDENTITY))
-            .description("a note")
-            .build();
-
-    assertEquals(expected, user, "unexpected user");
   }
 
   private User.Builder createBuilderWithRequiredValues() {

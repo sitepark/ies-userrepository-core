@@ -1,7 +1,5 @@
 package com.sitepark.ies.userrepository.core.usecase.query;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.userrepository.core.usecase.query.filter.Filter;
 import com.sitepark.ies.userrepository.core.usecase.query.limit.Limit;
 import com.sitepark.ies.userrepository.core.usecase.query.sort.SortCriteria;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
-@JsonDeserialize(builder = Query.Builder.class)
 @SuppressWarnings("PMD.LawOfDemeter")
 public final class Query {
 
@@ -63,7 +60,6 @@ public final class Query {
     return new Builder(this);
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static class Builder {
 
     protected @Nullable Filter filter;

@@ -5,14 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 class RoleTest {
 
@@ -124,11 +123,14 @@ class RoleTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
+  void testSerialize() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     Role role =
         Role.builder()
@@ -145,28 +147,5 @@ class RoleTest {
         """;
 
     assertEquals(expected, json, "unexpected json");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-
-    String json =
-        """
-        {"anchor":"myanchor","name":"testrole","description":"description"}\
-        """;
-
-    Role role = mapper.readValue(json, Role.class);
-
-    Role expected =
-        Role.builder()
-            .name("testrole")
-            .anchor(Anchor.ofString("myanchor"))
-            .description("description")
-            .build();
-
-    assertEquals(expected, role, "unexpected role");
   }
 }

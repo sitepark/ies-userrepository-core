@@ -4,14 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.sitepark.ies.userrepository.core.domain.value.Identity;
 import java.util.List;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 class LdapIdentityTest {
 
@@ -72,11 +71,14 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
+  void testSerialize() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
 
@@ -88,11 +90,14 @@ class LdapIdentityTest {
   }
 
   @Test
-  void testSerializeInList() throws JsonProcessingException {
+  void testSerializeInList() {
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-    mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_EMPTY))
+            .build();
 
     LdapIdentity ldapIdentity = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
 
@@ -103,20 +108,5 @@ class LdapIdentityTest {
     String expected = "[{\"serverId\":\"2\",\"dn\":\"userdn\",\"type\":\"ldap\"}]";
 
     assertEquals(expected, json, "unexpected json");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new Jdk8Module());
-
-    String json = "{\"serverId\":\"2\",\"dn\":\"userdn\",\"type\":\"ldap\"}";
-
-    LdapIdentity ldapIdentity = mapper.readValue(json, LdapIdentity.class);
-
-    LdapIdentity expected = LdapIdentity.builder().serverId("2").dn(USER_DN).build();
-
-    assertEquals(expected, ldapIdentity, "unexpected ldapIdentity");
   }
 }

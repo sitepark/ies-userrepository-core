@@ -1,7 +1,5 @@
 package com.sitepark.ies.userrepository.core.usecase.user;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.sharedkernel.base.Updatable;
@@ -13,7 +11,6 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 
-@JsonDeserialize(builder = UpdateUserRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
 public final class UpdateUserRequest {
 
@@ -63,7 +60,6 @@ public final class UpdateUserRequest {
   }
 
   @SuppressWarnings("NullAway.Init")
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private User user;
